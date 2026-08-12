@@ -1,0 +1,20 @@
+{
+  "name": "kafka",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/kafka/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/kafka",
+        "tsConfig": "libs/kafka/tsconfig.lib.json",
+        "packageJson": "libs/kafka/package.json",
+        "main": "libs/kafka/src/index.ts",
+        "assets": ["libs/kafka/*.md"]
+      }
+    }
+  }
+}
