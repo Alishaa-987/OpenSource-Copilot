@@ -27,7 +27,8 @@
       "@osc/observability": ["./libs/observability/src/index.ts"],
       "@osc/shared": ["./libs/shared/src/index.ts"],
       "@osc/database": ["./libs/database/src/index.ts"],
-      "@osc/kafka": ["./libs/kafka/src/index.ts"]
+      "@osc/kafka": ["./libs/kafka/src/index.ts"],
+      "@osc/github": ["./libs/github/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

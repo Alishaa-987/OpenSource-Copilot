@@ -1,0 +1,23 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "declaration": false,
+    "composite": false,
+    "types": ["node"],
+    "noPropertyAccessFromIndexSignature": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true
+  },
+  "include": ["libs/**/src/**/*.ts", "apps/**/src/**/*.ts"],
+  "exclude": [
+    "node_modules",
+    "tmp",
+    "apps/web/**",
+    "apps/*-e2e/**",
+    "**/*.spec.ts",
+    "**/*.test.ts",
+    "**/jest.config.*"
+  ]
+}

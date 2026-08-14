@@ -4,17 +4,6 @@
   "sourceRoot": "libs/observability/src",
   "projectType": "library",
   "tags": [],
-  "targets": {
-    "build": {
-      "executor": "@nx/js:tsc",
-      "outputs": ["{options.outputPath}"],
-      "options": {
-        "outputPath": "dist/libs/observability",
-        "tsConfig": "libs/observability/tsconfig.lib.json",
-        "packageJson": "libs/observability/package.json",
-        "main": "libs/observability/src/index.ts",
-        "assets": ["libs/observability/*.md"]
-      }
-    }
-  }
+  "// targets": "to see all targets run: nx show project observability --web",
+  "targets": {}
 }

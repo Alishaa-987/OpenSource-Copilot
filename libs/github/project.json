@@ -1,0 +1,8 @@
+{
+  "name": "github",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/github/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {}
+}

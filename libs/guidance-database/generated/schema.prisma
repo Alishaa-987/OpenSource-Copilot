@@ -1,0 +1,53 @@
+// Prisma schema for the guidance-service.
+
+// OWNERSHIP: guidance-service owns recommendation data and event-consumption state.
+// It intentionally has no relations to repository-service tables or client.
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../../libs/guidance-database/generated"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("GUIDANCE_DATABASE_URL")
+}
+
+model Recommendation {
+  id           String   @id @default(uuid()) @db.Uuid
+  repositoryId String   @db.Uuid
+  issueId      String?  @db.Uuid
+  score        Decimal  @db.Decimal(12, 6)
+  rank         Int
+  reason       String   @db.Text
+  createdAt    DateTime @default(now()) @db.Timestamptz(3)
+
+  @@unique([repositoryId, rank])
+  @@unique([repositoryId, issueId])
+  @@index([repositoryId, score])
+  @@index([issueId])
+  @@map("recommendations")
+}
+
+model ProcessedEvent {
+  eventId       String   @id @db.Uuid
+  eventType     String
+  version       Int
+  correlationId String
+  processedAt   DateTime @default(now()) @db.Timestamptz(3)
+
+  @@index([processedAt])
+  @@map("processed_events")
+}
+
+model ImportedRepositoryProjection {
+  repositoryId       String   @id @db.Uuid
+  githubRepositoryId String   @unique
+  lastImportedAt     DateTime @db.Timestamptz(3)
+  lastCorrelationId  String
+  createdAt          DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt          DateTime @updatedAt @db.Timestamptz(3)
+
+  @@index([githubRepositoryId])
+  @@map("imported_repository_projections")
+}

@@ -16,7 +16,7 @@ import { resolve } from 'node:path';
  * @returns the relative names of the files that were actually loaded.
  */
 export function loadEnvFiles(cwd: string = process.cwd()): string[] {
-  const nodeEnv = process.env.NODE_ENV ?? 'development';
+  const nodeEnv = process.env['NODE_ENV'] ?? 'development';
   const loaded: string[] = [];
 
   const candidates = [`.env.${nodeEnv}.local`, `.env.local`, `.env.${nodeEnv}`, `.env`];

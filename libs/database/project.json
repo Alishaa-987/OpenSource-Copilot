@@ -4,17 +4,6 @@
   "sourceRoot": "libs/database/src",
   "projectType": "library",
   "tags": [],
-  "targets": {
-    "build": {
-      "executor": "@nx/js:tsc",
-      "outputs": ["{options.outputPath}"],
-      "options": {
-        "outputPath": "dist/libs/database",
-        "tsConfig": "libs/database/tsconfig.lib.json",
-        "packageJson": "libs/database/package.json",
-        "main": "libs/database/src/index.ts",
-        "assets": ["libs/database/*.md"]
-      }
-    }
-  }
+  "// targets": "to see all targets run: nx show project database --web",
+  "targets": {}
 }

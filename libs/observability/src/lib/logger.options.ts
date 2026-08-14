@@ -38,10 +38,13 @@ export function buildLoggerParams(options: LoggerOptions): Params {
         return id;
       },
       // `req.id` is the correlation id (see genReqId); surface it explicitly.
-      customProps: (req: IncomingMessage & { id?: string }) => ({
-        service: serviceName,
-        correlationId: req.id,
-      }),
+      customProps: (req) => {
+        const id = (req as { id?: unknown }).id;
+        return {
+          service: serviceName,
+          correlationId: id === undefined || id === null ? undefined : String(id),
+        };
+      },
       autoLogging: true,
       redact: {
         paths: [

@@ -16,8 +16,10 @@ class FakeRes {
   }
 }
 
-function fakeReq(headers: Record<string, string> = {}): IncomingMessage & { id?: string } {
-  return { headers } as unknown as IncomingMessage & { id?: string };
+function fakeReq(
+  headers: Record<string, string> = {},
+): IncomingMessage & { id?: string; correlationId?: string } {
+  return { headers } as unknown as IncomingMessage & { id?: string; correlationId?: string };
 }
 function fakeRes(): ServerResponse & FakeRes {
   return new FakeRes() as unknown as ServerResponse & FakeRes;
@@ -63,9 +65,13 @@ describe('correlationMiddleware', () => {
 });
 
 describe('buildLoggerParams', () => {
+  type PinoHttpOpts = {
+    level?: string;
+    genReqId?: (req: IncomingMessage, res: ServerResponse) => string;
+    redact?: { paths: string[]; censor: string };
+  };
   const params = buildLoggerParams({ serviceName: 'svc', level: 'debug', pretty: false });
-  const pinoHttp = params.pinoHttp;
-  if (!pinoHttp) throw new Error('pinoHttp params missing');
+  const pinoHttp = params.pinoHttp as unknown as PinoHttpOpts;
 
   it('sets the configured level', () => {
     expect(pinoHttp.level).toBe('debug');
@@ -90,8 +96,8 @@ describe('buildLoggerParams', () => {
   });
 
   it('redacts auth headers, cookies and secret-like fields', () => {
-    const redact = pinoHttp.redact as { paths: string[]; censor: string };
-    expect(redact.paths).toEqual(
+    const redact = pinoHttp.redact;
+    expect(redact?.paths).toEqual(
       expect.arrayContaining([
         'req.headers.authorization',
         'req.headers.cookie',
@@ -100,7 +106,7 @@ describe('buildLoggerParams', () => {
         '*.accessToken',
       ]),
     );
-    expect(redact.censor).toBe('[REDACTED]');
+    expect(redact?.censor).toBe('[REDACTED]');
   });
 
   it('omits the pretty transport when pretty is false', () => {

@@ -1,0 +1,143 @@
+// Prisma schema for the repository-service.
+//
+// OWNERSHIP: repository-service owns and migrates these tables. Other services
+// must not read or write them directly; use service APIs or domain events.
+//
+// SCOPE: OpenSource Copilot Phase 1 data model. This contains persistence
+// foundations only; it does not implement GitHub API integration, AI, or RAG.
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  // Validated at service startup by @osc/config.
+  url      = env("DATABASE_URL")
+}
+
+model MigrationProbe {
+  id        String   @id @default(uuid())
+  note      String
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+
+  @@map("migration_probe")
+}
+
+model User {
+  id                 String             @id @default(uuid()) @db.Uuid
+  githubUserId       BigInt             @unique
+  username           String             @unique
+  displayName        String?
+  avatarUrl          String?
+  createdAt          DateTime           @default(now()) @db.Timestamptz(3)
+  updatedAt          DateTime           @updatedAt @db.Timestamptz(3)
+  repositoryAccesses RepositoryAccess[]
+
+  @@map("users")
+}
+
+model GitHubInstallation {
+  id                   String   @id @default(uuid()) @db.Uuid
+  githubInstallationId BigInt   @unique
+  accountType          String
+  accountLogin         String
+  createdAt            DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt            DateTime @updatedAt @db.Timestamptz(3)
+
+  @@unique([accountType, accountLogin])
+  @@map("github_installations")
+}
+
+model Repository {
+  id                 String               @id @default(uuid()) @db.Uuid
+  githubRepositoryId BigInt               @unique
+  owner              String
+  name               String
+  fullName           String               @unique
+  description        String?              @db.Text
+  url                String
+  stars              Int                  @default(0)
+  forks              Int                  @default(0)
+  language           String?
+  topics             String[]             @default([])
+  license            String?
+  defaultBranch      String
+  openIssuesCount    Int                  @default(0)
+  lastSyncedAt       DateTime?            @db.Timestamptz(3)
+  createdAt          DateTime             @default(now()) @db.Timestamptz(3)
+  updatedAt          DateTime             @updatedAt @db.Timestamptz(3)
+  accessEntries      RepositoryAccess[]
+  documents          RepositoryDocument[]
+  issues             Issue[]
+
+  @@index([owner, name])
+  @@index([lastSyncedAt])
+  @@map("repositories")
+}
+
+model RepositoryAccess {
+  id           String     @id @default(uuid()) @db.Uuid
+  userId       String     @db.Uuid
+  repositoryId String     @db.Uuid
+  accessLevel  String
+  createdAt    DateTime   @default(now()) @db.Timestamptz(3)
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  repository   Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@unique([userId, repositoryId])
+  @@index([userId, repositoryId])
+  @@index([repositoryId, userId])
+  @@map("repository_access")
+}
+
+model RepositoryDocument {
+  id           String     @id @default(uuid()) @db.Uuid
+  repositoryId String     @db.Uuid
+  documentType String
+  path         String
+  content      String     @db.Text
+  sha          String
+  createdAt    DateTime   @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime   @updatedAt @db.Timestamptz(3)
+  repository   Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@unique([repositoryId, path])
+  @@index([repositoryId, documentType])
+  @@index([repositoryId, sha])
+  @@map("repository_documents")
+}
+
+model Issue {
+  id            String       @id @default(uuid()) @db.Uuid
+  repositoryId  String       @db.Uuid
+  githubIssueId BigInt       @unique
+  number        Int
+  title         String
+  body          String?      @db.Text
+  state         String
+  author        String?
+  commentsCount Int          @default(0)
+  url           String
+  createdAt     DateTime     @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime     @updatedAt @db.Timestamptz(3)
+  closedAt      DateTime?    @db.Timestamptz(3)
+  repository    Repository   @relation(fields: [repositoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  labels        IssueLabel[]
+
+  @@unique([repositoryId, number])
+  @@index([repositoryId, state])
+  @@index([repositoryId, number])
+  @@map("issues")
+}
+
+model IssueLabel {
+  id      String @id @default(uuid()) @db.Uuid
+  issueId String @db.Uuid
+  name    String
+  color   String
+  issue   Issue  @relation(fields: [issueId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@unique([issueId, name])
+  @@index([issueId])
+  @@map("issue_labels")
+}

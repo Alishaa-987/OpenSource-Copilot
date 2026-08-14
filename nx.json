@@ -68,5 +68,6 @@
       },
       "exclude": ["apps/gateway-e2e/**/*"]
     }
-  ]
+  ],
+  "analytics": false
 }
