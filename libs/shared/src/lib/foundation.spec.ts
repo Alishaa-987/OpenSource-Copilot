@@ -1,5 +1,5 @@
-import 'reflect-metadata';
-import { ArgumentsHost, BadRequestException } from '@nestjs/common';
+﻿import 'reflect-metadata';
+import { ArgumentsHost, BadRequestException, Logger } from '@nestjs/common';
 import { IsString } from 'class-validator';
 import { correlationStorage } from '@osc/observability';
 import { AllExceptionsFilter } from './all-exceptions.filter';
@@ -60,7 +60,7 @@ describe('AllExceptionsFilter', () => {
 
   it('NEVER leaks internal error detail for unexpected (5xx) errors', () => {
     const { host, captured } = makeHost();
-    // A raw error carrying sensitive text — must not reach the client.
+    // A raw error carrying sensitive text â€” must not reach the client.
     filter.catch(new Error('connect ECONNREFUSED db password=SUPERSECRET'), host);
 
     expect(captured.status).toBe(500);
@@ -75,6 +75,20 @@ describe('AllExceptionsFilter', () => {
     expect(serialised).not.toContain('password');
   });
 
+  it('redacts secret-like values from unexpected-error logs', () => {
+    const loggerErrorSpy = jest.spyOn(Logger.prototype, 'error').mockImplementation();
+    try {
+      const { host } = makeHost();
+      filter.catch(new Error('authorization: Bearer bearer-secret password=SUPERSECRET token=TOKENVALUE'), host);
+      const logOutput = JSON.stringify(loggerErrorSpy.mock.calls);
+      expect(logOutput).not.toContain('bearer-secret');
+      expect(logOutput).not.toContain('SUPERSECRET');
+      expect(logOutput).not.toContain('TOKENVALUE');
+      expect(logOutput).toContain('[REDACTED]');
+    } finally {
+      loggerErrorSpy.mockRestore();
+    }
+  });
   it('uses the correlation id from async-local storage when present', () => {
     const { host, captured } = makeHost();
     correlationStorage.run({ correlationId: 'cid-42' }, () => {
@@ -126,3 +140,4 @@ describe('buildValidationPipe', () => {
     }
   });
 });
+

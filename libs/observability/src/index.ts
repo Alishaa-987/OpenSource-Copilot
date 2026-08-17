@@ -10,3 +10,4 @@ export * from './lib/correlation.service';
 export * from './lib/correlation.middleware';
 export * from './lib/logger.options';
 export * from './lib/observability.module';
+export * from "./lib/metrics.service";

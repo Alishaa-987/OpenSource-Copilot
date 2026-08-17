@@ -120,9 +120,25 @@ exports.Prisma.ImportedRepositoryProjectionScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.IssueIntelligenceScalarFieldEnum = {
+  id: 'id',
+  repositoryId: 'repositoryId',
+  issueId: 'issueId',
+  mappingJson: 'mappingJson',
+  analysisJson: 'analysisJson',
+  sourceVersion: 'sourceVersion',
+  generatedAt: 'generatedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
+};
+
+exports.Prisma.JsonNullValueInput = {
+  JsonNull: Prisma.JsonNull
 };
 
 exports.Prisma.QueryMode = {
@@ -135,11 +151,18 @@ exports.Prisma.NullsOrder = {
   last: 'last'
 };
 
+exports.Prisma.JsonNullValueFilter = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull,
+  AnyNull: Prisma.AnyNull
+};
+
 
 exports.Prisma.ModelName = {
   Recommendation: 'Recommendation',
   ProcessedEvent: 'ProcessedEvent',
-  ImportedRepositoryProjection: 'ImportedRepositoryProjection'
+  ImportedRepositoryProjection: 'ImportedRepositoryProjection',
+  IssueIntelligence: 'IssueIntelligence'
 };
 /**
  * Create the Client
@@ -152,7 +175,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "E:\\mc_project\\libs\\guidance-database\\generated",
+      "value": "e:\\mc_project\\libs\\guidance-database\\generated",
       "fromEnvVar": null
     },
     "config": {
@@ -166,7 +189,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "E:\\mc_project\\apps\\guidance-service\\prisma\\schema.prisma",
+    "sourceFilePath": "e:\\mc_project\\apps\\guidance-service\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
@@ -188,13 +211,13 @@ const config = {
       }
     }
   },
-  "inlineSchema": "// Prisma schema for the guidance-service.\n\n// OWNERSHIP: guidance-service owns recommendation data and event-consumption state.\n// It intentionally has no relations to repository-service tables or client.\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../../../libs/guidance-database/generated\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"GUIDANCE_DATABASE_URL\")\n}\n\nmodel Recommendation {\n  id           String   @id @default(uuid()) @db.Uuid\n  repositoryId String   @db.Uuid\n  issueId      String?  @db.Uuid\n  score        Decimal  @db.Decimal(12, 6)\n  rank         Int\n  reason       String   @db.Text\n  createdAt    DateTime @default(now()) @db.Timestamptz(3)\n\n  @@unique([repositoryId, rank])\n  @@unique([repositoryId, issueId])\n  @@index([repositoryId, score])\n  @@index([issueId])\n  @@map(\"recommendations\")\n}\n\nmodel ProcessedEvent {\n  eventId       String   @id @db.Uuid\n  eventType     String\n  version       Int\n  correlationId String\n  processedAt   DateTime @default(now()) @db.Timestamptz(3)\n\n  @@index([processedAt])\n  @@map(\"processed_events\")\n}\n\nmodel ImportedRepositoryProjection {\n  repositoryId       String   @id @db.Uuid\n  githubRepositoryId String   @unique\n  lastImportedAt     DateTime @db.Timestamptz(3)\n  lastCorrelationId  String\n  createdAt          DateTime @default(now()) @db.Timestamptz(3)\n  updatedAt          DateTime @updatedAt @db.Timestamptz(3)\n\n  @@index([githubRepositoryId])\n  @@map(\"imported_repository_projections\")\n}\n",
-  "inlineSchemaHash": "0ed15d5cbbc767b6e29767f6f12fbf2265bfaa09e9b5396164a9de1793375327",
+  "inlineSchema": "// Prisma schema for the guidance-service.\n\n// OWNERSHIP: guidance-service owns recommendation data and event-consumption state.\n// It intentionally has no relations to repository-service tables or client.\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../../../libs/guidance-database/generated\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"GUIDANCE_DATABASE_URL\")\n}\n\nmodel Recommendation {\n  id           String   @id @default(uuid()) @db.Uuid\n  repositoryId String   @db.Uuid\n  issueId      String?  @db.Uuid\n  score        Decimal  @db.Decimal(12, 6)\n  rank         Int\n  reason       String   @db.Text\n  createdAt    DateTime @default(now()) @db.Timestamptz(3)\n\n  @@unique([repositoryId, rank])\n  @@unique([repositoryId, issueId])\n  @@index([repositoryId, score])\n  @@index([issueId])\n  @@map(\"recommendations\")\n}\n\nmodel ProcessedEvent {\n  eventId       String   @id @map(\"event_id\") @db.Uuid\n  eventType     String   @map(\"event_type\")\n  version       Int\n  correlationId String   @map(\"correlation_id\")\n  processedAt   DateTime @default(now()) @map(\"processed_at\") @db.Timestamptz(3)\n\n  @@index([processedAt])\n  @@map(\"processed_events\")\n}\n\nmodel ImportedRepositoryProjection {\n  repositoryId       String   @id @map(\"repository_id\") @db.Uuid\n  githubRepositoryId String   @unique @map(\"github_repository_id\")\n  lastImportedAt     DateTime @map(\"last_imported_at\") @db.Timestamptz(3)\n  lastCorrelationId  String   @map(\"last_correlation_id\")\n  createdAt          DateTime @default(now()) @map(\"created_at\") @db.Timestamptz(3)\n  updatedAt          DateTime @updatedAt @map(\"updated_at\") @db.Timestamptz(3)\n\n  @@index([githubRepositoryId])\n  @@map(\"imported_repository_projections\")\n}\n\nmodel IssueIntelligence {\n  id            String   @id @default(uuid()) @db.Uuid\n  repositoryId  String   @db.Uuid\n  issueId       String   @db.Uuid\n  mappingJson   Json\n  analysisJson  Json\n  sourceVersion String   @default(\"phase3-v1\")\n  generatedAt   DateTime @default(now()) @db.Timestamptz(3)\n  createdAt     DateTime @default(now()) @db.Timestamptz(3)\n  updatedAt     DateTime @updatedAt @db.Timestamptz(3)\n\n  @@unique([repositoryId, issueId])\n  @@index([repositoryId, updatedAt])\n  @@index([issueId])\n  @@map(\"issue_intelligence\")\n}\n",
+  "inlineSchemaHash": "7d346cab4890fa4d3574a9b64958df2e45084471580bce77f5daa30ef48e0377",
   "copyEngine": true
 }
 config.dirname = '/'
 
-config.runtimeDataModel = JSON.parse("{\"models\":{\"Recommendation\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"repositoryId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"issueId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"score\",\"kind\":\"scalar\",\"type\":\"Decimal\"},{\"name\":\"rank\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"reason\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"recommendations\"},\"ProcessedEvent\":{\"fields\":[{\"name\":\"eventId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"eventType\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"version\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"correlationId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"processedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"processed_events\"},\"ImportedRepositoryProjection\":{\"fields\":[{\"name\":\"repositoryId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"githubRepositoryId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"lastImportedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"lastCorrelationId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"imported_repository_projections\"}},\"enums\":{},\"types\":{}}")
+config.runtimeDataModel = JSON.parse("{\"models\":{\"Recommendation\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"repositoryId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"issueId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"score\",\"kind\":\"scalar\",\"type\":\"Decimal\"},{\"name\":\"rank\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"reason\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"recommendations\"},\"ProcessedEvent\":{\"fields\":[{\"name\":\"eventId\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"event_id\"},{\"name\":\"eventType\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"event_type\"},{\"name\":\"version\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"correlationId\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"correlation_id\"},{\"name\":\"processedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\",\"dbName\":\"processed_at\"}],\"dbName\":\"processed_events\"},\"ImportedRepositoryProjection\":{\"fields\":[{\"name\":\"repositoryId\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"repository_id\"},{\"name\":\"githubRepositoryId\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"github_repository_id\"},{\"name\":\"lastImportedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\",\"dbName\":\"last_imported_at\"},{\"name\":\"lastCorrelationId\",\"kind\":\"scalar\",\"type\":\"String\",\"dbName\":\"last_correlation_id\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\",\"dbName\":\"created_at\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\",\"dbName\":\"updated_at\"}],\"dbName\":\"imported_repository_projections\"},\"IssueIntelligence\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"repositoryId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"issueId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"mappingJson\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"analysisJson\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"sourceVersion\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"generatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"issue_intelligence\"}},\"enums\":{},\"types\":{}}")
 defineDmmfProperty(exports.Prisma, config.runtimeDataModel)
 config.engineWasm = {
   getRuntime: async () => require('./query_engine_bg.js'),

@@ -1,4 +1,4 @@
-import {
+﻿import {
   BadRequestException,
   ForbiddenException,
   Inject,
@@ -15,6 +15,8 @@ import { getCorrelationId } from '@osc/observability';
 import type { Request } from 'express';
 import {
   GitHubRepositoryResponse,
+  ImportedRepositoryResponse,
+  RepositoryIssueResponse,
   ImportRepositoryDto,
   ListRepositoriesQueryDto,
   PublicRepositoryImportDto,
@@ -74,6 +76,36 @@ export class GitHubRepositoryService {
     } catch (error) {
       throw this.toHttpError(error);
     }
+  }
+
+  async getImportedRepository(request: Request, repositoryId: string): Promise<ImportedRepositoryResponse> {
+    const session = await this.sessions.requireSession(request);
+    const repository = await this.prisma.repository.findFirst({
+      where: { id: repositoryId, accessEntries: { some: { userId: session.userId } } },
+    });
+    if (!repository) throw new NotFoundException('Repository not found');
+    return this.mapStoredRepository(repository);
+  }
+
+  async listRepositoryIssues(request: Request, repositoryId: string) {
+    const session = await this.sessions.requireSession(request);
+    const issues = await this.prisma.issue.findMany({
+      where: { repositoryId, state: 'open', repository: { accessEntries: { some: { userId: session.userId } } } },
+      orderBy: [{ updatedAt: 'desc' }, { number: 'asc' }, { id: 'asc' }],
+      take: 1000,
+      include: { labels: true },
+    });
+    return { repositoryId, issues: issues.map((issue) => this.mapIssue(issue)) };
+  }
+
+  async getIssue(request: Request, issueId: string): Promise<RepositoryIssueResponse> {
+    const session = await this.sessions.requireSession(request);
+    const issue = await this.prisma.issue.findFirst({
+      where: { id: issueId, repository: { accessEntries: { some: { userId: session.userId } } } },
+      include: { labels: true },
+    });
+    if (!issue) throw new NotFoundException('Issue not found');
+    return this.mapIssue(issue);
   }
 
   private async importFromGitHub(session: GitHubSession | null, githubRepository: GitHubRepository): Promise<RepositoryImportResponse> {
@@ -158,7 +190,7 @@ export class GitHubRepositoryService {
       event,
     });
     return {
-      repository: this.mapRepository(githubRepository),
+      repository: this.mapStoredRepository(result.repository),
       imported: { documents: documents.length, issues: issues.length, labels: result.labels },
     };
   }
@@ -284,6 +316,24 @@ export class GitHubRepositoryService {
     return 'read';
   }
 
+  private mapStoredRepository(repository: {
+    id: string; githubRepositoryId: bigint; owner: string; name: string; fullName: string;
+    description: string | null; url: string; stars: number; forks: number; language: string | null;
+    topics: string[]; license: string | null; defaultBranch: string; openIssuesCount: number;
+    lastSyncedAt: Date | null; createdAt: Date; updatedAt: Date;
+  }): ImportedRepositoryResponse {
+    return { id: repository.githubRepositoryId.toString(), githubRepositoryId: repository.githubRepositoryId.toString(),
+      repositoryId: repository.id, owner: repository.owner, name: repository.name, fullName: repository.fullName,
+      description: repository.description, url: repository.url, stars: repository.stars, forks: repository.forks,
+      language: repository.language, topics: repository.topics, license: repository.license, defaultBranch: repository.defaultBranch,
+      openIssuesCount: repository.openIssuesCount, lastSyncedAt: repository.lastSyncedAt?.toISOString() ?? null,
+      createdAt: repository.createdAt.toISOString(), updatedAt: repository.updatedAt.toISOString(), };
+  }
+
+  private mapIssue(issue: { id: string; repositoryId: string; githubIssueId: bigint; number: number; title: string; body: string | null; state: string; author: string | null; commentsCount: number; url: string; createdAt: Date; updatedAt: Date; closedAt: Date | null; labels: Array<{ id: string; name: string; color: string }> }): RepositoryIssueResponse {
+    return { ...issue, githubIssueId: issue.githubIssueId.toString(), createdAt: issue.createdAt.toISOString(), updatedAt: issue.updatedAt.toISOString(), closedAt: issue.closedAt?.toISOString() ?? null, labels: issue.labels.map((label) => ({ id: label.id, name: label.name, color: label.color })) };
+  }
+
   private mapRepository(repository: GitHubRepository): GitHubRepositoryResponse {
     return {
       id: String(repository.id),
@@ -312,4 +362,6 @@ export class GitHubRepositoryService {
     return new ServiceUnavailableException('GitHub API is unavailable');
   }
 }
+
+
 

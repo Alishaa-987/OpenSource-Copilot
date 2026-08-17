@@ -28,6 +28,11 @@ export type ProcessedEvent = $Result.DefaultSelection<Prisma.$ProcessedEventPayl
  * 
  */
 export type ImportedRepositoryProjection = $Result.DefaultSelection<Prisma.$ImportedRepositoryProjectionPayload>
+/**
+ * Model IssueIntelligence
+ * 
+ */
+export type IssueIntelligence = $Result.DefaultSelection<Prisma.$IssueIntelligencePayload>
 
 /**
  * ##  Prisma Client ʲˢ
@@ -176,6 +181,16 @@ export class PrismaClient<
     * ```
     */
   get importedRepositoryProjection(): Prisma.ImportedRepositoryProjectionDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.issueIntelligence`: Exposes CRUD operations for the **IssueIntelligence** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more IssueIntelligences
+    * const issueIntelligences = await prisma.issueIntelligence.findMany()
+    * ```
+    */
+  get issueIntelligence(): Prisma.IssueIntelligenceDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -619,7 +634,8 @@ export namespace Prisma {
   export const ModelName: {
     Recommendation: 'Recommendation',
     ProcessedEvent: 'ProcessedEvent',
-    ImportedRepositoryProjection: 'ImportedRepositoryProjection'
+    ImportedRepositoryProjection: 'ImportedRepositoryProjection',
+    IssueIntelligence: 'IssueIntelligence'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -638,7 +654,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "recommendation" | "processedEvent" | "importedRepositoryProjection"
+      modelProps: "recommendation" | "processedEvent" | "importedRepositoryProjection" | "issueIntelligence"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -864,6 +880,80 @@ export namespace Prisma {
           }
         }
       }
+      IssueIntelligence: {
+        payload: Prisma.$IssueIntelligencePayload<ExtArgs>
+        fields: Prisma.IssueIntelligenceFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.IssueIntelligenceFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$IssueIntelligencePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.IssueIntelligenceFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$IssueIntelligencePayload>
+          }
+          findFirst: {
+            args: Prisma.IssueIntelligenceFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$IssueIntelligencePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.IssueIntelligenceFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$IssueIntelligencePayload>
+          }
+          findMany: {
+            args: Prisma.IssueIntelligenceFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$IssueIntelligencePayload>[]
+          }
+          create: {
+            args: Prisma.IssueIntelligenceCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$IssueIntelligencePayload>
+          }
+          createMany: {
+            args: Prisma.IssueIntelligenceCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.IssueIntelligenceCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$IssueIntelligencePayload>[]
+          }
+          delete: {
+            args: Prisma.IssueIntelligenceDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$IssueIntelligencePayload>
+          }
+          update: {
+            args: Prisma.IssueIntelligenceUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$IssueIntelligencePayload>
+          }
+          deleteMany: {
+            args: Prisma.IssueIntelligenceDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.IssueIntelligenceUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.IssueIntelligenceUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$IssueIntelligencePayload>[]
+          }
+          upsert: {
+            args: Prisma.IssueIntelligenceUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$IssueIntelligencePayload>
+          }
+          aggregate: {
+            args: Prisma.IssueIntelligenceAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateIssueIntelligence>
+          }
+          groupBy: {
+            args: Prisma.IssueIntelligenceGroupByArgs<ExtArgs>
+            result: $Utils.Optional<IssueIntelligenceGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.IssueIntelligenceCountArgs<ExtArgs>
+            result: $Utils.Optional<IssueIntelligenceCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -963,6 +1053,7 @@ export namespace Prisma {
     recommendation?: RecommendationOmit
     processedEvent?: ProcessedEventOmit
     importedRepositoryProjection?: ImportedRepositoryProjectionOmit
+    issueIntelligence?: IssueIntelligenceOmit
   }
 
   /* Types for Logging */
@@ -4140,6 +4231,1045 @@ export namespace Prisma {
 
 
   /**
+   * Model IssueIntelligence
+   */
+
+  export type AggregateIssueIntelligence = {
+    _count: IssueIntelligenceCountAggregateOutputType | null
+    _min: IssueIntelligenceMinAggregateOutputType | null
+    _max: IssueIntelligenceMaxAggregateOutputType | null
+  }
+
+  export type IssueIntelligenceMinAggregateOutputType = {
+    id: string | null
+    repositoryId: string | null
+    issueId: string | null
+    sourceVersion: string | null
+    generatedAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type IssueIntelligenceMaxAggregateOutputType = {
+    id: string | null
+    repositoryId: string | null
+    issueId: string | null
+    sourceVersion: string | null
+    generatedAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type IssueIntelligenceCountAggregateOutputType = {
+    id: number
+    repositoryId: number
+    issueId: number
+    mappingJson: number
+    analysisJson: number
+    sourceVersion: number
+    generatedAt: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type IssueIntelligenceMinAggregateInputType = {
+    id?: true
+    repositoryId?: true
+    issueId?: true
+    sourceVersion?: true
+    generatedAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type IssueIntelligenceMaxAggregateInputType = {
+    id?: true
+    repositoryId?: true
+    issueId?: true
+    sourceVersion?: true
+    generatedAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type IssueIntelligenceCountAggregateInputType = {
+    id?: true
+    repositoryId?: true
+    issueId?: true
+    mappingJson?: true
+    analysisJson?: true
+    sourceVersion?: true
+    generatedAt?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type IssueIntelligenceAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which IssueIntelligence to aggregate.
+     */
+    where?: IssueIntelligenceWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of IssueIntelligences to fetch.
+     */
+    orderBy?: IssueIntelligenceOrderByWithRelationInput | IssueIntelligenceOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: IssueIntelligenceWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` IssueIntelligences from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` IssueIntelligences.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned IssueIntelligences
+    **/
+    _count?: true | IssueIntelligenceCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: IssueIntelligenceMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: IssueIntelligenceMaxAggregateInputType
+  }
+
+  export type GetIssueIntelligenceAggregateType<T extends IssueIntelligenceAggregateArgs> = {
+        [P in keyof T & keyof AggregateIssueIntelligence]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateIssueIntelligence[P]>
+      : GetScalarType<T[P], AggregateIssueIntelligence[P]>
+  }
+
+
+
+
+  export type IssueIntelligenceGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: IssueIntelligenceWhereInput
+    orderBy?: IssueIntelligenceOrderByWithAggregationInput | IssueIntelligenceOrderByWithAggregationInput[]
+    by: IssueIntelligenceScalarFieldEnum[] | IssueIntelligenceScalarFieldEnum
+    having?: IssueIntelligenceScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: IssueIntelligenceCountAggregateInputType | true
+    _min?: IssueIntelligenceMinAggregateInputType
+    _max?: IssueIntelligenceMaxAggregateInputType
+  }
+
+  export type IssueIntelligenceGroupByOutputType = {
+    id: string
+    repositoryId: string
+    issueId: string
+    mappingJson: JsonValue
+    analysisJson: JsonValue
+    sourceVersion: string
+    generatedAt: Date
+    createdAt: Date
+    updatedAt: Date
+    _count: IssueIntelligenceCountAggregateOutputType | null
+    _min: IssueIntelligenceMinAggregateOutputType | null
+    _max: IssueIntelligenceMaxAggregateOutputType | null
+  }
+
+  type GetIssueIntelligenceGroupByPayload<T extends IssueIntelligenceGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<IssueIntelligenceGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof IssueIntelligenceGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], IssueIntelligenceGroupByOutputType[P]>
+            : GetScalarType<T[P], IssueIntelligenceGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type IssueIntelligenceSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    repositoryId?: boolean
+    issueId?: boolean
+    mappingJson?: boolean
+    analysisJson?: boolean
+    sourceVersion?: boolean
+    generatedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["issueIntelligence"]>
+
+  export type IssueIntelligenceSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    repositoryId?: boolean
+    issueId?: boolean
+    mappingJson?: boolean
+    analysisJson?: boolean
+    sourceVersion?: boolean
+    generatedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["issueIntelligence"]>
+
+  export type IssueIntelligenceSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    repositoryId?: boolean
+    issueId?: boolean
+    mappingJson?: boolean
+    analysisJson?: boolean
+    sourceVersion?: boolean
+    generatedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["issueIntelligence"]>
+
+  export type IssueIntelligenceSelectScalar = {
+    id?: boolean
+    repositoryId?: boolean
+    issueId?: boolean
+    mappingJson?: boolean
+    analysisJson?: boolean
+    sourceVersion?: boolean
+    generatedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type IssueIntelligenceOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "repositoryId" | "issueId" | "mappingJson" | "analysisJson" | "sourceVersion" | "generatedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["issueIntelligence"]>
+
+  export type $IssueIntelligencePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "IssueIntelligence"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      repositoryId: string
+      issueId: string
+      mappingJson: Prisma.JsonValue
+      analysisJson: Prisma.JsonValue
+      sourceVersion: string
+      generatedAt: Date
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["issueIntelligence"]>
+    composites: {}
+  }
+
+  type IssueIntelligenceGetPayload<S extends boolean | null | undefined | IssueIntelligenceDefaultArgs> = $Result.GetResult<Prisma.$IssueIntelligencePayload, S>
+
+  type IssueIntelligenceCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<IssueIntelligenceFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: IssueIntelligenceCountAggregateInputType | true
+    }
+
+  export interface IssueIntelligenceDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['IssueIntelligence'], meta: { name: 'IssueIntelligence' } }
+    /**
+     * Find zero or one IssueIntelligence that matches the filter.
+     * @param {IssueIntelligenceFindUniqueArgs} args - Arguments to find a IssueIntelligence
+     * @example
+     * // Get one IssueIntelligence
+     * const issueIntelligence = await prisma.issueIntelligence.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends IssueIntelligenceFindUniqueArgs>(args: SelectSubset<T, IssueIntelligenceFindUniqueArgs<ExtArgs>>): Prisma__IssueIntelligenceClient<$Result.GetResult<Prisma.$IssueIntelligencePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one IssueIntelligence that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {IssueIntelligenceFindUniqueOrThrowArgs} args - Arguments to find a IssueIntelligence
+     * @example
+     * // Get one IssueIntelligence
+     * const issueIntelligence = await prisma.issueIntelligence.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends IssueIntelligenceFindUniqueOrThrowArgs>(args: SelectSubset<T, IssueIntelligenceFindUniqueOrThrowArgs<ExtArgs>>): Prisma__IssueIntelligenceClient<$Result.GetResult<Prisma.$IssueIntelligencePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first IssueIntelligence that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {IssueIntelligenceFindFirstArgs} args - Arguments to find a IssueIntelligence
+     * @example
+     * // Get one IssueIntelligence
+     * const issueIntelligence = await prisma.issueIntelligence.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends IssueIntelligenceFindFirstArgs>(args?: SelectSubset<T, IssueIntelligenceFindFirstArgs<ExtArgs>>): Prisma__IssueIntelligenceClient<$Result.GetResult<Prisma.$IssueIntelligencePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first IssueIntelligence that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {IssueIntelligenceFindFirstOrThrowArgs} args - Arguments to find a IssueIntelligence
+     * @example
+     * // Get one IssueIntelligence
+     * const issueIntelligence = await prisma.issueIntelligence.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends IssueIntelligenceFindFirstOrThrowArgs>(args?: SelectSubset<T, IssueIntelligenceFindFirstOrThrowArgs<ExtArgs>>): Prisma__IssueIntelligenceClient<$Result.GetResult<Prisma.$IssueIntelligencePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more IssueIntelligences that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {IssueIntelligenceFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all IssueIntelligences
+     * const issueIntelligences = await prisma.issueIntelligence.findMany()
+     * 
+     * // Get first 10 IssueIntelligences
+     * const issueIntelligences = await prisma.issueIntelligence.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const issueIntelligenceWithIdOnly = await prisma.issueIntelligence.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends IssueIntelligenceFindManyArgs>(args?: SelectSubset<T, IssueIntelligenceFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$IssueIntelligencePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a IssueIntelligence.
+     * @param {IssueIntelligenceCreateArgs} args - Arguments to create a IssueIntelligence.
+     * @example
+     * // Create one IssueIntelligence
+     * const IssueIntelligence = await prisma.issueIntelligence.create({
+     *   data: {
+     *     // ... data to create a IssueIntelligence
+     *   }
+     * })
+     * 
+     */
+    create<T extends IssueIntelligenceCreateArgs>(args: SelectSubset<T, IssueIntelligenceCreateArgs<ExtArgs>>): Prisma__IssueIntelligenceClient<$Result.GetResult<Prisma.$IssueIntelligencePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many IssueIntelligences.
+     * @param {IssueIntelligenceCreateManyArgs} args - Arguments to create many IssueIntelligences.
+     * @example
+     * // Create many IssueIntelligences
+     * const issueIntelligence = await prisma.issueIntelligence.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends IssueIntelligenceCreateManyArgs>(args?: SelectSubset<T, IssueIntelligenceCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many IssueIntelligences and returns the data saved in the database.
+     * @param {IssueIntelligenceCreateManyAndReturnArgs} args - Arguments to create many IssueIntelligences.
+     * @example
+     * // Create many IssueIntelligences
+     * const issueIntelligence = await prisma.issueIntelligence.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many IssueIntelligences and only return the `id`
+     * const issueIntelligenceWithIdOnly = await prisma.issueIntelligence.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends IssueIntelligenceCreateManyAndReturnArgs>(args?: SelectSubset<T, IssueIntelligenceCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$IssueIntelligencePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a IssueIntelligence.
+     * @param {IssueIntelligenceDeleteArgs} args - Arguments to delete one IssueIntelligence.
+     * @example
+     * // Delete one IssueIntelligence
+     * const IssueIntelligence = await prisma.issueIntelligence.delete({
+     *   where: {
+     *     // ... filter to delete one IssueIntelligence
+     *   }
+     * })
+     * 
+     */
+    delete<T extends IssueIntelligenceDeleteArgs>(args: SelectSubset<T, IssueIntelligenceDeleteArgs<ExtArgs>>): Prisma__IssueIntelligenceClient<$Result.GetResult<Prisma.$IssueIntelligencePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one IssueIntelligence.
+     * @param {IssueIntelligenceUpdateArgs} args - Arguments to update one IssueIntelligence.
+     * @example
+     * // Update one IssueIntelligence
+     * const issueIntelligence = await prisma.issueIntelligence.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends IssueIntelligenceUpdateArgs>(args: SelectSubset<T, IssueIntelligenceUpdateArgs<ExtArgs>>): Prisma__IssueIntelligenceClient<$Result.GetResult<Prisma.$IssueIntelligencePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more IssueIntelligences.
+     * @param {IssueIntelligenceDeleteManyArgs} args - Arguments to filter IssueIntelligences to delete.
+     * @example
+     * // Delete a few IssueIntelligences
+     * const { count } = await prisma.issueIntelligence.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends IssueIntelligenceDeleteManyArgs>(args?: SelectSubset<T, IssueIntelligenceDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more IssueIntelligences.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {IssueIntelligenceUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many IssueIntelligences
+     * const issueIntelligence = await prisma.issueIntelligence.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends IssueIntelligenceUpdateManyArgs>(args: SelectSubset<T, IssueIntelligenceUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more IssueIntelligences and returns the data updated in the database.
+     * @param {IssueIntelligenceUpdateManyAndReturnArgs} args - Arguments to update many IssueIntelligences.
+     * @example
+     * // Update many IssueIntelligences
+     * const issueIntelligence = await prisma.issueIntelligence.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more IssueIntelligences and only return the `id`
+     * const issueIntelligenceWithIdOnly = await prisma.issueIntelligence.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends IssueIntelligenceUpdateManyAndReturnArgs>(args: SelectSubset<T, IssueIntelligenceUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$IssueIntelligencePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one IssueIntelligence.
+     * @param {IssueIntelligenceUpsertArgs} args - Arguments to update or create a IssueIntelligence.
+     * @example
+     * // Update or create a IssueIntelligence
+     * const issueIntelligence = await prisma.issueIntelligence.upsert({
+     *   create: {
+     *     // ... data to create a IssueIntelligence
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the IssueIntelligence we want to update
+     *   }
+     * })
+     */
+    upsert<T extends IssueIntelligenceUpsertArgs>(args: SelectSubset<T, IssueIntelligenceUpsertArgs<ExtArgs>>): Prisma__IssueIntelligenceClient<$Result.GetResult<Prisma.$IssueIntelligencePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of IssueIntelligences.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {IssueIntelligenceCountArgs} args - Arguments to filter IssueIntelligences to count.
+     * @example
+     * // Count the number of IssueIntelligences
+     * const count = await prisma.issueIntelligence.count({
+     *   where: {
+     *     // ... the filter for the IssueIntelligences we want to count
+     *   }
+     * })
+    **/
+    count<T extends IssueIntelligenceCountArgs>(
+      args?: Subset<T, IssueIntelligenceCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], IssueIntelligenceCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a IssueIntelligence.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {IssueIntelligenceAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends IssueIntelligenceAggregateArgs>(args: Subset<T, IssueIntelligenceAggregateArgs>): Prisma.PrismaPromise<GetIssueIntelligenceAggregateType<T>>
+
+    /**
+     * Group by IssueIntelligence.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {IssueIntelligenceGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends IssueIntelligenceGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: IssueIntelligenceGroupByArgs['orderBy'] }
+        : { orderBy?: IssueIntelligenceGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, IssueIntelligenceGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetIssueIntelligenceGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the IssueIntelligence model
+   */
+  readonly fields: IssueIntelligenceFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for IssueIntelligence.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__IssueIntelligenceClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the IssueIntelligence model
+   */
+  interface IssueIntelligenceFieldRefs {
+    readonly id: FieldRef<"IssueIntelligence", 'String'>
+    readonly repositoryId: FieldRef<"IssueIntelligence", 'String'>
+    readonly issueId: FieldRef<"IssueIntelligence", 'String'>
+    readonly mappingJson: FieldRef<"IssueIntelligence", 'Json'>
+    readonly analysisJson: FieldRef<"IssueIntelligence", 'Json'>
+    readonly sourceVersion: FieldRef<"IssueIntelligence", 'String'>
+    readonly generatedAt: FieldRef<"IssueIntelligence", 'DateTime'>
+    readonly createdAt: FieldRef<"IssueIntelligence", 'DateTime'>
+    readonly updatedAt: FieldRef<"IssueIntelligence", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * IssueIntelligence findUnique
+   */
+  export type IssueIntelligenceFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the IssueIntelligence
+     */
+    select?: IssueIntelligenceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the IssueIntelligence
+     */
+    omit?: IssueIntelligenceOmit<ExtArgs> | null
+    /**
+     * Filter, which IssueIntelligence to fetch.
+     */
+    where: IssueIntelligenceWhereUniqueInput
+  }
+
+  /**
+   * IssueIntelligence findUniqueOrThrow
+   */
+  export type IssueIntelligenceFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the IssueIntelligence
+     */
+    select?: IssueIntelligenceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the IssueIntelligence
+     */
+    omit?: IssueIntelligenceOmit<ExtArgs> | null
+    /**
+     * Filter, which IssueIntelligence to fetch.
+     */
+    where: IssueIntelligenceWhereUniqueInput
+  }
+
+  /**
+   * IssueIntelligence findFirst
+   */
+  export type IssueIntelligenceFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the IssueIntelligence
+     */
+    select?: IssueIntelligenceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the IssueIntelligence
+     */
+    omit?: IssueIntelligenceOmit<ExtArgs> | null
+    /**
+     * Filter, which IssueIntelligence to fetch.
+     */
+    where?: IssueIntelligenceWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of IssueIntelligences to fetch.
+     */
+    orderBy?: IssueIntelligenceOrderByWithRelationInput | IssueIntelligenceOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for IssueIntelligences.
+     */
+    cursor?: IssueIntelligenceWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` IssueIntelligences from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` IssueIntelligences.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of IssueIntelligences.
+     */
+    distinct?: IssueIntelligenceScalarFieldEnum | IssueIntelligenceScalarFieldEnum[]
+  }
+
+  /**
+   * IssueIntelligence findFirstOrThrow
+   */
+  export type IssueIntelligenceFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the IssueIntelligence
+     */
+    select?: IssueIntelligenceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the IssueIntelligence
+     */
+    omit?: IssueIntelligenceOmit<ExtArgs> | null
+    /**
+     * Filter, which IssueIntelligence to fetch.
+     */
+    where?: IssueIntelligenceWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of IssueIntelligences to fetch.
+     */
+    orderBy?: IssueIntelligenceOrderByWithRelationInput | IssueIntelligenceOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for IssueIntelligences.
+     */
+    cursor?: IssueIntelligenceWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` IssueIntelligences from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` IssueIntelligences.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of IssueIntelligences.
+     */
+    distinct?: IssueIntelligenceScalarFieldEnum | IssueIntelligenceScalarFieldEnum[]
+  }
+
+  /**
+   * IssueIntelligence findMany
+   */
+  export type IssueIntelligenceFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the IssueIntelligence
+     */
+    select?: IssueIntelligenceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the IssueIntelligence
+     */
+    omit?: IssueIntelligenceOmit<ExtArgs> | null
+    /**
+     * Filter, which IssueIntelligences to fetch.
+     */
+    where?: IssueIntelligenceWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of IssueIntelligences to fetch.
+     */
+    orderBy?: IssueIntelligenceOrderByWithRelationInput | IssueIntelligenceOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing IssueIntelligences.
+     */
+    cursor?: IssueIntelligenceWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` IssueIntelligences from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` IssueIntelligences.
+     */
+    skip?: number
+    distinct?: IssueIntelligenceScalarFieldEnum | IssueIntelligenceScalarFieldEnum[]
+  }
+
+  /**
+   * IssueIntelligence create
+   */
+  export type IssueIntelligenceCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the IssueIntelligence
+     */
+    select?: IssueIntelligenceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the IssueIntelligence
+     */
+    omit?: IssueIntelligenceOmit<ExtArgs> | null
+    /**
+     * The data needed to create a IssueIntelligence.
+     */
+    data: XOR<IssueIntelligenceCreateInput, IssueIntelligenceUncheckedCreateInput>
+  }
+
+  /**
+   * IssueIntelligence createMany
+   */
+  export type IssueIntelligenceCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many IssueIntelligences.
+     */
+    data: IssueIntelligenceCreateManyInput | IssueIntelligenceCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * IssueIntelligence createManyAndReturn
+   */
+  export type IssueIntelligenceCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the IssueIntelligence
+     */
+    select?: IssueIntelligenceSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the IssueIntelligence
+     */
+    omit?: IssueIntelligenceOmit<ExtArgs> | null
+    /**
+     * The data used to create many IssueIntelligences.
+     */
+    data: IssueIntelligenceCreateManyInput | IssueIntelligenceCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * IssueIntelligence update
+   */
+  export type IssueIntelligenceUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the IssueIntelligence
+     */
+    select?: IssueIntelligenceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the IssueIntelligence
+     */
+    omit?: IssueIntelligenceOmit<ExtArgs> | null
+    /**
+     * The data needed to update a IssueIntelligence.
+     */
+    data: XOR<IssueIntelligenceUpdateInput, IssueIntelligenceUncheckedUpdateInput>
+    /**
+     * Choose, which IssueIntelligence to update.
+     */
+    where: IssueIntelligenceWhereUniqueInput
+  }
+
+  /**
+   * IssueIntelligence updateMany
+   */
+  export type IssueIntelligenceUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update IssueIntelligences.
+     */
+    data: XOR<IssueIntelligenceUpdateManyMutationInput, IssueIntelligenceUncheckedUpdateManyInput>
+    /**
+     * Filter which IssueIntelligences to update
+     */
+    where?: IssueIntelligenceWhereInput
+    /**
+     * Limit how many IssueIntelligences to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * IssueIntelligence updateManyAndReturn
+   */
+  export type IssueIntelligenceUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the IssueIntelligence
+     */
+    select?: IssueIntelligenceSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the IssueIntelligence
+     */
+    omit?: IssueIntelligenceOmit<ExtArgs> | null
+    /**
+     * The data used to update IssueIntelligences.
+     */
+    data: XOR<IssueIntelligenceUpdateManyMutationInput, IssueIntelligenceUncheckedUpdateManyInput>
+    /**
+     * Filter which IssueIntelligences to update
+     */
+    where?: IssueIntelligenceWhereInput
+    /**
+     * Limit how many IssueIntelligences to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * IssueIntelligence upsert
+   */
+  export type IssueIntelligenceUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the IssueIntelligence
+     */
+    select?: IssueIntelligenceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the IssueIntelligence
+     */
+    omit?: IssueIntelligenceOmit<ExtArgs> | null
+    /**
+     * The filter to search for the IssueIntelligence to update in case it exists.
+     */
+    where: IssueIntelligenceWhereUniqueInput
+    /**
+     * In case the IssueIntelligence found by the `where` argument doesn't exist, create a new IssueIntelligence with this data.
+     */
+    create: XOR<IssueIntelligenceCreateInput, IssueIntelligenceUncheckedCreateInput>
+    /**
+     * In case the IssueIntelligence was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<IssueIntelligenceUpdateInput, IssueIntelligenceUncheckedUpdateInput>
+  }
+
+  /**
+   * IssueIntelligence delete
+   */
+  export type IssueIntelligenceDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the IssueIntelligence
+     */
+    select?: IssueIntelligenceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the IssueIntelligence
+     */
+    omit?: IssueIntelligenceOmit<ExtArgs> | null
+    /**
+     * Filter which IssueIntelligence to delete.
+     */
+    where: IssueIntelligenceWhereUniqueInput
+  }
+
+  /**
+   * IssueIntelligence deleteMany
+   */
+  export type IssueIntelligenceDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which IssueIntelligences to delete
+     */
+    where?: IssueIntelligenceWhereInput
+    /**
+     * Limit how many IssueIntelligences to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * IssueIntelligence without action
+   */
+  export type IssueIntelligenceDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the IssueIntelligence
+     */
+    select?: IssueIntelligenceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the IssueIntelligence
+     */
+    omit?: IssueIntelligenceOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -4189,12 +5319,34 @@ export namespace Prisma {
   export type ImportedRepositoryProjectionScalarFieldEnum = (typeof ImportedRepositoryProjectionScalarFieldEnum)[keyof typeof ImportedRepositoryProjectionScalarFieldEnum]
 
 
+  export const IssueIntelligenceScalarFieldEnum: {
+    id: 'id',
+    repositoryId: 'repositoryId',
+    issueId: 'issueId',
+    mappingJson: 'mappingJson',
+    analysisJson: 'analysisJson',
+    sourceVersion: 'sourceVersion',
+    generatedAt: 'generatedAt',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type IssueIntelligenceScalarFieldEnum = (typeof IssueIntelligenceScalarFieldEnum)[keyof typeof IssueIntelligenceScalarFieldEnum]
+
+
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
   };
 
   export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+  export const JsonNullValueInput: {
+    JsonNull: typeof JsonNull
+  };
+
+  export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
   export const QueryMode: {
@@ -4211,6 +5363,15 @@ export namespace Prisma {
   };
 
   export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+  export const JsonNullValueFilter: {
+    DbNull: typeof DbNull,
+    JsonNull: typeof JsonNull,
+    AnyNull: typeof AnyNull
+  };
+
+  export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
 
   /**
@@ -4271,6 +5432,20 @@ export namespace Prisma {
    * Reference to a field of type 'DateTime[]'
    */
   export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'Json'
+   */
+  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+  /**
+   * Reference to a field of type 'QueryMode'
+   */
+  export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
     
 
 
@@ -4468,6 +5643,79 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"ImportedRepositoryProjection"> | Date | string
   }
 
+  export type IssueIntelligenceWhereInput = {
+    AND?: IssueIntelligenceWhereInput | IssueIntelligenceWhereInput[]
+    OR?: IssueIntelligenceWhereInput[]
+    NOT?: IssueIntelligenceWhereInput | IssueIntelligenceWhereInput[]
+    id?: UuidFilter<"IssueIntelligence"> | string
+    repositoryId?: UuidFilter<"IssueIntelligence"> | string
+    issueId?: UuidFilter<"IssueIntelligence"> | string
+    mappingJson?: JsonFilter<"IssueIntelligence">
+    analysisJson?: JsonFilter<"IssueIntelligence">
+    sourceVersion?: StringFilter<"IssueIntelligence"> | string
+    generatedAt?: DateTimeFilter<"IssueIntelligence"> | Date | string
+    createdAt?: DateTimeFilter<"IssueIntelligence"> | Date | string
+    updatedAt?: DateTimeFilter<"IssueIntelligence"> | Date | string
+  }
+
+  export type IssueIntelligenceOrderByWithRelationInput = {
+    id?: SortOrder
+    repositoryId?: SortOrder
+    issueId?: SortOrder
+    mappingJson?: SortOrder
+    analysisJson?: SortOrder
+    sourceVersion?: SortOrder
+    generatedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type IssueIntelligenceWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    repositoryId_issueId?: IssueIntelligenceRepositoryIdIssueIdCompoundUniqueInput
+    AND?: IssueIntelligenceWhereInput | IssueIntelligenceWhereInput[]
+    OR?: IssueIntelligenceWhereInput[]
+    NOT?: IssueIntelligenceWhereInput | IssueIntelligenceWhereInput[]
+    repositoryId?: UuidFilter<"IssueIntelligence"> | string
+    issueId?: UuidFilter<"IssueIntelligence"> | string
+    mappingJson?: JsonFilter<"IssueIntelligence">
+    analysisJson?: JsonFilter<"IssueIntelligence">
+    sourceVersion?: StringFilter<"IssueIntelligence"> | string
+    generatedAt?: DateTimeFilter<"IssueIntelligence"> | Date | string
+    createdAt?: DateTimeFilter<"IssueIntelligence"> | Date | string
+    updatedAt?: DateTimeFilter<"IssueIntelligence"> | Date | string
+  }, "id" | "repositoryId_issueId">
+
+  export type IssueIntelligenceOrderByWithAggregationInput = {
+    id?: SortOrder
+    repositoryId?: SortOrder
+    issueId?: SortOrder
+    mappingJson?: SortOrder
+    analysisJson?: SortOrder
+    sourceVersion?: SortOrder
+    generatedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: IssueIntelligenceCountOrderByAggregateInput
+    _max?: IssueIntelligenceMaxOrderByAggregateInput
+    _min?: IssueIntelligenceMinOrderByAggregateInput
+  }
+
+  export type IssueIntelligenceScalarWhereWithAggregatesInput = {
+    AND?: IssueIntelligenceScalarWhereWithAggregatesInput | IssueIntelligenceScalarWhereWithAggregatesInput[]
+    OR?: IssueIntelligenceScalarWhereWithAggregatesInput[]
+    NOT?: IssueIntelligenceScalarWhereWithAggregatesInput | IssueIntelligenceScalarWhereWithAggregatesInput[]
+    id?: UuidWithAggregatesFilter<"IssueIntelligence"> | string
+    repositoryId?: UuidWithAggregatesFilter<"IssueIntelligence"> | string
+    issueId?: UuidWithAggregatesFilter<"IssueIntelligence"> | string
+    mappingJson?: JsonWithAggregatesFilter<"IssueIntelligence">
+    analysisJson?: JsonWithAggregatesFilter<"IssueIntelligence">
+    sourceVersion?: StringWithAggregatesFilter<"IssueIntelligence"> | string
+    generatedAt?: DateTimeWithAggregatesFilter<"IssueIntelligence"> | Date | string
+    createdAt?: DateTimeWithAggregatesFilter<"IssueIntelligence"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"IssueIntelligence"> | Date | string
+  }
+
   export type RecommendationCreateInput = {
     id?: string
     repositoryId: string
@@ -4653,6 +5901,90 @@ export namespace Prisma {
     githubRepositoryId?: StringFieldUpdateOperationsInput | string
     lastImportedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     lastCorrelationId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type IssueIntelligenceCreateInput = {
+    id?: string
+    repositoryId: string
+    issueId: string
+    mappingJson: JsonNullValueInput | InputJsonValue
+    analysisJson: JsonNullValueInput | InputJsonValue
+    sourceVersion?: string
+    generatedAt?: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type IssueIntelligenceUncheckedCreateInput = {
+    id?: string
+    repositoryId: string
+    issueId: string
+    mappingJson: JsonNullValueInput | InputJsonValue
+    analysisJson: JsonNullValueInput | InputJsonValue
+    sourceVersion?: string
+    generatedAt?: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type IssueIntelligenceUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    repositoryId?: StringFieldUpdateOperationsInput | string
+    issueId?: StringFieldUpdateOperationsInput | string
+    mappingJson?: JsonNullValueInput | InputJsonValue
+    analysisJson?: JsonNullValueInput | InputJsonValue
+    sourceVersion?: StringFieldUpdateOperationsInput | string
+    generatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type IssueIntelligenceUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    repositoryId?: StringFieldUpdateOperationsInput | string
+    issueId?: StringFieldUpdateOperationsInput | string
+    mappingJson?: JsonNullValueInput | InputJsonValue
+    analysisJson?: JsonNullValueInput | InputJsonValue
+    sourceVersion?: StringFieldUpdateOperationsInput | string
+    generatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type IssueIntelligenceCreateManyInput = {
+    id?: string
+    repositoryId: string
+    issueId: string
+    mappingJson: JsonNullValueInput | InputJsonValue
+    analysisJson: JsonNullValueInput | InputJsonValue
+    sourceVersion?: string
+    generatedAt?: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type IssueIntelligenceUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    repositoryId?: StringFieldUpdateOperationsInput | string
+    issueId?: StringFieldUpdateOperationsInput | string
+    mappingJson?: JsonNullValueInput | InputJsonValue
+    analysisJson?: JsonNullValueInput | InputJsonValue
+    sourceVersion?: StringFieldUpdateOperationsInput | string
+    generatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type IssueIntelligenceUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    repositoryId?: StringFieldUpdateOperationsInput | string
+    issueId?: StringFieldUpdateOperationsInput | string
+    mappingJson?: JsonNullValueInput | InputJsonValue
+    analysisJson?: JsonNullValueInput | InputJsonValue
+    sourceVersion?: StringFieldUpdateOperationsInput | string
+    generatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -4936,6 +6268,92 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
+  export type JsonFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type IssueIntelligenceRepositoryIdIssueIdCompoundUniqueInput = {
+    repositoryId: string
+    issueId: string
+  }
+
+  export type IssueIntelligenceCountOrderByAggregateInput = {
+    id?: SortOrder
+    repositoryId?: SortOrder
+    issueId?: SortOrder
+    mappingJson?: SortOrder
+    analysisJson?: SortOrder
+    sourceVersion?: SortOrder
+    generatedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type IssueIntelligenceMaxOrderByAggregateInput = {
+    id?: SortOrder
+    repositoryId?: SortOrder
+    issueId?: SortOrder
+    sourceVersion?: SortOrder
+    generatedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type IssueIntelligenceMinOrderByAggregateInput = {
+    id?: SortOrder
+    repositoryId?: SortOrder
+    issueId?: SortOrder
+    sourceVersion?: SortOrder
+    generatedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+  export type JsonWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedJsonFilter<$PrismaModel>
+    _max?: NestedJsonFilter<$PrismaModel>
+  }
 
   export type StringFieldUpdateOperationsInput = {
     set?: string
@@ -5159,6 +6577,29 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedDateTimeFilter<$PrismaModel>
     _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+  export type NestedJsonFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<NestedJsonFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
 

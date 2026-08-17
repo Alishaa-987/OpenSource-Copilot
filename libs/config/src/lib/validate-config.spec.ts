@@ -1,4 +1,4 @@
-import { z } from 'zod';
+﻿import { z } from 'zod';
 import {
   baseEnvSchema,
   booleanFromString,
@@ -62,7 +62,7 @@ describe('validateConfig', () => {
       error = e as ConfigValidationError;
     }
     expect(error).toBeInstanceOf(ConfigValidationError);
-    const joined = error!.issues.join('\n');
+    const joined = error?.issues.join('\n') ?? '';
     expect(joined).toContain('DATABASE_URL');
     expect(joined).toContain('REDIS_URL');
     expect(joined).toContain('KAFKA_BROKERS');
@@ -123,3 +123,4 @@ describe('booleanFromString', () => {
     expect(() => schema.parse({ FLAG: 'maybe' })).toThrow();
   });
 });
+

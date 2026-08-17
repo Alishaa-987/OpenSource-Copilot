@@ -1,4 +1,4 @@
-import {
+﻿import {
   ArgumentsHost,
   Catch,
   ExceptionFilter,
@@ -45,13 +45,19 @@ function reasonPhrase(status: number): string {
  * Catch-all exception filter that serialises **every** error into the single
  * {@link ApiErrorResponse} contract.
  *
- * Security requirement — "Do not return sensitive internal errors to clients":
+ * Security requirement â€” "Do not return sensitive internal errors to clients":
  *  - `HttpException`s (our own 4xx/expected errors) expose their client-safe
  *    message and reason phrase only.
  *  - Any other error (unexpected, 5xx) returns a **generic** message; the real
  *    exception (with stack) is logged server-side under the correlation id and
  *    NEVER placed in the response body.
  */
+function sanitizeExceptionForLog(exception: unknown): string {
+  const detail = exception instanceof Error ? exception.stack ?? exception.message : String(exception);
+  return detail
+    .replace(/(authorization\s*[:=]\s*bearer\s+)[^\s,]+/gi, '$1[REDACTED]')
+    .replace(/((?:cookie|password|secret|token|accessToken|refreshToken|api[_-]?key|client[_-]?secret)\s*[:=]\s*)[^\s,;)]*/gi, '$1[REDACTED]');
+}
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
   private readonly logger = new Logger(AllExceptionsFilter.name);
@@ -86,11 +92,11 @@ export class AllExceptionsFilter implements ExceptionFilter {
     }
 
     // Log the full error server-side (with stack for 5xx). This is the ONLY
-    // place internal detail is recorded — it never reaches the client.
+    // place internal detail is recorded â€” it never reaches the client.
     if (statusCode >= HttpStatus.INTERNAL_SERVER_ERROR) {
       this.logger.error(
         `Unhandled exception [${correlationId}] ${request?.method ?? ''} ${path}`,
-        exception instanceof Error ? exception.stack : String(exception),
+        sanitizeExceptionForLog(exception),
       );
     } else {
       this.logger.warn(
@@ -110,3 +116,5 @@ export class AllExceptionsFilter implements ExceptionFilter {
     response.status(statusCode).json(payload);
   }
 }
+
+

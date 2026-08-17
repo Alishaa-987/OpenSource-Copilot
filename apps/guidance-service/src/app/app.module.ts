@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { AppConfigModule } from '@osc/config';
 import { KafkaModule } from '@osc/kafka';
 import { ObservabilityModule } from '@osc/observability';
@@ -9,6 +9,8 @@ import { AppService } from './app.service';
 import { guidanceEnvSchema } from './env';
 import { HealthController } from './health.controller';
 import { RepositoryImportedConsumer } from './events/repository-imported.consumer';
+import { ContributorIntelligenceModule } from './contributor-intelligence/contributor-intelligence.module';
+import { RecommendationsModule } from './recommendations/recommendations.module';
 
 @Module({
   imports: [
@@ -22,12 +24,10 @@ import { RepositoryImportedConsumer } from './events/repository-imported.consume
     KafkaModule.forRoot({ producerName: 'guidance-service' }),
     HealthModule,
     GuidanceDatabaseModule,
+    RecommendationsModule,
+    ContributorIntelligenceModule,
   ],
   controllers: [AppController, HealthController],
   providers: [AppService, RepositoryImportedConsumer],
 })
 export class AppModule {}
-
-
-
-

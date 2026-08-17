@@ -1,57 +1,71 @@
-import { DynamicModule, INestApplication, Type } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
-import { Logger, correlationMiddleware } from '@osc/observability';
-import { AllExceptionsFilter } from './all-exceptions.filter';
-import { buildValidationPipe } from './validation';
+import { DynamicModule, INestApplication, Type } from "@nestjs/common";
+import { NestFactory } from "@nestjs/core";
+import { json, urlencoded } from "express";
+import type { NextFunction, Request, Response } from "express";
+import { TypedConfigService } from "@osc/config";
+import { Logger, correlationMiddleware, MetricsService } from "@osc/observability";
+import { AllExceptionsFilter } from "./all-exceptions.filter";
+import { buildValidationPipe } from "./validation";
+import { RateLimitService } from "./rate-limit/rate-limit.service";
 
 export interface BootstrapOptions {
-  /** Logical service name (used in the startup log line). */
   serviceName: string;
-  /** TCP port to listen on (validated from `PORT` at startup). */
   port: number;
-  /** Route prefix for all controllers. Defaults to `api`. */
   globalPrefix?: string;
 }
 
-/**
- * Creates and starts a Nest HTTP application with the shared runtime posture:
- *  - pino structured logging as the app logger (buffered until wired),
- *  - correlation-id middleware (async-local storage + `x-correlation-id`),
- *  - a global `ValidationPipe` (whitelist + safe error output),
- *  - the global {@link AllExceptionsFilter} (uniform, leak-free error bodies),
- *  - graceful shutdown hooks.
- *
- * Each service's `main.ts` calls this with its own `AppModule`, so the wiring is
- * identical and defined in exactly one place.
- */
-export async function bootstrapService(
-  appModule: Type<unknown> | DynamicModule,
-  options: BootstrapOptions,
-): Promise<INestApplication> {
-  const app = await NestFactory.create(appModule, { bufferLogs: true });
+function isExemptFromRateLimit(path: string): boolean {
+  return path.endsWith("/health/live") || path.endsWith("/metrics");
+}
 
-  // Route Nest's logs through pino, then flush anything buffered during startup.
+export async function bootstrapService(appModule: Type<unknown> | DynamicModule, options: BootstrapOptions): Promise<INestApplication> {
+  const app = await NestFactory.create(appModule, { bufferLogs: true, bodyParser: false });
   app.useLogger(app.get(Logger));
-
-  // Correlation context for every request (applied app-wide, not per-route, to
-  // avoid Express path-matching entirely).
+  app.use(json({ limit: "100kb", strict: true }));
+  app.use(urlencoded({ extended: false, limit: "100kb" }));
+  app.use((request: Request, response: Response, next: NextFunction) => {
+    response.setHeader("X-Content-Type-Options", "nosniff");
+    response.setHeader("X-Frame-Options", "DENY");
+    response.setHeader("Referrer-Policy", "no-referrer");
+    response.setHeader("Permissions-Policy", "camera=(), geolocation=(), microphone=()");
+    next();
+  });
   app.use(correlationMiddleware);
-
-  const prefix = options.globalPrefix ?? 'api';
+  const metrics = app.get(MetricsService);
+  app.use((request: Request, response: Response, next: NextFunction) => {
+    const startedAt = Date.now();
+    response.once("finish", () => {
+      metrics.recordHttpRequest(request.method, request.path || request.url, response.statusCode, Date.now() - startedAt);
+    });
+    next();
+  });
+  const config = app.get(TypedConfigService) as TypedConfigService<Record<string, unknown>>;
+  const limiter = app.get(RateLimitService);
+  const enabled = config.get("RATE_LIMIT_ENABLED") as boolean;
+  const maxRequests = config.get("RATE_LIMIT_MAX_REQUESTS") as number;
+  const windowSeconds = config.get("RATE_LIMIT_WINDOW_SECONDS") as number;
+  if (enabled) {
+    app.use(async (request: Request, response: Response, next: NextFunction) => {
+      if (isExemptFromRateLimit(request.path || request.url)) { next(); return; }
+      const address = request.socket.remoteAddress || request.ip || "unknown";
+      const subject = address + "|" + (request.path || request.url).split("?")[0];
+      const result = await limiter.consume(subject, maxRequests, windowSeconds);
+      response.setHeader("X-RateLimit-Limit", String(result.limit));
+      response.setHeader("X-RateLimit-Remaining", String(result.remaining));
+      if (!result.allowed) {
+        response.setHeader("Retry-After", String(result.retryAfterSeconds));
+        response.status(429).json({ code: "RATE_LIMITED", message: "Too many requests" });
+        return;
+      }
+      next();
+    });
+  }
+  const prefix = options.globalPrefix || "api";
   app.setGlobalPrefix(prefix);
-
   app.useGlobalPipes(buildValidationPipe());
   app.useGlobalFilters(new AllExceptionsFilter());
-
   app.enableShutdownHooks();
-
   await app.listen(options.port);
-
-  const logger = app.get(Logger);
-  logger.log(
-    `${options.serviceName} listening on port ${options.port} (prefix "/${prefix}")`,
-    'Bootstrap',
-  );
-
+  app.get(Logger).log(options.serviceName + " listening on port " + options.port + " (prefix /" + prefix + ")", "Bootstrap");
   return app;
 }

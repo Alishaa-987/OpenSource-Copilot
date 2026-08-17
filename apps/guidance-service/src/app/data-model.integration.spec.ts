@@ -1,3 +1,4 @@
+// eslint-disable-next-line @nx/enforce-module-boundaries
 import { Prisma, PrismaClient } from '../../../../libs/guidance-database/generated';
 
 const integration = process.env['RUN_INTEGRATION'] === '1' ? it : it.skip;

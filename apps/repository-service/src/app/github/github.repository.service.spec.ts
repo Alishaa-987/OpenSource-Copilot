@@ -30,7 +30,7 @@ function makeService() {
   };
   const sessions = { requireSession: jest.fn().mockResolvedValue({ sessionId: 's', userId: 'u', token: 't', githubUserId: 7n, username: 'octocat', expiresAt: new Date().toISOString() }) };
   const tx = {
-    repository: { upsert: jest.fn().mockResolvedValue({ id: '11111111-1111-4111-8111-111111111111' }) },
+    repository: { upsert: jest.fn().mockResolvedValue({ id: '11111111-1111-4111-8111-111111111111', githubRepositoryId: 123n, owner: 'acme', name: 'copilot', fullName: 'acme/copilot', description: 'A repository', url: 'https://github.com/acme/copilot', stars: 12, forks: 2, language: 'TypeScript', topics: ['copilot'], license: 'MIT', defaultBranch: 'main', openIssuesCount: 3, lastSyncedAt: new Date('2026-01-01T00:00:00.000Z'), createdAt: new Date('2026-01-01T00:00:00.000Z'), updatedAt: new Date('2026-01-01T00:00:00.000Z') }) },
     repositoryAccess: { upsert: jest.fn() },
     repositoryDocument: { upsert: jest.fn() },
     issue: { upsert: jest.fn() },

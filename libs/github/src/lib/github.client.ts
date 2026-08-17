@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import {
   GitHubComment,
@@ -36,7 +36,9 @@ export class GitHubClient {
     this.http = axios.create({
       baseURL: options.apiBaseUrl.replace(/\/$/, ''),
       timeout: options.timeoutMs,
-      maxRedirects: 3,
+      maxContentLength: 5 * 1024 * 1024,
+      maxBodyLength: 5 * 1024 * 1024,
+      maxRedirects: 0,
       headers: {
         Accept: 'application/vnd.github+json',
         'X-GitHub-Api-Version': options.apiVersion,
@@ -93,8 +95,9 @@ export class GitHubClient {
       },
     });
     const items = this.parseArray(GitHubRepositorySchema, response.data, '/user/repos');
-    const filtered = query.search
-      ? items.filter((repository) => repository.full_name.toLowerCase().includes(query.search!.toLowerCase()))
+    const normalizedSearch = query.search?.toLowerCase();
+    const filtered = normalizedSearch
+      ? items.filter((repository) => repository.full_name.toLowerCase().includes(normalizedSearch))
       : items;
     return { items: filtered, pageInfo: this.pageInfo(response, query.page, query.perPage, items.length) };
   }
@@ -289,3 +292,6 @@ export class GitHubClient {
     return Number.isFinite(parsed) ? parsed : null;
   }
 }
+
+
+

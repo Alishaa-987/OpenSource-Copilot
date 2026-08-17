@@ -3,6 +3,7 @@ import { Redis } from 'ioredis';
 import { TypedConfigService } from '@osc/config';
 import { REDIS_CLIENT, REDIS_OPTIONS, RedisModuleOptions } from './redis.constants';
 import { RedisService } from './redis.service';
+import { RateLimitService } from '../rate-limit/rate-limit.service';
 
 /**
  * Provides a single, shared ioredis client wired from `REDIS_URL`.
@@ -37,8 +38,8 @@ export class RedisModule {
 
     return {
       module: RedisModule,
-      providers: [optionsProvider, clientProvider, RedisService],
-      exports: [RedisService, REDIS_CLIENT],
+      providers: [optionsProvider, clientProvider, RedisService, RateLimitService],
+      exports: [RedisService, REDIS_CLIENT, RateLimitService],
     };
   }
 }

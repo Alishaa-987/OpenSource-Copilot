@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query, Req, Res } from '@nestjs/common';
+﻿import { Body, Controller, Get, HttpException, HttpStatus, Param, ParseUUIDPipe, Post, Query, Req, Res } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { GitHubRepositoryService } from './github.repository.service';
 import {
@@ -12,6 +12,7 @@ import { GitHubSessionService } from './github.session.service';
 
 @Controller('v1/github')
 export class GitHubController {
+  private readonly publicImportAttempts = new Map<string, number[]>();
   constructor(
     private readonly sessions: GitHubSessionService,
     private readonly repositories: GitHubRepositoryService,
@@ -29,6 +30,7 @@ export class GitHubController {
   ) {
     const result = await this.sessions.completeOAuth(query.code, query.state);
     response.cookie(this.sessions.cookieName(), result.session.sessionId, this.sessions.cookieOptions());
+    if (result.returnTo) return response.redirect(result.returnTo);
     return { user: result.user, expiresAt: result.expiresAt };
   }
 
@@ -54,8 +56,47 @@ export class GitHubController {
     return this.repositories.importRepository(request, body);
   }
 
+  @Get('repositories/:repositoryId')
+  getRepository(@Req() request: Request, @Param('repositoryId', new ParseUUIDPipe()) repositoryId: string) {
+    return this.repositories.getImportedRepository(request, repositoryId);
+  }
+
+  @Get('repositories/:repositoryId/issues')
+  listRepositoryIssues(@Req() request: Request, @Param('repositoryId', new ParseUUIDPipe()) repositoryId: string) {
+    return this.repositories.listRepositoryIssues(request, repositoryId);
+  }
+
+  @Get('issues/:issueId')
+  getIssue(@Req() request: Request, @Param('issueId', new ParseUUIDPipe()) issueId: string) {
+    return this.repositories.getIssue(request, issueId);
+  }
   @Post('repositories/import/public')
-  importPublicRepository(@Body() body: PublicRepositoryImportDto) {
+  importPublicRepository(@Req() request: Request, @Body() body: PublicRepositoryImportDto) {
+    this.enforcePublicImportLimit(request);
     return this.repositories.importPublicRepository(body);
   }
+
+  private enforcePublicImportLimit(request: Request): void {
+    const now = Date.now();
+    const windowStart = now - 60_000;
+    const key = request.ip || request.socket.remoteAddress || 'unknown';
+    const attempts = (this.publicImportAttempts.get(key) ?? []).filter((timestamp) => timestamp > windowStart);
+    if (attempts.length >= 10) {
+      throw new HttpException('Too many public repository imports', HttpStatus.TOO_MANY_REQUESTS);
+    }
+    attempts.push(now);
+    this.publicImportAttempts.set(key, attempts);
+    if (this.publicImportAttempts.size > 10_000) {
+      for (const [clientKey, clientAttempts] of this.publicImportAttempts) {
+        if (clientAttempts.every((timestamp) => timestamp <= windowStart)) {
+          this.publicImportAttempts.delete(clientKey);
+        }
+      }
+    }
+  }
 }
+
+
+
+
+

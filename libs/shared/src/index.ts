@@ -13,3 +13,4 @@ export * from './lib/redis/redis.service';
 export * from './lib/redis/redis.module';
 export * from './lib/health/service-health.indicator';
 export * from './lib/health/health.module';
+export * from "./lib/rate-limit/rate-limit.service";

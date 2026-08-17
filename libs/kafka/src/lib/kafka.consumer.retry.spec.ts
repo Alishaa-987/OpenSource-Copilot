@@ -1,21 +1,28 @@
-import { KafkaConsumerService } from './kafka.consumer';
+﻿import { KafkaConsumerService } from './kafka.consumer';
 import { CorrelationService } from '@osc/observability';
 import { CORRELATION_ID_KAFKA_HEADER } from '@osc/contracts';
+import type { Kafka } from 'kafkajs';
 
 class FakeConsumer {
-  runConfig?: { eachMessage: (payload: any) => Promise<void> };
-  async connect(): Promise<void> {}
-  async subscribe(): Promise<void> {}
-  async run(config: { eachMessage: (payload: any) => Promise<void> }): Promise<void> {
+  runConfig?: { eachMessage: (payload: unknown) => Promise<void> };
+  async connect(): Promise<void> {
+    return Promise.resolve();
+  }
+  async subscribe(): Promise<void> {
+    return Promise.resolve();
+  }
+  async run(config: { eachMessage: (payload: unknown) => Promise<void> }): Promise<void> {
     this.runConfig = config;
   }
-  async disconnect(): Promise<void> {}
+  async disconnect(): Promise<void> {
+    return Promise.resolve();
+  }
 }
 
 describe('KafkaConsumerService raw event handling', () => {
   function makeConsumer() {
     const consumer = new FakeConsumer();
-    const kafka = { consumer: () => consumer } as any;
+    const kafka = { consumer: () => consumer } as unknown as Kafka;
     const correlation = new CorrelationService();
     const service = new KafkaConsumerService(kafka, { producerName: 'guidance-service', consumerGroup: 'guidance-service' }, correlation);
     return { service, consumer, correlation };
@@ -57,3 +64,5 @@ describe('KafkaConsumerService raw event handling', () => {
     expect(handler).toHaveBeenCalledTimes(2);
   });
 });
+
+

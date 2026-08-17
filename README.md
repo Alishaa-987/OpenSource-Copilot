@@ -1,88 +1,230 @@
-﻿# Backend Foundation
+# OpenSource Copilot — Backend
 
-This repository contains the phase-one backend foundation for OpenSource Copilot. The backend uses an Nx classic path-based workspace with three NestJS applications: gateway, repository-service, and guidance-service. The existing apps/web frontend remains outside the backend project graph and is intentionally untouched.
+A modular NestJS/Nx backend for OpenSource Copilot: import GitHub repositories, generate deterministic beginner-friendly issue recommendations, and provide a retrieval-augmented generation (RAG) layer for repository-aware Q&A and contributor intelligence.
 
-## Service map
+> **Scope note:** `apps/web` is a standalone Next.js frontend. It is managed independently and is intentionally excluded from the backend Nx project graph.
 
-| Service | Default port | Responsibilities | Readiness dependencies |
-|---|---:|---|---|
-| gateway | 3000 | HTTP entrypoint and edge-facing foundation | Redis, Kafka |
-| repository-service | 3001 | PostgreSQL/Prisma owner and repository boundary | PostgreSQL, Redis, Kafka |
-| guidance-service | 3002 | Guidance service foundation | Redis, Kafka |
+---
 
-Every service uses the shared configuration, observability, validation, exception, correlation, and health primitives. Configuration is loaded from dotenv files and validated with Zod at startup. Invalid configuration stops startup; secret values are not included in validation errors or logs.
+## Architecture
 
-## Local infrastructure
+The backend is an Nx classic path-based monorepo with four NestJS applications and shared libraries.
 
-Copy .env.example to .env and keep real credentials out of version control. The example values are local-development placeholders only.
+| Service | Port | Responsibilities | Infrastructure dependencies |
+|---|---|---|---|
+| `gateway` | 3000 | HTTP entrypoint, health, and shared edge foundation | Redis, Kafka |
+| `repository-service` | 3001 | GitHub OAuth, repository import, repository/issue data ownership, internal knowledge-source API | PostgreSQL, Redis, Kafka |
+| `guidance-service` | 3002 | Deterministic recommendations, contributor intelligence, event projections | PostgreSQL, Redis, Kafka |
+| `knowledge-service` | 3003 | Document chunking, embeddings, Qdrant vector storage, RAG ask/retrieve endpoints | Redis, Kafka, Qdrant |
 
-Start PostgreSQL, Redis, and Kafka with:
+Shared libraries (`libs/*`) provide configuration, contracts, observability, health, exception handling, Redis, Kafka, GitHub client, and database modules.
 
-    npm run infra:up
+---
 
-Inspect infrastructure logs with:
+## Technology stack
 
-    npm run infra:logs
+- **Runtime:** Node.js, NestJS 11
+- **Workspace:** Nx 23
+- **Databases:** PostgreSQL (per-service schemas via Prisma), Redis (cache/sessions), Qdrant (vector store)
+- **Messaging:** Apache Kafka 3.9 (KRaft)
+- **Observability:** Pino structured logging with correlation IDs
+- **Validation:** Zod environment schemas, class-validator DTOs
+- **Frontend proxy:** Next.js rewrites (independent `apps/web`)
 
-Stop infrastructure with:
+---
 
-    npm run infra:down
+## Prerequisites
 
-The repository service is the only service that owns a Prisma schema and applies database migrations. Generate the Prisma client with:
+- Node.js LTS
+- Docker + Docker Compose (for local infrastructure)
+- A GitHub OAuth App
+- (Optional for RAG) OpenAI-compatible embedding and chat-completions endpoints + API keys
 
-    npm run prisma:generate
+---
 
-Apply migrations with:
+## Quick start
 
-    npm run prisma:deploy
+### 1. Clone and install
 
-The schema currently contains only the MigrationProbe table. It is deliberately a connectivity and migration probe, not a business-domain model.
+```bash
+npm install
+```
 
-## Running services
+### 2. Configure environment
 
-Use the Nx serve targets from separate terminals. The default ports are 3000 for gateway, 3001 for repository-service, and 3002 for guidance-service.
+Copy the example file and replace every placeholder:
 
-    npx nx serve gateway
-    npx nx serve repository-service
-    npx nx serve guidance-service
+```bash
+cp .env.example .env
+```
 
-Each process reads the same environment contract. PORT may be overridden per terminal when needed.
+**Important:** `.env` is gitignored and must never be committed. The example file contains development placeholders only.
+
+Required local values:
+
+- `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET` from your GitHub OAuth App
+- `GITHUB_REDIRECT_URI` must match the Authorization callback URL in the GitHub app
+- `FRONTEND_BASE_URL` must match the origin where `apps/web` runs (default: `http://localhost:3000`)
+
+For RAG/AI features you also need:
+
+- `EMBEDDING_BASE_URL` + `EMBEDDING_API_KEY`
+- `LLM_BASE_URL` + `LLM_API_KEY`
+
+Without these keys the services **start successfully**, but embedding, indexing, and ask endpoints fail at runtime.
+
+### 3. Start infrastructure
+
+```bash
+npm run infra:up
+```
+
+This starts PostgreSQL (ports `5432` and `5433`), Redis (`6379`), Kafka (`9092`), and Qdrant (`6333`).
+
+### 4. Generate Prisma clients and run migrations
+
+```bash
+npm run prisma:generate
+npm run prisma:deploy
+npm run prisma:guidance:generate
+npm run prisma:guidance:deploy
+```
+
+> `libs/guidance-database/generated` is generated by `prisma:guidance:generate` and is gitignored.
+
+### 5. Run the services
+
+In separate terminals:
+
+```bash
+npx nx serve gateway
+npx nx serve repository-service
+npx nx serve guidance-service
+npx nx serve knowledge-service
+```
+
+Default ports: gateway `3000`, repository-service `3001`, guidance-service `3002`, knowledge-service `3003`.
+
+---
+
+## Frontend
+
+The Next.js frontend lives in `apps/web` and is bootstrapped independently:
+
+```bash
+cd apps/web
+cp .env.example .env  # if you need frontend env vars (none required for Phase 1)
+npm install
+npm run dev
+```
+
+`apps/web/next.config.ts` rewrites browser calls:
+
+- `/api/repository/*` → repository-service
+- `/api/guidance/*` → guidance-service
+
+The frontend currently does **not** proxy the knowledge service directly; RAG flows are consumed through guidance-service endpoints.
+
+---
 
 ## Health endpoints
 
-The shared bootstrap applies the api global prefix. Each service exposes a liveness endpoint at /api/health/live and a readiness endpoint at /api/health or /api/health/ready.
+Every service exposes:
 
-Liveness checks only application availability. Readiness checks the service plus its configured infrastructure dependencies. Repository-service additionally runs SELECT 1 through Prisma. A dependency failure produces a standard Terminus unhealthy response without leaking connection strings or credentials.
+- `GET /api/health/live` — liveness
+- `GET /api/health` and `GET /api/health/ready` — readiness (includes infrastructure checks)
 
-## Kafka foundation
+Readiness fails closed: a dependency failure returns a standard Terminus unhealthy response without leaking connection strings or credentials.
 
-KafkaProducerService creates the shared event envelope, assigns or propagates a correlation identifier, derives the topic from the event name, and includes correlation, event name, and version headers. KafkaConsumerService parses envelopes, restores correlation context for each message, and lets KafkaJS retry by rethrowing handler failures. Consumer groups are supplied through KAFKA_CONSUMER_GROUP.
+---
 
-## Verification
+## Key API flows
 
-Run the backend unit tests with:
+| Flow | Entrypoint | Notes |
+|---|---|---|
+| GitHub login | `GET /api/repository/v1/github/auth/start` | Server-side OAuth state, cookie-based session |
+| List repositories | `GET /api/repository/v1/github/repositories` | Returns GitHub-accessible repos |
+| Import repository | `POST /api/repository/v1/github/repositories/import` | Persists metadata, docs, issues; publishes `RepositoryImported` event |
+| List issues | `GET /api/repository/v1/github/repositories/:id/issues` | Repository-service owned issues |
+| Recommendations | `GET /api/guidance/v1/repositories/:id/recommendations` | Deterministic ranking |
+| Ask repository | `POST /api/knowledge/v1/repositories/:id/ask` | RAG answer (requires LLM provider) |
+| Retrieve context | `POST /api/knowledge/v1/repositories/:id/retrieve` | Raw retrieved chunks (requires embedding provider) |
 
-    npx nx run-many -t test --projects=gateway,repository-service,guidance-service,config,contracts,observability,shared,database,kafka
+---
 
-Run the backend lint targets with:
+## Testing
 
-    npx nx run-many -t lint --projects=gateway,repository-service,guidance-service,config,contracts,observability,shared,database,kafka
+```bash
+# TypeScript typecheck
+npm run typecheck
 
-Run the typecheck with:
+# Lint all backend projects
+npm run lint
 
-    npm run typecheck
+# Unit tests
+npx nx run-many -t test --projects=gateway,repository-service,guidance-service,knowledge-service,config,contracts,observability,shared,database,kafka
 
-Build the three applications with:
+# Integration tests (require running infrastructure)
+$env:RUN_INTEGRATION=1; npx nx test repository-service
+$env:RUN_INTEGRATION=1; npx nx test guidance-service
+```
 
-    npx nx run-many -t build --projects=gateway,repository-service,guidance-service
+On Windows, the aggregate Nx lint wrapper can stall; run direct ESLint over backend sources if needed.
 
-The repository-service integration test is guarded by RUN_INTEGRATION=1. With Docker infrastructure running, set RUN_INTEGRATION to 1 and run the repository-service test target to verify application startup plus PostgreSQL, Redis, and Kafka connectivity. Without that flag, the integration suite is skipped so ordinary unit tests do not require external services.
+---
 
-## Security and scope notes
+## Repository layout
 
-Redis is used only as a cache or ephemeral side-store. PostgreSQL is the primary datastore for repository-service. No real secrets are included in .env.example. The known transitive npm audit findings are not automatically force-fixed because doing so could introduce breaking dependency changes; review them separately before production release.
+```text
+.
+├── apps/
+│   ├── gateway/              # Entrypoint / edge service
+│   ├── guidance-service/     # Recommendations + contributor intelligence
+│   ├── knowledge-service/    # RAG: chunking, embeddings, Qdrant, LLM orchestration
+│   ├── repository-service/   # GitHub integration + repository data owner
+│   └── web/                  # Next.js frontend (independent)
+├── libs/
+│   ├── config/               # dotenv loading + Zod validation
+│   ├── contracts/            # Event envelopes + API error contracts
+│   ├── database/             # Repository-service Prisma module
+│   ├── github/               # Resilient GitHub REST/OAuth client
+│   ├── guidance-database/    # Guidance-service generated Prisma client
+│   ├── kafka/                # KafkaJS producer/consumer + correlation
+│   ├── observability/        # Pino logging + correlation middleware
+│   └── shared/               # Bootstrap, health, Redis, rate limiting
+├── docs/                     # Architecture, API, events, database, environment
+├── docker-compose.yml        # Local infrastructure
+└── nx.json                   # Nx workspace configuration
+```
 
+---
 
-### Phase 1 data ownership
+## Documentation
 
-Repository-service and guidance-service use separate Prisma schemas and databases. Repository-service owns repository-facing tables; guidance-service owns `Recommendation`. Cross-service identifiers are UUID scalar values and are not database foreign keys. Use `npm run prisma:deploy` for repository migrations and `npm run prisma:guidance:deploy` for guidance migrations.
+- [Architecture and service boundaries](docs/ARCHITECTURE.md)
+- [API reference](docs/API.md)
+- [Event contracts](docs/EVENTS.md)
+- [Database ownership and migrations](docs/DATABASE.md)
+- [Environment and local setup](docs/ENVIRONMENT.md)
+- [Backend progress and verification](BACKEND_PROGRESS.md)
+- [Engineering quality review](ENGINEERING_QUALITY_REVIEW.md)
+- [Frontend/backend contract notes](FRONTEND_BACKEND_CONTRACT.md)
+
+---
+
+## Security notes
+
+- `.env` is gitignored; real secrets must never be committed.
+- GitHub tokens and OAuth state are stored server-side in Redis with TTLs.
+- Repository content is treated as untrusted data in RAG prompts.
+- Rate limiting defaults to enabled and uses Redis with a process-local fallback.
+- Local setup uses plaintext Kafka/HTTP and development credentials; production requires TLS, proxy trust, cookie policies, and centralized secrets.
+
+---
+
+## Known operational notes
+
+1. **RAG requires provider keys.** The knowledge service env schema makes `EMBEDDING_API_KEY`, `EMBEDDING_BASE_URL`, `LLM_API_KEY`, and `LLM_BASE_URL` optional so the service can start without them. However, `indexRepository`, `retrieve`, and `ask` call the HTTP providers, which throw `"Embedding provider is not configured"` / `"LLM provider is not configured"` when keys are missing.
+2. **Duplicate Kafka consumer group.** The previous `.env` defined `KAFKA_CONSUMER_GROUP` twice, which could cause guidance-service and knowledge-service to share partitions unexpectedly. The cleaned `.env.example` now defines it once.
+3. **Frontend analysis status.** The UI adapter currently hardcodes `analysisStatus: "not-analyzed"`. After a successful import the repository overview still displays "Not analyzed" until the adapter is updated to read real indexing state.
+4. **Windows shutdown warning.** NestJS shutdown hooks may log `kill ENOSYS` on Windows; this is an OS-level signal limitation and does not affect request handling.

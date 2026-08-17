@@ -1,4 +1,4 @@
-import { z } from 'zod';
+﻿import { z } from 'zod';
 import { baseEnvSchema, databaseEnvSchema, kafkaEnvSchema, redisEnvSchema } from '@osc/config';
 
 export const repositoryEnvSchema = baseEnvSchema
@@ -7,6 +7,8 @@ export const repositoryEnvSchema = baseEnvSchema
   .merge(kafkaEnvSchema)
   .extend({
     PORT: z.coerce.number().int().min(1).max(65_535).default(3001),
+    FRONTEND_BASE_URL: z.string().url().default('http://localhost:3000'),
+    KNOWLEDGE_SERVICE_TOKEN: z.string().min(32).optional(),
     GITHUB_CLIENT_ID: z.string().min(1).optional(),
     GITHUB_CLIENT_SECRET: z.string().min(1).optional(),
     GITHUB_REDIRECT_URI: z.string().url().default('http://localhost:3001/api/v1/github/auth/callback'),
@@ -22,3 +24,5 @@ export const repositoryEnvSchema = baseEnvSchema
   });
 
 export type RepositoryEnv = z.infer<typeof repositoryEnvSchema>;
+
+

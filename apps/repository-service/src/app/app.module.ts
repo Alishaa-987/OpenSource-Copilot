@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { AppConfigModule } from '@osc/config';
 import { PrismaModule } from '@osc/database';
 import { GitHubModule } from '@osc/github';
@@ -12,6 +12,8 @@ import { HealthController } from './health.controller';
 import { GitHubController } from './github/github.controller';
 import { GitHubRepositoryService } from './github/github.repository.service';
 import { GitHubSessionService } from './github/github.session.service';
+import { RepositoryIssuesController } from './repository-issues.controller';
+import { RepositoryKnowledgeController } from './repository-knowledge.controller';
 
 @Module({
   imports: [
@@ -27,7 +29,8 @@ import { GitHubSessionService } from './github/github.session.service';
     GitHubModule.forRoot(),
     HealthModule,
   ],
-  controllers: [AppController, HealthController, GitHubController],
+  controllers: [AppController, HealthController, GitHubController, RepositoryIssuesController, RepositoryKnowledgeController],
   providers: [AppService, GitHubSessionService, GitHubRepositoryService],
 })
 export class AppModule {}
+

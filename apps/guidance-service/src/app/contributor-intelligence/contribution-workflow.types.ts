@@ -1,0 +1,3 @@
+﻿export type ContributionStepId = 'understand-repository' | 'contribution-rules' | 'choose-issue' | 'understand-issue' | 'find-files' | 'plan-change' | 'understand-tests' | 'create-branch' | 'implement' | 'run-tests' | 'create-pr';
+export interface ContributionWorkflowStep { readonly id: ContributionStepId; readonly order: number; readonly title: string; readonly purpose: string; readonly actions: readonly string[]; readonly completionEvidence: readonly string[]; }
+export interface ContributionWorkflow { readonly repositoryId: string; readonly issueId: string; readonly issueTitle: string; readonly beginnerSuitable: boolean; readonly caution: string; readonly steps: readonly ContributionWorkflowStep[]; }

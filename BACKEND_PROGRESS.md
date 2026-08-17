@@ -83,3 +83,46 @@ Gateway-level GitHub proxying, guidance-service GitHub access, AI/RAG pipelines,
 
 Last updated: Phase 1 GitHub integration completion and verification.
 
+
+## Engineering-quality review â€” completed
+
+A focused engineering-quality pass was completed without adding product features or touching `apps/web`. Architecture boundaries, strict typing, DTOs, dependency injection, configuration, timeouts, retries, Kafka idempotency, security, correlation IDs, structured logging, and documentation were reviewed.
+
+Concrete fixes included typed Kafka test doubles, removal of a config-test non-null assertion, reliable Gateway E2E setup and typed teardown state, server-side exception log redaction for common secret-bearing values, and new architecture/API/event/database/environment documentation.
+
+Final verification: direct backend ESLint passed with 0 errors and 0 warnings; backend typecheck passed; Gateway E2E typecheck passed; Gateway, Repository Service, and Guidance Service builds passed; all project unit/integration suites passed; database tests passed against local infrastructure; Gateway API E2E passed. Remaining debt is documented in `ENGINEERING_QUALITY_REVIEW.md`, including process-local rate limiting, production transport/service-auth controls, Kafka dead-letter observability, and transitive development-tool dependency findings.
+
+## Phase 2 ï¿½ AI + RAG ï¿½ completed
+
+Phase 2 Knowledge Service implementation is complete as of 2026-08-15. The backend now provides provider-neutral document chunking, embedding, Qdrant vector storage, authenticated repository-source access, retrieval with repository isolation and relevance filtering, and grounded AI orchestration through configurable OpenAI-compatible providers.
+
+| Area | Completed implementation | Verification |
+|---|---|---|
+| Knowledge Service | Environment validation, health/readiness, NestJS module wiring, Kafka repository-import consumer, retrieval and indexing endpoints. | Production build passed. |
+| Ingestion and chunking | Configurable chunk size and overlap with document metadata preservation. | Unit tests passed. |
+| Embeddings | Bounded HTTP provider with response-count and dimension validation. | Unit tests and typecheck passed. |
+| Vector storage | Qdrant collection initialization, deterministic point IDs, repository metadata filtering, safe payload validation. | Unit tests/typecheck/build passed. |
+| Repository source access | Internal Repository Service endpoint with authentication/access checks and no cross-service database access. | Repository Service tests and build passed. |
+| AI orchestration | Explicit system, question, and untrusted repository-context separation; insufficient-context fallback; source deduplication; provider-failure mapping. | Unit tests passed, including prompt-injection and failure paths. |
+| Security boundary | No frontend secrets, no raw GitHub tokens in events, repository access asserted before retrieval, repository content treated as data. | Targeted lint and full typecheck passed. |
+
+### Phase 2 verification evidence
+
+- Knowledge Service: 4 suites passed, 11 tests passed.
+- Repository Service: 3 suites passed, 8 tests passed; 1 guarded integration suite skipped.
+- Guidance Service: 4 suites passed, 11 tests passed; 1 guarded integration suite skipped.
+- Full workspace TypeScript typecheck: passed with zero errors.
+- Targeted Phase 2 ESLint: passed with zero errors and zero warnings.
+- Nx production builds: `knowledge-service`, `repository-service`, and `guidance-service` passed with cache disabled.
+- Existing generated Prisma source-map parsing warning remains during the Guidance Service build; it does not fail the build.
+
+The broad workspace ESLint command still reports pre-existing findings in generated Prisma output and unrelated legacy files. Those findings were not suppressed or changed as part of Phase 2; the Knowledge Service and modified Repository Service files pass targeted lint. Phase 3 implementation is authorized; the completed Contributor Intelligence slice is recorded below.
+
+
+## Phase 3 Contributor Intelligence — implementation update
+
+Status: implemented slice verified; production hardening and optional PR data integration remain follow-up work.
+
+Completed: authenticated confidence-scored issue-to-code mapping; explainable deterministic issue analysis; Guidance-owned IssueIntelligence persistence; ordered contribution workflow; deterministic first-contribution recommendations with fallback labeling; lexical similar-issue retrieval with same-repository filtering; and permission-aware similar-pull-request output that fails closed when no authorized PR source is configured. Repository content remains untrusted data, service boundaries remain intact, and apps/web was not modified.
+
+Verification: Guidance full suite passed with 7 suites and 18 tests; Repository full suite passed with 3 suites and 8 tests; similar-context focused suite passed with 2 tests; full workspace TypeScript typecheck passed; targeted ESLint passed with zero errors and warnings. One guarded integration suite remains skipped by configuration. Nx/direct production build retries were blocked by a Windows/Nx worker timeout and are not claimed as passed.

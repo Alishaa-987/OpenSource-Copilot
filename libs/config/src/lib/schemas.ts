@@ -37,6 +37,9 @@ export function serviceNameSchema(defaultName: string) {
 export const baseEnvSchema = z.object({
   NODE_ENV: nodeEnvSchema,
   LOG_LEVEL: logLevelSchema,
+  RATE_LIMIT_ENABLED: booleanFromString.default(true),
+  RATE_LIMIT_MAX_REQUESTS: z.coerce.number().int().min(1).max(10000).default(120),
+  RATE_LIMIT_WINDOW_SECONDS: z.coerce.number().int().min(1).max(86400).default(60),
 });
 
 /** Opt-in: services that own or read a Postgres database via Prisma. */

@@ -1,16 +1,20 @@
-import { DynamicModule, Global, Module } from '@nestjs/common';
-import { LoggerModule } from 'nestjs-pino';
-import { CorrelationService } from './correlation.service';
-import { buildLoggerParams, LoggerOptions } from './logger.options';
+import { Controller, DynamicModule, Get, Global, Header, Module } from "@nestjs/common";
+import { LoggerModule } from "nestjs-pino";
+import { CorrelationService } from "./correlation.service";
+import { buildLoggerParams, LoggerOptions } from "./logger.options";
+import { MetricsService } from "./metrics.service";
 
-/**
- * Global observability module: structured pino logging (via nestjs-pino) plus a
- * correlation service.
- *
- * The correlation middleware is applied at the app level in the shared
- * bootstrap (`app.use(correlationMiddleware)`), so it is intentionally NOT wired
- * here as route middleware.
- */
+@Controller("metrics")
+class MetricsController {
+  constructor(private readonly metrics: MetricsService) {}
+
+  @Get()
+  @Header("Content-Type", "text/plain; version=0.0.4; charset=utf-8")
+  getMetrics(): string {
+    return this.metrics.renderPrometheus();
+  }
+}
+
 @Global()
 @Module({})
 export class ObservabilityModule {
@@ -18,8 +22,9 @@ export class ObservabilityModule {
     return {
       module: ObservabilityModule,
       imports: [LoggerModule.forRoot(buildLoggerParams(options))],
-      providers: [CorrelationService],
-      exports: [CorrelationService, LoggerModule],
+      controllers: [MetricsController],
+      providers: [CorrelationService, MetricsService],
+      exports: [CorrelationService, MetricsService, LoggerModule],
     };
   }
 }

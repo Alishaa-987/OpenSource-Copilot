@@ -30,24 +30,41 @@ model Recommendation {
 }
 
 model ProcessedEvent {
-  eventId       String   @id @db.Uuid
-  eventType     String
+  eventId       String   @id @map("event_id") @db.Uuid
+  eventType     String   @map("event_type")
   version       Int
-  correlationId String
-  processedAt   DateTime @default(now()) @db.Timestamptz(3)
+  correlationId String   @map("correlation_id")
+  processedAt   DateTime @default(now()) @map("processed_at") @db.Timestamptz(3)
 
   @@index([processedAt])
   @@map("processed_events")
 }
 
 model ImportedRepositoryProjection {
-  repositoryId       String   @id @db.Uuid
-  githubRepositoryId String   @unique
-  lastImportedAt     DateTime @db.Timestamptz(3)
-  lastCorrelationId  String
-  createdAt          DateTime @default(now()) @db.Timestamptz(3)
-  updatedAt          DateTime @updatedAt @db.Timestamptz(3)
+  repositoryId       String   @id @map("repository_id") @db.Uuid
+  githubRepositoryId String   @unique @map("github_repository_id")
+  lastImportedAt     DateTime @map("last_imported_at") @db.Timestamptz(3)
+  lastCorrelationId  String   @map("last_correlation_id")
+  createdAt          DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt          DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
 
   @@index([githubRepositoryId])
   @@map("imported_repository_projections")
+}
+
+model IssueIntelligence {
+  id            String   @id @default(uuid()) @db.Uuid
+  repositoryId  String   @db.Uuid
+  issueId       String   @db.Uuid
+  mappingJson   Json
+  analysisJson  Json
+  sourceVersion String   @default("phase3-v1")
+  generatedAt   DateTime @default(now()) @db.Timestamptz(3)
+  createdAt     DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime @updatedAt @db.Timestamptz(3)
+
+  @@unique([repositoryId, issueId])
+  @@index([repositoryId, updatedAt])
+  @@index([issueId])
+  @@map("issue_intelligence")
 }

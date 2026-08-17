@@ -148,9 +148,25 @@ exports.Prisma.ImportedRepositoryProjectionScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.IssueIntelligenceScalarFieldEnum = {
+  id: 'id',
+  repositoryId: 'repositoryId',
+  issueId: 'issueId',
+  mappingJson: 'mappingJson',
+  analysisJson: 'analysisJson',
+  sourceVersion: 'sourceVersion',
+  generatedAt: 'generatedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
+};
+
+exports.Prisma.JsonNullValueInput = {
+  JsonNull: Prisma.JsonNull
 };
 
 exports.Prisma.QueryMode = {
@@ -163,11 +179,18 @@ exports.Prisma.NullsOrder = {
   last: 'last'
 };
 
+exports.Prisma.JsonNullValueFilter = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull,
+  AnyNull: Prisma.AnyNull
+};
+
 
 exports.Prisma.ModelName = {
   Recommendation: 'Recommendation',
   ProcessedEvent: 'ProcessedEvent',
-  ImportedRepositoryProjection: 'ImportedRepositoryProjection'
+  ImportedRepositoryProjection: 'ImportedRepositoryProjection',
+  IssueIntelligence: 'IssueIntelligence'
 };
 
 /**

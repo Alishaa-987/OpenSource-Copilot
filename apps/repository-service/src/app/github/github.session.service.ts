@@ -1,4 +1,4 @@
-import { Inject, Injectable, UnauthorizedException, ServiceUnavailableException } from '@nestjs/common';
+﻿import { BadRequestException, Inject, Injectable, UnauthorizedException, ServiceUnavailableException } from '@nestjs/common';
 import { TypedConfigService } from '@osc/config';
 import { PrismaService } from '@osc/database';
 import { REDIS_CLIENT } from '@osc/shared';
@@ -39,7 +39,8 @@ export class GitHubSessionService {
     }
     const state = randomUUID();
     const stateTtl = this.config.get('GITHUB_OAUTH_STATE_TTL_SECONDS');
-    await this.redis.set(this.stateKey(state), JSON.stringify({ returnTo } satisfies OAuthState), 'EX', stateTtl);
+    const validatedReturnTo = this.validateReturnTo(returnTo);
+    await this.redis.set(this.stateKey(state), JSON.stringify({ returnTo: validatedReturnTo } satisfies OAuthState), 'EX', stateTtl);
     const authorizationUrl = new URL('https://github.com/login/oauth/authorize');
     authorizationUrl.searchParams.set('client_id', clientId);
     authorizationUrl.searchParams.set('redirect_uri', this.config.get('GITHUB_REDIRECT_URI'));
@@ -54,6 +55,8 @@ export class GitHubSessionService {
     if (!stateRecord) {
       throw new UnauthorizedException('Invalid or expired GitHub OAuth state');
     }
+    const stateData = JSON.parse(stateRecord) as OAuthState;
+    const returnTo = this.validateReturnTo(stateData.returnTo);
     await this.redis.del(stateKey);
     const clientId = this.config.get('GITHUB_CLIENT_ID');
     const clientSecret = this.config.get('GITHUB_CLIENT_SECRET');
@@ -96,7 +99,7 @@ export class GitHubSessionService {
       ...session,
       githubUserId: session.githubUserId.toString(),
     }), 'EX', ttl);
-    return { user: this.mapUser(githubUser), expiresAt, session };
+    return { user: this.mapUser(githubUser), expiresAt, session, returnTo };
   }
 
   async getSession(request: Request): Promise<GitHubSession | null> {
@@ -159,6 +162,18 @@ export class GitHubSessionService {
     };
   }
 
+  private validateReturnTo(returnTo?: string): string | undefined {
+    if (!returnTo) return undefined;
+    try {
+      const candidate = new URL(returnTo);
+      const allowed = new URL(this.config.get('FRONTEND_BASE_URL'));
+      if (candidate.origin !== allowed.origin) throw new BadRequestException('OAuth return target is not allowed');
+      return candidate.toString();
+    } catch (error) {
+      if (error instanceof BadRequestException) throw error;
+      throw new BadRequestException('OAuth return target is invalid');
+    }
+  }
   private stateKey(state: string): string {
     return `github:oauth:state:${state}`;
   }
@@ -176,3 +191,4 @@ export class GitHubSessionService {
     return null;
   }
 }
+
