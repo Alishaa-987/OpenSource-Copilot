@@ -1,4 +1,4 @@
-﻿import {
+import {
   BadRequestException,
   ForbiddenException,
   Inject,
@@ -68,23 +68,37 @@ export class GitHubRepositoryService {
     return this.importFromGitHub(session, repository);
   }
 
-  async importPublicRepository(input: PublicRepositoryImportDto): Promise<RepositoryImportResponse> {
+  async importPublicRepository(request: Request, input: PublicRepositoryImportDto): Promise<RepositoryImportResponse> {
     const parsed = this.parseRepositoryUrl(input.url);
+    const session = await this.sessions.getSession(request);
     try {
-      const repository = await this.github.getRepository('', parsed.owner, parsed.name);
-      return this.importFromGitHub(null, repository);
+      const repository = await this.github.getRepository(session?.token ?? '', parsed.owner, parsed.name);
+      return this.importFromGitHub(session, repository);
     } catch (error) {
       throw this.toHttpError(error);
     }
   }
 
-  async getImportedRepository(request: Request, repositoryId: string): Promise<ImportedRepositoryResponse> {
+async getImportedRepository(request: Request, repositoryId: string): Promise<ImportedRepositoryResponse> {
     const session = await this.sessions.requireSession(request);
     const repository = await this.prisma.repository.findFirst({
       where: { id: repositoryId, accessEntries: { some: { userId: session.userId } } },
     });
     if (!repository) throw new NotFoundException('Repository not found');
-    return this.mapStoredRepository(repository);
+    const readme = await this.prisma.repositoryDocument.findFirst({
+      where: { repositoryId: repository.id, documentType: 'readme' },
+      select: { content: true },
+    });
+    try {
+      const live = await this.github.getRepository(session.token, repository.owner, repository.name);
+      const refreshed = await this.prisma.repository.update({
+        where: { id: repository.id },
+        data: this.repositoryUpdateData(live),
+      });
+      return this.mapStoredRepository(refreshed, readme?.content);
+    } catch {
+      return this.mapStoredRepository(repository, readme?.content);
+    }
   }
 
   async listRepositoryIssues(request: Request, repositoryId: string) {
@@ -124,10 +138,11 @@ export class GitHubRepositoryService {
         update: this.repositoryUpdateData(githubRepository),
       });
       if (session) {
+        await tx.repositoryAccess.updateMany({ where: { userId: session.userId }, data: { isActive: false } });
         await tx.repositoryAccess.upsert({
           where: { userId_repositoryId: { userId: session.userId, repositoryId: repository.id } },
-          create: { userId: session.userId, repositoryId: repository.id, accessLevel: this.accessLevel(githubRepository) },
-          update: { accessLevel: this.accessLevel(githubRepository) },
+          create: { userId: session.userId, repositoryId: repository.id, accessLevel: this.accessLevel(githubRepository), isActive: true },
+          update: { accessLevel: this.accessLevel(githubRepository), isActive: true },
         });
       }
       let labels = 0;
@@ -190,7 +205,7 @@ export class GitHubRepositoryService {
       event,
     });
     return {
-      repository: this.mapStoredRepository(result.repository),
+      repository: this.mapStoredRepository(result.repository, documents.find((document) => document.documentType === 'readme')?.content),
       imported: { documents: documents.length, issues: issues.length, labels: result.labels },
     };
   }
@@ -316,18 +331,24 @@ export class GitHubRepositoryService {
     return 'read';
   }
 
-  private mapStoredRepository(repository: {
+private mapStoredRepository(repository: {
     id: string; githubRepositoryId: bigint; owner: string; name: string; fullName: string;
     description: string | null; url: string; stars: number; forks: number; language: string | null;
     topics: string[]; license: string | null; defaultBranch: string; openIssuesCount: number;
     lastSyncedAt: Date | null; createdAt: Date; updatedAt: Date;
-  }): ImportedRepositoryResponse {
+  }, readmeContent?: string): ImportedRepositoryResponse {
     return { id: repository.githubRepositoryId.toString(), githubRepositoryId: repository.githubRepositoryId.toString(),
       repositoryId: repository.id, owner: repository.owner, name: repository.name, fullName: repository.fullName,
-      description: repository.description, url: repository.url, stars: repository.stars, forks: repository.forks,
+      description: repository.description, readmeSummary: this.summarizeReadme(readmeContent), url: repository.url, stars: repository.stars, forks: repository.forks,
       language: repository.language, topics: repository.topics, license: repository.license, defaultBranch: repository.defaultBranch,
       openIssuesCount: repository.openIssuesCount, lastSyncedAt: repository.lastSyncedAt?.toISOString() ?? null,
       createdAt: repository.createdAt.toISOString(), updatedAt: repository.updatedAt.toISOString(), };
+  }
+
+  private summarizeReadme(content?: string): string | null {
+    if (!content?.trim()) return null;
+    const summary = content.replace(/^\s*#+\s+[^\n]+\n?/, '').replace(/```[\s\S]*?```/g, '').replace(/[`*_>\[\]#]/g, '').replace(/\s+/g, ' ').trim();
+    return summary ? summary.slice(0, 600) + (summary.length > 600 ? '…' : '') : null;
   }
 
   private mapIssue(issue: { id: string; repositoryId: string; githubIssueId: bigint; number: number; title: string; body: string | null; state: string; author: string | null; commentsCount: number; url: string; createdAt: Date; updatedAt: Date; closedAt: Date | null; labels: Array<{ id: string; name: string; color: string }> }): RepositoryIssueResponse {
@@ -362,6 +383,9 @@ export class GitHubRepositoryService {
     return new ServiceUnavailableException('GitHub API is unavailable');
   }
 }
+
+
+
 
 
 

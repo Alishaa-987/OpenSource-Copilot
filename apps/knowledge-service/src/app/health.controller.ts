@@ -9,6 +9,7 @@ export class HealthController {
   @Get('live')
   @HealthCheck()
   live() { return this.health.check([() => this.indicator.check('service', async () => true)]); }
+  @Get()
   @Get('ready')
   @HealthCheck()
   ready() { return this.health.check([() => this.indicator.check('redis', async () => this.redis.ping()), () => this.indicator.check('kafka', async () => this.kafka.isHealthy())]); }

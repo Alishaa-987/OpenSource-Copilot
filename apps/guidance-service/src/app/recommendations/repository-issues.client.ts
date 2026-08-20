@@ -1,4 +1,5 @@
-﻿import axios from 'axios';
+import { BadGatewayException, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import axios from 'axios';
 import { TypedConfigService } from '@osc/config';
 import { getCorrelationId } from '@osc/observability';
 import { z } from 'zod';
@@ -26,8 +27,9 @@ const RepositoryIssueResponseSchema = z
   })
   .strict();
 
+@Injectable()
 export class RepositoryIssuesClient {
-  constructor(private readonly config: TypedConfigService<GuidanceEnv>) {}
+  constructor(@Inject(TypedConfigService) private readonly config: TypedConfigService<GuidanceEnv>) {}
 
   async listOpenIssues(repositoryId: string, cookieHeader?: string): Promise<RepositoryIssueInput[]> {
     const correlationId = getCorrelationId();

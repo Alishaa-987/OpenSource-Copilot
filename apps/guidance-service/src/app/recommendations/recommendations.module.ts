@@ -1,4 +1,4 @@
-﻿import { Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { TypedConfigService } from '@osc/config';
 import { GuidanceEnv } from '../env';
 import { RecommendationsController } from './recommendations.controller';
@@ -9,7 +9,11 @@ import { DefaultIssueScoringStrategy, ISSUE_SCORING_STRATEGY } from './scoring/i
 @Module({
   controllers: [RecommendationsController],
   providers: [
-    RepositoryIssuesClient,
+    {
+      provide: RepositoryIssuesClient,
+      inject: [TypedConfigService],
+      useFactory: (config: TypedConfigService<GuidanceEnv>) => new RepositoryIssuesClient(config),
+    },
     RecommendationService,
     {
       provide: ISSUE_SCORING_STRATEGY,

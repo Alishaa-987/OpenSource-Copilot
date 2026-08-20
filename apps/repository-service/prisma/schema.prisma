@@ -80,12 +80,13 @@ model RepositoryAccess {
   userId       String     @db.Uuid
   repositoryId String     @db.Uuid
   accessLevel  String
+  isActive     Boolean    @default(false)
   createdAt    DateTime   @default(now()) @db.Timestamptz(3)
   user         User       @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   repository   Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@unique([userId, repositoryId])
-  @@index([userId, repositoryId])
+  @@index([userId, isActive])
   @@index([repositoryId, userId])
   @@map("repository_access")
 }
@@ -141,3 +142,5 @@ model IssueLabel {
   @@index([issueId])
   @@map("issue_labels")
 }
+
+

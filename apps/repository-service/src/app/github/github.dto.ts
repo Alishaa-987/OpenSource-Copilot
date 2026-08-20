@@ -52,6 +52,12 @@ export class GitHubOAuthCallbackQueryDto {
   @IsNotEmpty()
   @IsUUID('4')
   state!: string;
+
+  /** Optional issuer parameter now included by GitHub OAuth callbacks. */
+  @IsOptional()
+  @IsUrl({ protocols: ['https'], require_protocol: true, require_tld: false })
+  @MaxLength(2048)
+  iss?: string;
 }
 
 export interface GitHubUserResponse {
@@ -110,6 +116,7 @@ export interface ImportedRepositoryResponse extends GitHubRepositoryResponse {
   githubRepositoryId: string;
   /** Internal UUID owned by Repository Service. */
   repositoryId: string;
+  readmeSummary: string | null;
   lastSyncedAt: string | null;
   createdAt: string;
   updatedAt: string;

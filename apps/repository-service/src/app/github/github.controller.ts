@@ -73,7 +73,7 @@ export class GitHubController {
   @Post('repositories/import/public')
   importPublicRepository(@Req() request: Request, @Body() body: PublicRepositoryImportDto) {
     this.enforcePublicImportLimit(request);
-    return this.repositories.importPublicRepository(body);
+    return this.repositories.importPublicRepository(request, body);
   }
 
   private enforcePublicImportLimit(request: Request): void {
