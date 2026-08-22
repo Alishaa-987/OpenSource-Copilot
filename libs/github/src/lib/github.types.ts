@@ -56,6 +56,7 @@ export const GitHubRepositorySchema = z
     name: z.string().min(1),
     full_name: z.string().min(3),
     owner: z.object({ login: z.string().min(1) }).passthrough(),
+    fork: z.boolean().default(false),
     description: z.string().nullable().optional(),
     html_url: z.string().url(),
     stargazers_count: z.number().int().nonnegative().optional(),
@@ -66,6 +67,14 @@ export const GitHubRepositorySchema = z
     default_branch: z.string().min(1).optional(),
     open_issues_count: z.number().int().nonnegative().optional(),
     permissions: GitHubPermissionsSchema.optional(),
+    parent: z
+      .object({
+        owner: z.object({ login: z.string().min(1) }).passthrough(),
+        name: z.string().min(1),
+        full_name: z.string().min(3),
+      })
+      .passthrough()
+      .optional(),
   })
   .passthrough();
 export type GitHubRepository = z.infer<typeof GitHubRepositorySchema>;
@@ -83,6 +92,16 @@ export const GitHubContentSchema = z
   })
   .passthrough();
 export type GitHubContent = z.infer<typeof GitHubContentSchema>;
+
+export const GitHubTreeEntrySchema = z.object({
+  path: z.string().min(1),
+  mode: z.string().optional(),
+  type: z.enum(['blob', 'tree', 'commit']),
+  sha: z.string().min(1),
+  size: z.number().int().nonnegative().optional(),
+  url: z.string().url().optional(),
+}).passthrough();
+export type GitHubTreeEntry = z.infer<typeof GitHubTreeEntrySchema>;
 
 export const GitHubIssueLabelSchema = z
   .object({

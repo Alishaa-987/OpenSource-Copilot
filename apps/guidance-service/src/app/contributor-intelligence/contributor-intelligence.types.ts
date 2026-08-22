@@ -46,6 +46,12 @@ export interface IssueMapping {
 export type Complexity = 'low' | 'medium' | 'high';
 export type Effort = 'small' | 'medium' | 'large';
 
+export interface GuidanceStep {
+  readonly title: string;
+  readonly actions: readonly string[];
+  readonly completionEvidence: string;
+}
+
 export interface IssueAnalysis {
   readonly complexity: Complexity;
   readonly effort: Effort;
@@ -55,6 +61,11 @@ export interface IssueAnalysis {
   readonly confidence: number;
   readonly reasons: readonly string[];
   readonly evidence: readonly string[];
+  readonly explanation: string;
+  readonly rootCause: string;
+  readonly suggestedApproach: readonly string[];
+  readonly contributionSteps: readonly GuidanceStep[];
+  readonly testingPlan: readonly string[];
   readonly method: 'deterministic-heuristic';
 }
 

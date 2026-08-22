@@ -9,7 +9,7 @@ import {
 import { randomUUID } from 'node:crypto';
 import { PrismaService } from '@osc/database';
 import { createRepositoryImportedEvent, REPOSITORY_IMPORTED_EVENT_TYPE, REPOSITORY_IMPORTED_EVENT_VERSION, REPOSITORY_IMPORTED_TOPIC } from '@osc/contracts';
-import { GITHUB_CLIENT, GitHubApiError, GitHubClient, GitHubRateLimitError, GitHubRepository } from '@osc/github';
+import { GITHUB_CLIENT, GitHubApiError, GitHubClient, GitHubIssue, GitHubRateLimitError, GitHubRepository } from '@osc/github';
 import { KafkaProducerService } from '@osc/kafka';
 import { getCorrelationId } from '@osc/observability';
 import type { Request } from 'express';
@@ -79,7 +79,7 @@ export class GitHubRepositoryService {
     }
   }
 
-async getImportedRepository(request: Request, repositoryId: string): Promise<ImportedRepositoryResponse> {
+  async getImportedRepository(request: Request, repositoryId: string): Promise<ImportedRepositoryResponse> {
     const session = await this.sessions.requireSession(request);
     const repository = await this.prisma.repository.findFirst({
       where: { id: repositoryId, accessEntries: { some: { userId: session.userId } } },
@@ -95,7 +95,9 @@ async getImportedRepository(request: Request, repositoryId: string): Promise<Imp
         where: { id: repository.id },
         data: this.repositoryUpdateData(live),
       });
-      return this.mapStoredRepository(refreshed, readme?.content);
+      const liveReadme = await this.github.getReadme(session.token, repository.owner, repository.name);
+      const liveReadmeContent = liveReadme ? this.decodeContent(liveReadme.content, liveReadme.encoding) : undefined;
+      return this.mapStoredRepository(refreshed, liveReadmeContent?.trim() ? liveReadmeContent : readme?.content);
     } catch {
       return this.mapStoredRepository(repository, readme?.content);
     }
@@ -126,9 +128,18 @@ async getImportedRepository(request: Request, repositoryId: string): Promise<Imp
     const owner = githubRepository.owner.login;
     const name = githubRepository.name;
     const token = session?.token;
+    const issuesPromise = (async () => {
+      const allIssues = await this.fetchIssues(token, owner, name, false);
+      if (githubRepository.fork && githubRepository.parent) {
+        const upstreamIssues = await this.fetchIssues(token, githubRepository.parent.owner.login, githubRepository.parent.name, true);
+        allIssues.push(...upstreamIssues);
+      }
+      return allIssues;
+    })();
+
     const [documents, issues] = await Promise.all([
       this.fetchDocuments(token, owner, name),
-      this.fetchIssues(token, owner, name),
+      issuesPromise,
     ]);
 
     const result = await this.prisma.$transaction(async (tx) => {
@@ -166,6 +177,7 @@ async getImportedRepository(request: Request, repositoryId: string): Promise<Imp
             author: issue.author,
             commentsCount: issue.commentsCount,
             url: issue.url,
+            isUpstream: issue.isUpstream,
             closedAt: issue.closedAt,
           },
           update: {
@@ -177,6 +189,7 @@ async getImportedRepository(request: Request, repositoryId: string): Promise<Imp
             author: issue.author,
             commentsCount: issue.commentsCount,
             url: issue.url,
+            isUpstream: issue.isUpstream,
             closedAt: issue.closedAt,
           },
         });
@@ -190,7 +203,7 @@ async getImportedRepository(request: Request, repositoryId: string): Promise<Imp
         }
       }
       return { repository, labels };
-    });
+    }, { timeout: 120_000 });
 
     const event = createRepositoryImportedEvent({
       repositoryId: result.repository.id,
@@ -227,7 +240,7 @@ async getImportedRepository(request: Request, repositoryId: string): Promise<Imp
     return documents;
   }
 
-  private async fetchIssues(token: string | undefined, owner: string, name: string): Promise<Array<{
+  private async fetchIssues(token: string | undefined, owner: string, name: string, isUpstream: boolean): Promise<Array<{
     githubIssueId: number;
     number: number;
     title: string;
@@ -237,10 +250,18 @@ async getImportedRepository(request: Request, repositoryId: string): Promise<Imp
     commentsCount: number;
     url: string;
     closedAt: Date | null;
+    isUpstream: boolean;
     labels: Array<{ name: string; color: string }>;
   }>> {
-    const page = await this.github.listIssues(token, owner, name, { page: 1, perPage: 100, state: 'all' });
-    return page.items.map((issue) => ({
+    const rawIssues: GitHubIssue[] = [];
+    let pageNumber = 1;
+    while (true) {
+      const page = await this.github.listIssues(token, owner, name, { page: pageNumber, perPage: 100, state: 'open' });
+      rawIssues.push(...page.items);
+      if (!page.pageInfo.hasNext) break;
+      pageNumber = page.pageInfo.nextPage ?? pageNumber + 1;
+    }
+    return rawIssues.filter(issue => !issue.pull_request).map((issue) => ({
       githubIssueId: issue.id,
       number: issue.number,
       title: issue.title,
@@ -250,6 +271,7 @@ async getImportedRepository(request: Request, repositoryId: string): Promise<Imp
       commentsCount: issue.comments ?? 0,
       url: issue.html_url,
       closedAt: issue.closed_at ? new Date(issue.closed_at) : null,
+      isUpstream,
       labels: (issue.labels ?? []).map((label) => ({ name: label.name, color: label.color })),
     }));
   }
@@ -298,6 +320,8 @@ async getImportedRepository(request: Request, repositoryId: string): Promise<Imp
       topics: repository.topics ?? [],
       license: repository.license?.spdx_id ?? repository.license?.key ?? null,
       defaultBranch: repository.default_branch ?? 'main',
+      isFork: repository.fork === true,
+      parentFullName: repository.parent?.full_name ?? null,
       openIssuesCount: repository.open_issues_count ?? 0,
       lastSyncedAt: new Date(),
     };
@@ -317,6 +341,8 @@ async getImportedRepository(request: Request, repositoryId: string): Promise<Imp
       topics: data.topics,
       license: data.license,
       defaultBranch: data.defaultBranch,
+      isFork: data.isFork,
+      parentFullName: data.parentFullName,
       openIssuesCount: data.openIssuesCount,
       lastSyncedAt: data.lastSyncedAt,
     };
@@ -331,28 +357,80 @@ async getImportedRepository(request: Request, repositoryId: string): Promise<Imp
     return 'read';
   }
 
-private mapStoredRepository(repository: {
+  private mapStoredRepository(repository: {
     id: string; githubRepositoryId: bigint; owner: string; name: string; fullName: string;
     description: string | null; url: string; stars: number; forks: number; language: string | null;
-    topics: string[]; license: string | null; defaultBranch: string; openIssuesCount: number;
+    topics: string[]; license: string | null; defaultBranch: string; isFork: boolean; parentFullName: string | null; openIssuesCount: number;
     lastSyncedAt: Date | null; createdAt: Date; updatedAt: Date;
   }, readmeContent?: string): ImportedRepositoryResponse {
-    return { id: repository.githubRepositoryId.toString(), githubRepositoryId: repository.githubRepositoryId.toString(),
-      repositoryId: repository.id, owner: repository.owner, name: repository.name, fullName: repository.fullName,
-      description: repository.description, readmeSummary: this.summarizeReadme(readmeContent), url: repository.url, stars: repository.stars, forks: repository.forks,
-      language: repository.language, topics: repository.topics, license: repository.license, defaultBranch: repository.defaultBranch,
-      openIssuesCount: repository.openIssuesCount, lastSyncedAt: repository.lastSyncedAt?.toISOString() ?? null,
-      createdAt: repository.createdAt.toISOString(), updatedAt: repository.updatedAt.toISOString(), };
+    return {
+      id: repository.githubRepositoryId.toString(),
+      githubRepositoryId: repository.githubRepositoryId.toString(),
+      repositoryId: repository.id,
+      owner: repository.owner,
+      name: repository.name,
+      fullName: repository.fullName,
+      description: repository.description,
+      readmeSummary: this.summarizeReadme(readmeContent),
+      url: repository.url,
+      stars: repository.stars,
+      forks: repository.forks,
+      language: repository.language,
+      topics: repository.topics,
+      license: repository.license,
+      defaultBranch: repository.defaultBranch,
+      isFork: repository.isFork,
+      parentFullName: repository.parentFullName,
+      openIssuesCount: repository.openIssuesCount,
+      lastSyncedAt: repository.lastSyncedAt?.toISOString() ?? null,
+      createdAt: repository.createdAt.toISOString(),
+      updatedAt: repository.updatedAt.toISOString(),
+    };
   }
 
   private summarizeReadme(content?: string): string | null {
     if (!content?.trim()) return null;
-    const summary = content.replace(/^\s*#+\s+[^\n]+\n?/, '').replace(/```[\s\S]*?```/g, '').replace(/[`*_>\[\]#]/g, '').replace(/\s+/g, ' ').trim();
-    return summary ? summary.slice(0, 600) + (summary.length > 600 ? '…' : '') : null;
+
+    const lines = content
+      .replace(/<!--[\s\S]*?-->/g, '\n')
+      .replace(/```[\s\S]*?```/g, '\n')
+      .replace(/<\/?(?:div|a|img|figure|center)\b[^<]*(?=<)/gi, '\n')
+      .replace(/<\/?(?:h[1-6]|p)(?=[A-Z0-9])/g, '\n')
+      .replace(/<br\s*\/?\s*>/gi, '\n')
+      .replace(/<img\b[^>]*>/gi, '\n')
+      .replace(/<[^>]*>/g, ' ')
+      .replace(/!\[[^\]]*\]\([^)]*\)/g, '\n')
+      .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
+      .replace(/https?:\/\/\S+/g, ' ')
+      .replace(/^\s*#{1,6}\s*/gm, '')
+      .replace(/[`*_>#]/g, ' ')
+      .replace(/&(?:nbsp|amp|quot|apos|#39);/gi, ' ')
+      .split(/\r?\n/)
+      .map((line) => line.replace(/\s+/g, ' ').trim())
+      .filter((line) => line.length >= 25)
+      .filter((line) => !/(shields\.io|img\.shields|badge|committers\.top|npmjs\.com\/package|version\s*\(!?committers|live\s*(web\s*)?demo|play\s*store)/i.test(line))
+      .filter((line) => !/[<>]|(?:src|href|align)\s*=|\b(?:div|img|href|src|alt)\b/i.test(line))
+      .filter((line) => /[A-Za-z]{3,}/.test(line));
+
+    const summary = lines.slice(0, 2).join(' ').trim();
+    return summary ? summary.slice(0, 600).trimEnd() + (summary.length > 600 ? '...' : '') : null;
   }
 
-  private mapIssue(issue: { id: string; repositoryId: string; githubIssueId: bigint; number: number; title: string; body: string | null; state: string; author: string | null; commentsCount: number; url: string; createdAt: Date; updatedAt: Date; closedAt: Date | null; labels: Array<{ id: string; name: string; color: string }> }): RepositoryIssueResponse {
-    return { ...issue, githubIssueId: issue.githubIssueId.toString(), createdAt: issue.createdAt.toISOString(), updatedAt: issue.updatedAt.toISOString(), closedAt: issue.closedAt?.toISOString() ?? null, labels: issue.labels.map((label) => ({ id: label.id, name: label.name, color: label.color })) };
+  private mapIssue(issue: {
+    id: string; repositoryId: string; githubIssueId: bigint; number: number; title: string;
+    body: string | null; state: string; author: string | null; commentsCount: number;
+    url: string; createdAt: Date; updatedAt: Date; closedAt: Date | null; isUpstream: boolean;
+    labels: Array<{ id: string; name: string; color: string }>;
+  }): RepositoryIssueResponse {
+    return {
+      ...issue,
+      githubIssueId: issue.githubIssueId.toString(),
+      createdAt: issue.createdAt.toISOString(),
+      updatedAt: issue.updatedAt.toISOString(),
+      closedAt: issue.closedAt?.toISOString() ?? null,
+      isUpstream: issue.isUpstream,
+      labels: issue.labels.map((label) => ({ id: label.id, name: label.name, color: label.color })),
+    };
   }
 
   private mapRepository(repository: GitHubRepository): GitHubRepositoryResponse {
@@ -363,6 +441,7 @@ private mapStoredRepository(repository: {
       fullName: repository.full_name,
       description: repository.description ?? null,
       url: repository.html_url,
+      fork: repository.fork === true,
       stars: repository.stargazers_count ?? 0,
       forks: repository.forks_count ?? 0,
       language: repository.language ?? null,
@@ -383,9 +462,3 @@ private mapStoredRepository(repository: {
     return new ServiceUnavailableException('GitHub API is unavailable');
   }
 }
-
-
-
-
-
-

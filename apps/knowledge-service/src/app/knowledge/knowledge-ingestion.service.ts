@@ -21,6 +21,12 @@ export class KnowledgeIngestionService {
   }
   async retrieve(repositoryId: string, question: string, limit?: number, cookieHeader?: string): Promise<RetrievedChunk[]> {
     await this.sourceClient.assertAccess(repositoryId, cookieHeader);
+    const source = await this.sourceClient.getSource(repositoryId, cookieHeader, question);
+    const sourceChunks = this.chunker.chunk(source.documents.filter((document) => document.documentType === 'code'));
+    if (sourceChunks.length > 0) {
+      const sourceVectors = await this.embeddings.embed(sourceChunks.map((chunk) => chunk.content));
+      await this.vectorStore.upsert(sourceChunks, sourceVectors);
+    }
     const vectors = await this.embeddings.embed([question]);
     const rows = await this.vectorStore.search(repositoryId, vectors[0], limit ?? this.config.get('KNOWLEDGE_RETRIEVAL_LIMIT'));
     return rows.filter((row) => row.relevance >= this.config.get('KNOWLEDGE_MIN_RELEVANCE'));

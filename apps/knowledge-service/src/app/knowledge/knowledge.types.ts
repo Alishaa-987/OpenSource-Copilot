@@ -1,4 +1,4 @@
-﻿export type KnowledgeDocumentType = 'readme' | 'contributing' | 'code-of-conduct' | 'security' | 'documentation' | 'issue';
+﻿export type KnowledgeDocumentType = 'readme' | 'contributing' | 'code-of-conduct' | 'security' | 'documentation' | 'issue' | 'code';
 export interface SourceDocument { repositoryId: string; documentId: string; path: string; documentType: KnowledgeDocumentType; url: string; content: string; }
 export interface DocumentChunk { repositoryId: string; documentId: string; path: string; documentType: KnowledgeDocumentType; url: string; chunkIndex: number; content: string; }
 export interface RetrievedChunk extends DocumentChunk { relevance: number; }

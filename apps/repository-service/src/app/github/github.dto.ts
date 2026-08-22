@@ -80,6 +80,7 @@ export interface GitHubRepositoryResponse {
   topics: string[];
   license: string | null;
   defaultBranch: string;
+  fork?: boolean;
   openIssuesCount: number;
 }
 
@@ -117,6 +118,8 @@ export interface ImportedRepositoryResponse extends GitHubRepositoryResponse {
   /** Internal UUID owned by Repository Service. */
   repositoryId: string;
   readmeSummary: string | null;
+  isFork: boolean;
+  parentFullName: string | null;
   lastSyncedAt: string | null;
   createdAt: string;
   updatedAt: string;
@@ -133,6 +136,7 @@ export interface RepositoryIssueResponse {
   author: string | null;
   commentsCount: number;
   url: string;
+  isUpstream: boolean;
   createdAt: string;
   updatedAt: string;
   closedAt: string | null;

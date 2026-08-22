@@ -28,7 +28,8 @@ function makeService() {
     getFile: jest.fn().mockResolvedValue(null),
     listIssues: jest.fn().mockResolvedValue({ items: [], pageInfo: { page: 1, perPage: 100, hasNext: false, nextPage: null } }),
   };
-  const sessions = { requireSession: jest.fn().mockResolvedValue({ sessionId: 's', userId: 'u', token: 't', githubUserId: 7n, username: 'octocat', expiresAt: new Date().toISOString() }) };
+  const session = { sessionId: 's', userId: 'u', token: 't', githubUserId: 7n, username: 'octocat', expiresAt: new Date().toISOString() };
+  const sessions = { requireSession: jest.fn().mockResolvedValue(session), getSession: jest.fn().mockResolvedValue(null) };
   const tx = {
     repository: { upsert: jest.fn().mockResolvedValue({ id: '11111111-1111-4111-8111-111111111111', githubRepositoryId: 123n, owner: 'acme', name: 'copilot', fullName: 'acme/copilot', description: 'A repository', url: 'https://github.com/acme/copilot', stars: 12, forks: 2, language: 'TypeScript', topics: ['copilot'], license: 'MIT', defaultBranch: 'main', openIssuesCount: 3, lastSyncedAt: new Date('2026-01-01T00:00:00.000Z'), createdAt: new Date('2026-01-01T00:00:00.000Z'), updatedAt: new Date('2026-01-01T00:00:00.000Z') }) },
     repositoryAccess: { upsert: jest.fn(), updateMany: jest.fn() },
@@ -56,7 +57,7 @@ describe('GitHubRepositoryService', () => {
 
   it('rejects malformed public repository URLs before any API call', async () => {
     const { service, github } = makeService();
-    await expect(service.importPublicRepository({ url: 'http://evil.example/acme/copilot' }))
+    await expect(service.importPublicRepository({} as never, { url: 'http://evil.example/acme/copilot' }))
       .rejects.toBeInstanceOf(BadRequestException);
     expect(github.getRepository).not.toHaveBeenCalled();
   });
@@ -64,7 +65,7 @@ describe('GitHubRepositoryService', () => {
   it('imports a public repository without a session token', async () => {
     const { service, github, tx, kafka } = makeService();
     github.getRepository.mockResolvedValue(githubRepository);
-    await expect(service.importPublicRepository({ url: 'https://github.com/acme/copilot' }))
+    await expect(service.importPublicRepository({} as never, { url: 'https://github.com/acme/copilot' }))
       .resolves.toMatchObject({ repository: { id: '123' }, imported: { documents: 0, issues: 0 } });
     expect(github.getRepository).toHaveBeenCalledWith('', 'acme', 'copilot');
     expect(tx.repository.upsert).toHaveBeenCalledTimes(1);

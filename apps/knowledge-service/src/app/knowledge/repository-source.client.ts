@@ -24,8 +24,9 @@ export class RepositorySourceClient {
     const response = await this.client.get<AccessResponse>('/v1/internal/repositories/' + encodeURIComponent(repositoryId) + '/access', { headers: this.headers(cookieHeader) });
     if (response.data.repositoryId !== repositoryId || response.data.allowed !== true) throw new Error('Repository access was not granted');
   }
-  async getSource(repositoryId: string, cookieHeader?: string): Promise<RepositoryKnowledgeSource> {
-    const response = await this.client.get<SourceResponse>('/v1/internal/repositories/' + encodeURIComponent(repositoryId) + '/knowledge-source', { headers: this.headers(cookieHeader) });
+  async getSource(repositoryId: string, cookieHeader?: string, question?: string): Promise<RepositoryKnowledgeSource> {
+    const params = question ? { q: question.slice(0, 8_000) } : undefined;
+    const response = await this.client.get<SourceResponse>('/v1/internal/repositories/' + encodeURIComponent(repositoryId) + '/knowledge-source', { headers: this.headers(cookieHeader), params });
     if (response.data.repositoryId !== repositoryId || !Array.isArray(response.data.documents)) throw new Error('Repository source response was invalid');
     return { repositoryId, documents: response.data.documents };
   }

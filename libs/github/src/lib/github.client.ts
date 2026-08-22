@@ -1,5 +1,6 @@
 ﻿import { Injectable } from '@nestjs/common';
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import { z } from 'zod';
 import {
   GitHubComment,
   GitHubContent,
@@ -13,6 +14,8 @@ import {
   GitHubUser,
   GitHubClientOptions,
   GitHubContentSchema,
+  GitHubTreeEntry,
+  GitHubTreeEntrySchema,
   GitHubIssueSchema,
   GitHubCommentSchema,
   GitHubPullRequestSchema,
@@ -87,7 +90,7 @@ export class GitHubClient {
       token,
       params: {
         visibility: 'all',
-        affiliation: 'owner,collaborator,organization_member',
+        affiliation: 'owner',
         sort: 'full_name',
         direction: 'asc',
         page: query.page,
@@ -96,10 +99,11 @@ export class GitHubClient {
     });
     const items = this.parseArray(GitHubRepositorySchema, response.data, '/user/repos');
     const normalizedSearch = query.search?.toLowerCase();
+    const forked = items.filter((repository) => repository.fork === true);
     const filtered = normalizedSearch
-      ? items.filter((repository) => repository.full_name.toLowerCase().includes(normalizedSearch))
-      : items;
-    return { items: filtered, pageInfo: this.pageInfo(response, query.page, query.perPage, items.length) };
+      ? forked.filter((repository) => repository.full_name.toLowerCase().includes(normalizedSearch))
+      : forked;
+    return { items: filtered, pageInfo: this.pageInfo(response, query.page, query.perPage, forked.length) };
   }
 
   async getRepository(token: string | undefined, owner: string, name: string): Promise<GitHubRepository> {
@@ -130,6 +134,17 @@ export class GitHubClient {
 
   async getFile(token: string | undefined, owner: string, name: string, path: string): Promise<GitHubContent | null> {
     return this.getOptionalContent(token, owner, name, path, `/contents/${path}`);
+  }
+
+  async getRepositoryTree(token: string | undefined, owner: string, name: string, branch: string): Promise<GitHubTreeEntry[]> {
+    const response = await this.request<unknown>({
+      method: 'GET',
+      url: `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(name)}/git/trees/${encodeURIComponent(branch)}`,
+      token,
+      params: { recursive: 1 },
+    });
+    const payload = z.object({ tree: z.array(GitHubTreeEntrySchema) }).passthrough().parse(response.data);
+    return payload.tree;
   }
 
   async listIssues(
