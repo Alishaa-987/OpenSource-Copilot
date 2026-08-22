@@ -1,230 +1,750 @@
-# OpenSource Copilot — Backend
+<img width="1885" height="907" alt="image" src="https://github.com/user-attachments/assets/2aefd75c-dff9-49a5-bf08-ee124e7de9db" />
+# OpenSource Copilot
 
-A modular NestJS/Nx backend for OpenSource Copilot: import GitHub repositories, generate deterministic beginner-friendly issue recommendations, and provide a retrieval-augmented generation (RAG) layer for repository-aware Q&A and contributor intelligence.
+<p align="center">
+  <strong>AI-powered intelligence for open-source contribution</strong>
+</p>
 
-> **Scope note:** `apps/web` is a standalone Next.js frontend. It is managed independently and is intentionally excluded from the backend Nx project graph.
+<p align="center">
+  Understand repositories. Find the right issues. Discover relevant code. Build with confidence.
+</p>
+
+<p align="center">
+  <a href="https://github.com/Alishaa-987/OpenSource-Copilot">
+    <img src="https://img.shields.io/badge/GitHub-OpenSource--Copilot-black?logo=github" alt="GitHub">
+  </a>
+  <img src="https://img.shields.io/badge/TypeScript-5.x-blue?logo=typescript" alt="TypeScript">
+  <img src="https://img.shields.io/badge/NestJS-E0234E?logo=nestjs" alt="NestJS">
+  <img src="https://img.shields.io/badge/Next.js-black?logo=next.js" alt="Next.js">
+  <img src="https://img.shields.io/badge/PostgreSQL-316192?logo=postgresql" alt="PostgreSQL">
+  <img src="https://img.shields.io/badge/Kafka-231F20?logo=apachekafka" alt="Kafka">
+  <img src="https://img.shields.io/badge/Qdrant-Vector%20Database-red" alt="Qdrant">
+  <img src="https://img.shields.io/badge/License-See%20Repository-lightgrey" alt="License">
+</p>
 
 ---
+
+#                                                                             OpenSource Copilot
+
+> **AI-powered intelligence for understanding open-source repositories and helping developers make their first meaningful contribution.**
+
+OpenSource Copilot is an AI-powered developer platform designed to reduce the complexity of contributing to unfamiliar open-source repositories.
+
+It connects with GitHub, imports repository context, analyzes issues, identifies relevant code, retrieves repository-specific knowledge, and provides structured contributor guidance.
+
+The goal is simple:
+
+> **Turn repository complexity into actionable context so developers can understand what to work on, where to work, and how to start.**
+
+---
+
+
+## Overview
+
+Contributing to an unfamiliar open-source repository is often difficult because of the amount of context a developer needs to understand before writing code.
+
+A contributor may need to:
+
+- Understand the repository architecture
+- Explore thousands of files
+- Find relevant issues
+- Understand what an issue actually means
+- Identify the code responsible for a problem
+- Find related issues or pull requests
+- Determine where a change should be made
+- Understand the expected implementation approach
+- Validate whether enough context has been gathered before starting development
+
+OpenSource Copilot is built to reduce this onboarding friction.
+
+Instead of acting as a generic AI chatbot, it focuses on the repository as the primary source of context.
+
+---
+
+## Problem
+
+The traditional open-source contribution workflow often looks like this:
+
+```text
+Discover Repository
+        |
+        v
+Read README
+        |
+        v
+Explore Repository Structure
+        |
+        v
+Search Issues
+        |
+        v
+Read Issue Discussions
+        |
+        v
+Search the Codebase
+        |
+        v
+Guess Relevant Files
+        |
+        v
+Understand Architecture
+        |
+        v
+Search Similar Issues / PRs
+        |
+        v
+Plan Implementation
+        |
+        v
+Start Coding
+```
+
+For experienced maintainers this process may be familiar, but for a new contributor it can be overwhelming.
+
+OpenSource Copilot aims to shorten this path.
+
+---
+
+## Solution
+
+OpenSource Copilot transforms repository information into structured contributor intelligence.
+
+```text 
+GitHub Repository
+       |
+       v
+Repository Import
+       |
+       +------------------+
+       |                  |
+       v                  v
+Repository Data        Issues
+       |                  |
+       +--------+---------+
+                |
+                v
+       Repository Intelligence
+                |
+        +-------+-------+
+        |       |       |
+        v       v       v
+      Code    Issue   Retrieval
+     Mapping Analysis   Context
+        |       |       |
+        +-------+-------+
+                |
+                v
+       Contributor Intelligence
+                |
+        +-------+-------+-------+
+        |       |       |       |
+        v       v       v       v
+    Relevant Root  Workflow Recommendations
+      Files      Cause
+                |
+                v
+       Confident Contribution
+```
+       
+
+## Key Features
+
+## GitHub Integration
+
+Connect OpenSource Copilot with GitHub to work directly with real repositories.
+
+Features include:
+
+- GitHub OAuth authentication
+- Repository discovery
+- Public repository import
+- Authenticated repository import
+- Repository metadata retrieval
+- README and document retrieval
+- GitHub issue retrieval
+- Issue labels and metadata
+- Secure server-side sessions
+  
+## AI-Powered Issue Intelligence
+
+OpenSource Copilot doesn't simply display GitHub issues.
+
+- It analyzes issues in the context of the repository.
+- Given an issue, the system can help answer:
+- What is this issue actually asking?
+- Which part of the repository is involved?
+- Which files are likely relevant?
+- What could be causing the problem?
+- How should I approach the implementation?
+- This turns an issue from a piece of text into an actionable engineering problem.
+
+## Issue-to-Code Mapping
+
+One of the core capabilities of OpenSource Copilot is connecting an issue to the codebase.
+```
+GitHub Issue
+     │
+     ▼
+Issue Understanding
+     │
+     ▼
+Repository Context
+     │
+     ▼
+Relevant Code Candidates
+     │
+     ▼
+Confidence Scoring
+     │
+     ▼
+Relevant Files
+```
+
+Instead of searching an entire repository manually, contributors receive a focused starting point.
+
+## Root Cause Analysis
+
+OpenSource Copilot goes beyond summarizing issue descriptions.
+
+It uses repository context to reason about the area of the codebase related to the issue and provide an explainable analysis of the likely cause.
+
+The objective is to help developers move from:
+
+"What is wrong?"
+
+to:
+```
+"Why is it happening?"
+        ↓
+"Where is it happening?"
+        ↓
+"What should I investigate?"
+        ↓
+"What should I change?"
+```
+## Implementation Guidance
+
+Once the relevant code has been identified, OpenSource Copilot can provide a structured implementation approach.
+
+The guidance focuses on helping contributors understand:
+
+- What to inspect first
+- Which files are involved
+- What parts of the architecture matter
+- What type of change may be required
+- What should be considered before implementation
+
+The developer remains in control of the implementation.
+---
+
+## AI + RAG
+Repository-Aware Artificial Intelligence
+
+The core idea behind OpenSource Copilot is simple:
+
+AI should understand the repository before giving repository-specific guidance.
+
+Generic AI assistants can provide useful programming answers, but they often lack the context of a specific codebase.
+
+OpenSource Copilot addresses this using Retrieval-Augmented Generation (RAG).
+
+## How RAG Works
+
+Repository content is processed and transformed into searchable knowledge.
+```
+Repository Files & Documents
+            │
+            ▼
+      Document Processing
+            │
+            ▼
+          Chunking
+            │
+            ▼
+        Embeddings
+            │
+            ▼
+     Qdrant Vector Database
+            │
+            ▼
+   Semantic Repository Search
+            │
+            ▼
+     Relevant Context
+            │
+            ▼
+       AI Orchestration
+            │
+            ▼
+     Grounded AI Response
+```
+When a developer asks a question, OpenSource Copilot retrieves the most relevant repository context before generating the answer.
+
+This allows the AI to reason using information from the actual project.
+
+## Why RAG?
+
+Without repository context:
+```
+Developer Question
+        ↓
+Generic AI Knowledge
+        ↓
+Generic Answer
+```
+With OpenSource Copilot:
+```
+Developer Question
+        ↓
+Repository Retrieval
+        ↓
+Relevant Files / Documents / Issues
+        ↓
+Repository Context
+        ↓
+AI Reasoning
+        ↓
+Repository-Grounded Answer
+```
+
+This makes the system more useful for repository-specific questions.
+
+## Repository Isolation
+
+Retrieval is scoped to the repository being accessed.
+
+This means information from unrelated repositories should not be mixed into the context used for a response.
+``` 
+User
+ │
+ ▼
+Repository Access Check
+ │
+ ▼
+Repository-Scoped Retrieval
+ │
+ ▼
+Relevant Repository Context
+ │
+ ▼
+AI Response
+```
+
+## AI Safety
+
+Repository content is treated as untrusted data.
+
+OpenSource Copilot separates:
+
+- System instructions
+- User questions
+- Retrieved repository content
+
+This helps prevent repository-controlled content from being treated as privileged AI instructions.
+
+The system also includes:
+
+- Context validation
+- Repository access checks
+- Insufficient-context handling
+- Source deduplication
+- Provider failure handling
+- Contributor Intelligence
+
+## Contributor Intelligence
+
+OpenSource Copilot is designed around the contributor journey.
+
+## First Contribution Recommendations
+
+Finding a suitable first issue can be difficult.
+
+OpenSource Copilot can provide deterministic recommendations based on available repository and issue context.
+
+The goal is to help contributors find realistic starting points instead of randomly selecting an issue.
+
+## Similar Issues
+
+Related issues can provide valuable historical context.
+
+OpenSource Copilot can identify similar issues within the same repository to help contributors understand:
+
+- Whether a similar problem has appeared before
+- How the repository has discussed similar problems
+- What areas of the codebase were involved
+- What previous context may be useful
+ ## Pull Request Context
+
+Where authorized pull-request data is available, OpenSource Copilot can use related PR context to provide additional insight into how similar problems were approached.
+
+Access is permission-aware and fails closed when an authorized PR source is unavailable.
+
+User Journey
+```
+A typical OpenSource Copilot workflow looks like:
+
+1. Sign in with GitHub
+        ↓
+2. Select or import a repository
+        ↓
+3. Open repository issues
+        ↓
+4. Select an issue
+        ↓
+5. Open Issue Intelligence
+        ↓
+6. Understand the issue
+        ↓
+7. Explore relevant files
+        ↓
+8. Review root-cause analysis
+        ↓
+9. Review implementation guidance
+        ↓
+10. Explore similar context
+        ↓
+11. Start contributing
+```
+The experience is designed to reduce the amount of manual repository exploration required before a developer can begin meaningful work.
 
 ## Architecture
 
-The backend is an Nx classic path-based monorepo with four NestJS applications and shared libraries.
+OpenSource Copilot uses a modular, service-oriented backend architecture.
 
-| Service | Port | Responsibilities | Infrastructure dependencies |
-|---|---|---|---|
-| `gateway` | 3000 | HTTP entrypoint, health, and shared edge foundation | Redis, Kafka |
-| `repository-service` | 3001 | GitHub OAuth, repository import, repository/issue data ownership, internal knowledge-source API | PostgreSQL, Redis, Kafka |
-| `guidance-service` | 3002 | Deterministic recommendations, contributor intelligence, event projections | PostgreSQL, Redis, Kafka |
-| `knowledge-service` | 3003 | Document chunking, embeddings, Qdrant vector storage, RAG ask/retrieve endpoints | Redis, Kafka, Qdrant |
+                         ┌─────────────────────┐
+                         │      Next.js        │
+                         │      Web App        │
+                         └──────────┬──────────┘
+                                    │
+                                    ▼
+                         ┌─────────────────────┐
+                         │      Gateway        │
+                         └──────────┬──────────┘
+                                    │
+              ┌─────────────────────┼─────────────────────┐
+              │                     │                     │
+              ▼                     ▼                     ▼
+     ┌─────────────────┐   ┌─────────────────┐   ┌─────────────────┐
+     │ Repository      │   │ Guidance        │   │ Knowledge       │
+     │ Service         │   │ Service         │   │ Service         │
+     │                 │   │                 │   │                 │
+     │ GitHub          │   │ Contributor     │   │ AI + RAG        │
+     │ Integration     │   │ Intelligence    │   │ Retrieval       │
+     └────────┬────────┘   └────────┬────────┘   └────────┬────────┘
+              │                     │                     │
+              ▼                     ▼                     ▼
+       ┌─────────────┐       ┌─────────────┐       ┌─────────────┐
+       │ PostgreSQL  │       │ PostgreSQL  │       │   Qdrant    │
+       │             │       │             │       │             │
+       │ Repository  │       │ Guidance    │       │ Vector Data │
+       │ Data        │       │ Data        │       │             │
+       └─────────────┘       └─────────────┘       └─────────────┘
+              │
+              ├──────────────────────┐
+              ▼                      ▼
+         ┌───────────┐         ┌───────────┐
+         │   Redis   │         │   Kafka   │
+         │ Sessions  │         │  Events   │
+         └───────────┘         └─────┬─────┘
+                                     │
+                                     ▼
+                              Knowledge Service
+## Services
 
-Shared libraries (`libs/*`) provide configuration, contracts, observability, health, exception handling, Redis, Kafka, GitHub client, and database modules.
+## Gateway
 
----
+The central backend entry point responsible for routing, shared infrastructure, health checks, and backend application coordination.
 
-## Technology stack
+Repository Service
 
-- **Runtime:** Node.js, NestJS 11
-- **Workspace:** Nx 23
-- **Databases:** PostgreSQL (per-service schemas via Prisma), Redis (cache/sessions), Qdrant (vector store)
-- **Messaging:** Apache Kafka 3.9 (KRaft)
-- **Observability:** Pino structured logging with correlation IDs
-- **Validation:** Zod environment schemas, class-validator DTOs
-- **Frontend proxy:** Next.js rewrites (independent `apps/web`)
+Responsible for:
 
----
+- GitHub integration
+- OAuth
+- Repository management
+- Repository import
+- Issues
+- Repository documents
+- Repository access
+##  Guidance Service
+
+Responsible for:
+
+- Issue Intelligence
+- Issue-to-code mapping
+- Root cause analysis
+- Contribution workflows
+- Contributor recommendations
+- Similar issue context
+- Similar PR context
+## Knowledge Service
+
+Responsible for:
+
+- Repository knowledge ingestion
+- Document chunking
+- Embeddings
+- Qdrant vector storage
+- Semantic retrieval
+- AI orchestration
+- Grounded responses
+ ## Event-Driven Processing
+
+OpenSource Copilot uses Apache Kafka for asynchronous communication between backend services.
+
+For example:
+```
+Repository Import
+       │
+       ▼
+Repository Service
+       │
+       ▼
+RepositoryImported Event
+       │
+       ▼
+      Kafka
+       │
+       ▼
+Knowledge Service
+       │
+       ▼
+Repository Knowledge Processing
+```
+This allows repository processing to remain decoupled from the service responsible for managing repository data.
+
+## Data Layer
+
+OpenSource Copilot uses separate data ownership boundaries for different backend services.
+
+## Repository Service
+
+Owns repository-related data such as:
+
+- Users
+- GitHub installations
+- Repositories
+- Repository access
+- Repository documents
+- Issues
+- Issue labels
+## Guidance Service
+
+Owns contributor intelligence data such as:
+
+- Recommendations
+- Issue intelligence
+## Knowledge Service
+
+Uses Qdrant for vector-based repository knowledge and semantic retrieval.
+
+Services communicate through APIs and events rather than directly accessing another service's database.
+
+## Technology Stack
+
+| Category         | Technologies                     |
+| ---------------- | -------------------------------- |
+| Frontend         | Next.js, React, TypeScript       |
+| Backend          | NestJS, TypeScript               |
+| Monorepo         | Nx                               |
+| Database         | PostgreSQL                       |
+| ORM              | Prisma                           |
+| Cache / Sessions | Redis                            |
+| Messaging        | Apache Kafka, KafkaJS            |
+| Vector Database  | Qdrant                           |
+| AI               | OpenAI-compatible providers      |
+| Embeddings       | Configurable embedding providers |
+| GitHub           | GitHub REST API, GitHub OAuth    |
+| Validation       | Zod                              |
+| Logging          | Pino                             |
+| Infrastructure   | Docker, Docker Compose           |
+
+
+## Project Structure
+```
+OpenSource-Copilot/
+│
+├── apps/
+│   ├── web/
+│   │   └── Next.js frontend
+│   │
+│   ├── gateway/
+│   │   └── API gateway
+│   │
+│   ├── repository-service/
+│   │   └── GitHub & repository intelligence
+│   │
+│   ├── guidance-service/
+│   │   └── Contributor intelligence
+│   │
+│   └── knowledge-service/
+│       └── AI & RAG
+│
+├── libs/
+│   ├── contracts/
+│   ├── config/
+│   ├── observability/
+│   ├── shared/
+│   ├── database/
+│   ├── kafka/
+│   └── github/
+│
+├── docker-compose.yml
+├── nx.json
+├── package.json
+├── tsconfig.json
+└── README.md
+```
+## Getting Started
 
 ## Prerequisites
 
-- Node.js LTS
-- Docker + Docker Compose (for local infrastructure)
-- A GitHub OAuth App
-- (Optional for RAG) OpenAI-compatible embedding and chat-completions endpoints + API keys
+Make sure you have the following installed:
 
----
+- Node.js
+- npm
+- Git
+- Docker Desktop
 
-## Quick start
+You will also need credentials/configuration for the services used by the application, including GitHub OAuth and the configured AI, embedding, and Qdrant providers.
 
-### 1. Clone and install
-
-```bash
+## Clone the Repository
+```
+git clone https://github.com/Alishaa-987/OpenSource-Copilot.git
+cd OpenSource-Copilot
+```
+## Install Dependencies
+```
 npm install
 ```
+## Configure Environment Variables
 
-### 2. Configure environment
-
-Copy the example file and replace every placeholder:
-
-```bash
+Create your local environment file:
+```
 cp .env.example .env
 ```
+Configure the required values for:
 
-**Important:** `.env` is gitignored and must never be committed. The example file contains development placeholders only.
+- PostgreSQL
+- Redis
+- Kafka
+- GitHub OAuth
+- Qdrant
+- AI provider
+- Embedding provider
+- Service configuration
 
-Required local values:
+Never commit real API keys, OAuth secrets, or other credentials.
 
-- `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET` from your GitHub OAuth App
-- `GITHUB_REDIRECT_URI` must match the Authorization callback URL in the GitHub app
-- `FRONTEND_BASE_URL` must match the origin where `apps/web` runs (default: `http://localhost:3000`)
+## Run Local Infrastructure
 
-For RAG/AI features you also need:
-
-- `EMBEDDING_BASE_URL` + `EMBEDDING_API_KEY`
-- `LLM_BASE_URL` + `LLM_API_KEY`
-
-Without these keys the services **start successfully**, but embedding, indexing, and ask endpoints fail at runtime.
-
-### 3. Start infrastructure
-
-```bash
-npm run infra:up
+The project provides Docker Compose configuration for local infrastructure.
 ```
-
-This starts PostgreSQL (ports `5432` and `5433`), Redis (`6379`), Kafka (`9092`), and Qdrant (`6333`).
-
-### 4. Generate Prisma clients and run migrations
-
-```bash
-npm run prisma:generate
-npm run prisma:deploy
-npm run prisma:guidance:generate
-npm run prisma:guidance:deploy
+docker compose up -d
 ```
+This starts the required infrastructure services, including:
 
-> `libs/guidance-database/generated` is generated by `prisma:guidance:generate` and is gitignored.
+- PostgreSQL
+- Redis
+- Apache Kafka
 
-### 5. Run the services
+Qdrant and external AI/embedding providers can be configured according to the environment being used.
 
-In separate terminals:
+## Run the Services
 
-```bash
+Start the backend services using Nx:
+```
 npx nx serve gateway
+```
+```
 npx nx serve repository-service
+```
+```
 npx nx serve guidance-service
+```
+```
 npx nx serve knowledge-service
 ```
-
-Default ports: gateway `3000`, repository-service `3001`, guidance-service `3002`, knowledge-service `3003`.
-
----
-
-## Frontend
-
-The Next.js frontend lives in `apps/web` and is bootstrapped independently:
-
-```bash
-cd apps/web
-cp .env.example .env  # if you need frontend env vars (none required for Phase 1)
-npm install
-npm run dev
+Start the frontend:
 ```
-
-`apps/web/next.config.ts` rewrites browser calls:
-
-- `/api/repository/*` → repository-service
-- `/api/guidance/*` → guidance-service
-
-The frontend currently does **not** proxy the knowledge service directly; RAG flows are consumed through guidance-service endpoints.
-
----
-
-## Health endpoints
-
-Every service exposes:
-
-- `GET /api/health/live` — liveness
-- `GET /api/health` and `GET /api/health/ready` — readiness (includes infrastructure checks)
-
-Readiness fails closed: a dependency failure returns a standard Terminus unhealthy response without leaking connection strings or credentials.
-
----
-
-## Key API flows
-
-| Flow | Entrypoint | Notes |
-|---|---|---|
-| GitHub login | `GET /api/repository/v1/github/auth/start` | Server-side OAuth state, cookie-based session |
-| List repositories | `GET /api/repository/v1/github/repositories` | Returns GitHub-accessible repos |
-| Import repository | `POST /api/repository/v1/github/repositories/import` | Persists metadata, docs, issues; publishes `RepositoryImported` event |
-| List issues | `GET /api/repository/v1/github/repositories/:id/issues` | Repository-service owned issues |
-| Recommendations | `GET /api/guidance/v1/repositories/:id/recommendations` | Deterministic ranking |
-| Ask repository | `POST /api/knowledge/v1/repositories/:id/ask` | RAG answer (requires LLM provider) |
-| Retrieve context | `POST /api/knowledge/v1/repositories/:id/retrieve` | Raw retrieved chunks (requires embedding provider) |
-
----
-
-## Testing
-
-```bash
-# TypeScript typecheck
-npm run typecheck
-
-# Lint all backend projects
-npm run lint
-
-# Unit tests
-npx nx run-many -t test --projects=gateway,repository-service,guidance-service,knowledge-service,config,contracts,observability,shared,database,kafka
-
-# Integration tests (require running infrastructure)
-$env:RUN_INTEGRATION=1; npx nx test repository-service
-$env:RUN_INTEGRATION=1; npx nx test guidance-service
+npx nx serve web
 ```
+## Development
 
-On Windows, the aggregate Nx lint wrapper can stall; run direct ESLint over backend sources if needed.
-
----
-
-## Repository layout
-
-```text
-.
-├── apps/
-│   ├── gateway/              # Entrypoint / edge service
-│   ├── guidance-service/     # Recommendations + contributor intelligence
-│   ├── knowledge-service/    # RAG: chunking, embeddings, Qdrant, LLM orchestration
-│   ├── repository-service/   # GitHub integration + repository data owner
-│   └── web/                  # Next.js frontend (independent)
-├── libs/
-│   ├── config/               # dotenv loading + Zod validation
-│   ├── contracts/            # Event envelopes + API error contracts
-│   ├── database/             # Repository-service Prisma module
-│   ├── github/               # Resilient GitHub REST/OAuth client
-│   ├── guidance-database/    # Guidance-service generated Prisma client
-│   ├── kafka/                # KafkaJS producer/consumer + correlation
-│   ├── observability/        # Pino logging + correlation middleware
-│   └── shared/               # Bootstrap, health, Redis, rate limiting
-├── docs/                     # Architecture, API, events, database, environment
-├── docker-compose.yml        # Local infrastructure
-└── nx.json                   # Nx workspace configuration
+Run type checking:
 ```
+npx nx run-many --target=typecheck
+```
+Run tests:
+```
+npx nx run-many --target=test
+```
+Build services:
+```
+npx nx run-many --target=build
+```
+Infrastructure-dependent tests may require:
+```
+RUN_INTEGRATION=1
+```
+with PostgreSQL, Redis, and Kafka running locally.
 
----
+## Roadmap
 
-## Documentation
+OpenSource Copilot is actively evolving.
 
-- [Architecture and service boundaries](docs/ARCHITECTURE.md)
-- [API reference](docs/API.md)
-- [Event contracts](docs/EVENTS.md)
-- [Database ownership and migrations](docs/DATABASE.md)
-- [Environment and local setup](docs/ENVIRONMENT.md)
-- [Backend progress and verification](BACKEND_PROGRESS.md)
-- [Engineering quality review](ENGINEERING_QUALITY_REVIEW.md)
-- [Frontend/backend contract notes](FRONTEND_BACKEND_CONTRACT.md)
+Planned improvements include:
 
----
+- Repository architecture visualization
+- GitHub webhook integration
+- Background repository synchronization
+- Deeper code understanding
+- Branch-aware repository indexing
+- Advanced code-aware retrieval
+- Retrieval reranking
+- Improved issue-to-code reasoning
+- Pull request intelligence
+- Personalized contributor recommendations
+- Contribution difficulty estimation
+- Interactive contributor onboarding
+- Advanced AI orchestration
+- Additional AI and embedding providers
+- Production observability and distributed tracing
+- Vision
 
-## Security notes
+Open-source projects contain an enormous amount of knowledge, but that knowledge is often difficult for new contributors to discover.
+```
+OpenSource Copilot aims to make that knowledge accessible.
 
-- `.env` is gitignored; real secrets must never be committed.
-- GitHub tokens and OAuth state are stored server-side in Redis with TTLs.
-- Repository content is treated as untrusted data in RAG prompts.
-- Rate limiting defaults to enabled and uses Redis with a process-local fallback.
-- Local setup uses plaintext Kafka/HTTP and development credentials; production requires TLS, proxy trust, cookie policies, and centralized secrets.
+Repository Complexity
+        ↓
+Repository Understanding
+        ↓
+Issue Understanding
+        ↓
+Code Understanding
+        ↓
+AI-Powered Guidance
+        ↓
+Confident Contribution
+```
+The long-term vision is to make contributing to unfamiliar open-source projects feel less like navigating an unknown codebase and more like having an experienced contributor guide you through it.
 
----
+## Contributing
 
-## Known operational notes
+Contributions are welcome.
 
-1. **RAG requires provider keys.** The knowledge service env schema makes `EMBEDDING_API_KEY`, `EMBEDDING_BASE_URL`, `LLM_API_KEY`, and `LLM_BASE_URL` optional so the service can start without them. However, `indexRepository`, `retrieve`, and `ask` call the HTTP providers, which throw `"Embedding provider is not configured"` / `"LLM provider is not configured"` when keys are missing.
-2. **Duplicate Kafka consumer group.** The previous `.env` defined `KAFKA_CONSUMER_GROUP` twice, which could cause guidance-service and knowledge-service to share partitions unexpectedly. The cleaned `.env.example` now defines it once.
-3. **Frontend analysis status.** The UI adapter currently hardcodes `analysisStatus: "not-analyzed"`. After a successful import the repository overview still displays "Not analyzed" until the adapter is updated to read real indexing state.
-4. **Windows shutdown warning.** NestJS shutdown hooks may log `kill ENOSYS` on Windows; this is an OS-level signal limitation and does not affect request handling.
+If you would like to contribute:
+
+- Fork the repository.
+- Create a feature branch.
+- Make your changes.
+- Add relevant tests.
+- Verify the affected services.
+- Open a pull request with a clear description of your changes.
+
+Please preserve the existing service boundaries and repository access controls when contributing to the backend.
+
+## License
+
+This project is licensed under the terms specified in the repository's license.
