@@ -1,5 +1,4 @@
 <img width="1885" height="907" alt="image" src="https://github.com/user-attachments/assets/2aefd75c-dff9-49a5-bf08-ee124e7de9db" />
-# OpenSource Copilot
 
 <p align="center">
   <strong>AI-powered intelligence for open-source contribution</strong>
