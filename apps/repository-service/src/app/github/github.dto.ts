@@ -77,6 +77,7 @@ export interface GitHubRepositoryResponse {
   stars: number;
   forks: number;
   language: string | null;
+  languages: Record<string, number>;
   topics: string[];
   license: string | null;
   defaultBranch: string;

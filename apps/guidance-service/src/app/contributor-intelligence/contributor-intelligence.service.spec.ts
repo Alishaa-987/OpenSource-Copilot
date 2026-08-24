@@ -8,7 +8,8 @@ describe('ContributorIntelligenceService', () => {
     const issues = { getIssue: jest.fn().mockResolvedValue(issue) };
     const knowledge = { retrieve };
     const prisma = { issueIntelligence: { upsert: jest.fn().mockResolvedValue({}) } };
-    return { service: new ContributorIntelligenceService(issues as never, knowledge as never, prisma as never), issues, prisma };
+    const llm = { isConfigured: jest.fn().mockReturnValue(false), generate: jest.fn() };
+    return { service: new ContributorIntelligenceService(issues as never, knowledge as never, prisma as never, llm as never), issues, prisma, llm };
   }
 
   it('maps retrieved files and documentation with bounded confidence', async () => {

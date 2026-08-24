@@ -9,6 +9,7 @@ import { ContributionWorkflowService } from './contribution-workflow.service';
 import { SimilarContextController } from './similar-context.controller';
 import { SimilarContextService } from './similar-context.service';
 import { RepositorySimilarIssuesClient } from './similar-issues.client';
+import { GuidanceLlmService } from './guidance-llm.service';
 
 @Module({
   controllers: [ContributorIntelligenceController, ContributionWorkflowController, SimilarContextController],
@@ -19,6 +20,7 @@ import { RepositorySimilarIssuesClient } from './similar-issues.client';
     ContributorIntelligenceService,
     ContributionWorkflowService,
     SimilarContextService,
+    GuidanceLlmService,
   ],
 })
 export class ContributorIntelligenceModule {}

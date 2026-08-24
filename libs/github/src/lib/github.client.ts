@@ -124,6 +124,15 @@ export class GitHubClient {
     return this.parse(GitHubRepositorySchema, response.data, `/repositories/${githubRepositoryId.toString()}`);
   }
 
+  async getLanguages(token: string | undefined, owner: string, name: string): Promise<Record<string, number>> {
+    const response = await this.request<unknown>({
+      method: 'GET',
+      url: `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(name)}/languages`,
+      token,
+    });
+    return z.record(z.string().min(1), z.number().nonnegative()).parse(response.data);
+  }
+
   async getReadme(token: string | undefined, owner: string, name: string): Promise<GitHubContent | null> {
     return this.getOptionalContent(token, owner, name, 'README.md', '/readme');
   }

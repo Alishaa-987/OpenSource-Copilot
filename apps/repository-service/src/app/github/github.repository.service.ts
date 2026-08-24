@@ -89,18 +89,67 @@ export class GitHubRepositoryService {
       where: { repositoryId: repository.id, documentType: 'readme' },
       select: { content: true },
     });
+    let live: GitHubRepository | null = null;
     try {
-      const live = await this.github.getRepository(session.token, repository.owner, repository.name);
-      const refreshed = await this.prisma.repository.update({
-        where: { id: repository.id },
-        data: this.repositoryUpdateData(live),
-      });
-      const liveReadme = await this.github.getReadme(session.token, repository.owner, repository.name);
-      const liveReadmeContent = liveReadme ? this.decodeContent(liveReadme.content, liveReadme.encoding) : undefined;
-      return this.mapStoredRepository(refreshed, liveReadmeContent?.trim() ? liveReadmeContent : readme?.content);
+      live = await this.github.getRepository(session.token, repository.owner, repository.name);
     } catch {
+      // GitHub may temporarily reject a detail refresh (rate limit, expired
+      // token, or transient upstream error). The imported record is still
+      // authorized and usable, so do not turn the entire overview into 500.
+    }
+
+    if (!live) {
       return this.mapStoredRepository(repository, readme?.content);
     }
+
+    const refreshed = await this.prisma.repository.update({
+      where: { id: repository.id },
+      data: this.repositoryUpdateData(live),
+    });
+
+    // Forks are analyzed against upstream issues, so their overview statistics
+    // must come from the upstream repository rather than the usually-empty fork.
+    let overviewSource = live;
+    if (live.parent?.owner.login && live.parent.name) {
+      try {
+        overviewSource = await this.github.getRepository(session.token, live.parent.owner.login, live.parent.name);
+      } catch {
+        // Keep fork metadata if upstream metadata is temporarily unavailable.
+      }
+    }
+
+    // Optional enrichment must not hide the live repository metadata. A failure
+    // while loading README or language statistics should never make stars and
+    // openIssuesCount fall back to stale database values.
+    let readmeContent = readme?.content;
+    try {
+      const liveReadme = await this.github.getReadme(session.token, repository.owner, repository.name);
+      const decoded = liveReadme ? this.decodeContent(liveReadme.content, liveReadme.encoding) : undefined;
+      if (decoded?.trim()) readmeContent = decoded;
+    } catch {
+      // Keep the previously imported README when GitHub README enrichment fails.
+    }
+
+    let languages: Record<string, number> = {};
+    try {
+      languages = await this.github.getLanguages(session.token, overviewSource.owner.login, overviewSource.name);
+    } catch {
+      // Language statistics are optional; primaryLanguage remains available.
+    }
+
+    const overviewStars = overviewSource.stargazers_count ?? refreshed.stars;
+    const overviewOpenIssues = overviewSource.open_issues_count ?? refreshed.openIssuesCount;
+    const persistedOverview = await this.prisma.repository.update({
+      where: { id: refreshed.id },
+      data: { stars: overviewStars, openIssuesCount: overviewOpenIssues },
+    });
+    const overviewRepository = {
+      ...persistedOverview,
+      stars: overviewStars,
+      openIssuesCount: overviewOpenIssues,
+      language: overviewSource.language ?? persistedOverview.language,
+    };
+    return this.mapStoredRepository(overviewRepository, readmeContent, languages);
   }
 
   async listRepositoryIssues(request: Request, repositoryId: string) {
@@ -217,8 +266,41 @@ export class GitHubRepositoryService {
       key: result.repository.id,
       event,
     });
+    // The import response is cached by the frontend immediately. For forks,
+    // return the upstream repository's live counters so the first render does
+    // not briefly (or permanently) show the fork's usual zero values.
+    let overviewSource = githubRepository;
+    if (githubRepository.fork && githubRepository.parent) {
+      try {
+        overviewSource = await this.github.getRepository(
+          token ?? '',
+          githubRepository.parent.owner.login,
+          githubRepository.parent.name,
+        );
+      } catch {
+        // Keep the imported fork response if upstream refresh is unavailable.
+      }
+    }
+    let importedLanguages: Record<string, number> = {};
+    try {
+      importedLanguages = await this.github.getLanguages(token ?? '', overviewSource.owner.login, overviewSource.name);
+    } catch {
+      // Language statistics are optional enrichment.
+    }
+    const overviewStars = overviewSource.stargazers_count ?? result.repository.stars;
+    const overviewOpenIssues = overviewSource.open_issues_count ?? result.repository.openIssuesCount;
+    await this.prisma.repository.update({
+      where: { id: result.repository.id },
+      data: { stars: overviewStars, openIssuesCount: overviewOpenIssues },
+    });
+    const overviewRepository = {
+      ...result.repository,
+      stars: overviewStars,
+      openIssuesCount: overviewOpenIssues,
+      language: overviewSource.language ?? result.repository.language,
+    };
     return {
-      repository: this.mapStoredRepository(result.repository, documents.find((document) => document.documentType === 'readme')?.content),
+      repository: this.mapStoredRepository(overviewRepository, documents.find((document) => document.documentType === 'readme')?.content, importedLanguages),
       imported: { documents: documents.length, issues: issues.length, labels: result.labels },
     };
   }
@@ -362,7 +444,7 @@ export class GitHubRepositoryService {
     description: string | null; url: string; stars: number; forks: number; language: string | null;
     topics: string[]; license: string | null; defaultBranch: string; isFork: boolean; parentFullName: string | null; openIssuesCount: number;
     lastSyncedAt: Date | null; createdAt: Date; updatedAt: Date;
-  }, readmeContent?: string): ImportedRepositoryResponse {
+  }, readmeContent?: string, languages: Record<string, number> = {}): ImportedRepositoryResponse {
     return {
       id: repository.githubRepositoryId.toString(),
       githubRepositoryId: repository.githubRepositoryId.toString(),
@@ -376,6 +458,7 @@ export class GitHubRepositoryService {
       stars: repository.stars,
       forks: repository.forks,
       language: repository.language,
+      languages,
       topics: repository.topics,
       license: repository.license,
       defaultBranch: repository.defaultBranch,
@@ -408,12 +491,13 @@ export class GitHubRepositoryService {
       .split(/\r?\n/)
       .map((line) => line.replace(/\s+/g, ' ').trim())
       .filter((line) => line.length >= 25)
+      .filter((line) => !/^\s*\|.*\|\s*$/.test(line))
       .filter((line) => !/(shields\.io|img\.shields|badge|committers\.top|npmjs\.com\/package|version\s*\(!?committers|live\s*(web\s*)?demo|play\s*store)/i.test(line))
       .filter((line) => !/[<>]|(?:src|href|align)\s*=|\b(?:div|img|href|src|alt)\b/i.test(line))
       .filter((line) => /[A-Za-z]{3,}/.test(line));
 
-    const summary = lines.slice(0, 2).join(' ').trim();
-    return summary ? summary.slice(0, 600).trimEnd() + (summary.length > 600 ? '...' : '') : null;
+    const summary = lines.slice(0, 8).join('\n\n').trim();
+    return summary ? summary.slice(0, 1600).trimEnd() + (summary.length > 1600 ? '...' : '') : null;
   }
 
   private mapIssue(issue: {
@@ -445,6 +529,7 @@ export class GitHubRepositoryService {
       stars: repository.stargazers_count ?? 0,
       forks: repository.forks_count ?? 0,
       language: repository.language ?? null,
+      languages: {},
       topics: repository.topics ?? [],
       license: repository.license?.spdx_id ?? repository.license?.key ?? null,
       defaultBranch: repository.default_branch ?? 'main',

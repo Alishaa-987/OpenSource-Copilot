@@ -15,7 +15,7 @@ export class KnowledgeController {
   @Post(':repositoryId/retrieve')
   async retrieve(@Param('repositoryId', new ParseUUIDPipe()) repositoryId: string, @Body() body: RetrieveKnowledgeDto, @Req() request: Request) {
     if (!request.headers.cookie) throw new UnauthorizedException('Authentication required');
-    const rows = await this.knowledge.retrieve(repositoryId, body.question, body.limit);
+    const rows = await this.knowledge.retrieve(repositoryId, body.question, body.limit, request.headers.cookie);
     return { repositoryId, chunks: rows };
   }
 }

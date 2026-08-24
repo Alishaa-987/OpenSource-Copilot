@@ -66,7 +66,8 @@ export interface IssueAnalysis {
   readonly suggestedApproach: readonly string[];
   readonly contributionSteps: readonly GuidanceStep[];
   readonly testingPlan: readonly string[];
-  readonly method: 'deterministic-heuristic';
+  readonly evidencePaths: readonly string[];
+  readonly method: 'grounded-llm' | 'deterministic-heuristic';
 }
 
 export interface ContributorIntelligenceResult {

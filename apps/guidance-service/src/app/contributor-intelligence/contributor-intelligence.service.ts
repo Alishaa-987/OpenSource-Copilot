@@ -4,6 +4,7 @@ import { Prisma } from '../../../../../libs/guidance-database/generated';
 import { GuidancePrismaService } from '../database/guidance-prisma.service';
 import { KnowledgeRetrievalClient, RepositoryIssueDetailClient } from './contributor-intelligence.clients';
 import type { ContributorIssue, ContributorIntelligenceResult, Effort, GuidanceStep, IssueAnalysis, IssueMapping, MappingEvidence, RetrievedKnowledgeChunk } from './contributor-intelligence.types';
+import { GuidanceLlmService } from './guidance-llm.service';
 
 const DOC_TYPES = new Set(['readme', 'contributing', 'code-of-conduct', 'security', 'documentation']);
 const HIGH_RISK_LABELS = new Set(['breaking-change', 'breaking', 'major-feature', 'large-feature', 'architectural-change', 'architecture']);
@@ -14,7 +15,7 @@ const normalize = (value: string): string => value.trim().toLowerCase().replace(
 @Injectable()
 export class ContributorIntelligenceService {
   private readonly logger = new Logger(ContributorIntelligenceService.name);
-  constructor(private readonly issues: RepositoryIssueDetailClient, private readonly knowledge: KnowledgeRetrievalClient, private readonly prisma: GuidancePrismaService) {}
+  constructor(private readonly issues: RepositoryIssueDetailClient, private readonly knowledge: KnowledgeRetrievalClient, private readonly prisma: GuidancePrismaService, private readonly llm: GuidanceLlmService) {}
 
   async getIntelligence(repositoryId: string, issueId: string, cookie: string): Promise<ContributorIntelligenceResult> {
     const issue = await this.issues.getIssue(repositoryId, issueId, cookie);
@@ -24,8 +25,15 @@ export class ContributorIntelligenceService {
       limitations.push('Repository retrieval was unavailable; mapping uses issue metadata only.');
       this.logger.warn('Knowledge retrieval failed; using deterministic issue-only analysis');
     }
-    const mapping = this.buildMapping(issue, chunks, limitations);
-    const analysis = this.buildAnalysis(issue, mapping);
+    let mapping = this.buildMapping(issue, chunks, limitations);
+    const analysis = await this.buildGroundedAnalysis(issue, mapping, chunks, limitations);
+    if (analysis.method === 'grounded-llm') {
+      const verifiedPaths = new Set(analysis.evidencePaths);
+      const relevantFiles = mapping.relevantFiles.filter((file) => verifiedPaths.has(file.path));
+      const relevantDocumentation = mapping.relevantDocumentation.filter((file) => verifiedPaths.has(file.path));
+      const relevantModules = mapping.relevantModules.filter((module) => relevantFiles.some((file) => file.path.startsWith(module.path + '/')));
+      mapping = { ...mapping, relevantFiles, relevantDocumentation, relevantModules, confidence: relevantFiles.length > 0 ? mapping.confidence : 0, limitations: relevantFiles.length > 0 ? mapping.limitations : [...mapping.limitations, 'No repository file was verified by the grounded analysis.'] };
+    }
     const generatedAt = new Date().toISOString();
     await this.prisma.issueIntelligence.upsert({
       where: { repositoryId_issueId: { repositoryId, issueId } },
@@ -61,7 +69,36 @@ export class ContributorIntelligenceService {
     return { relevantFiles: files.slice(0, 8), relevantDocumentation: documentation.slice(0, 8), relevantModules: modules, confidence, limitations: Object.freeze([...limitations, ...(evidence.length === 0 ? ['No indexed repository context matched this issue.'] : [])]) };
   }
 
-  private buildAnalysis(issue: ContributorIssue, mapping: IssueMapping): IssueAnalysis {
+  private async buildGroundedAnalysis(issue: ContributorIssue, mapping: IssueMapping, chunks: readonly RetrievedKnowledgeChunk[], limitations: readonly string[]): Promise<IssueAnalysis> {
+    if (!this.llm.isConfigured() || chunks.length === 0) return this.buildAnalysis(issue, mapping, limitations);
+    try {
+      const grounded = await this.llm.generate(issue, mapping, chunks);
+      const allowedPaths = new Set(chunks.map((chunk) => chunk.path));
+      const evidencePaths = grounded.evidencePaths.filter((path) => allowedPaths.has(path));
+      return {
+        complexity: grounded.complexity,
+        effort: grounded.effort,
+        requiredKnowledge: grounded.requiredKnowledge,
+        dependencies: grounded.dependencies,
+        beginnerSuitable: grounded.beginnerSuitable,
+        confidence: mapping.confidence,
+        reasons: [...grounded.reasons, ...limitations],
+        evidence: evidencePaths.map((path) => `Retrieved path: ${path}`),
+        explanation: grounded.explanation,
+        rootCause: grounded.rootCause,
+        suggestedApproach: grounded.suggestedApproach,
+        contributionSteps: grounded.contributionSteps,
+        testingPlan: grounded.testingPlan,
+        evidencePaths,
+        method: 'grounded-llm',
+      };
+    } catch (error) {
+      this.logger.warn(`Grounded guidance unavailable; using deterministic fallback: ${error instanceof Error ? error.message : 'unknown error'}`);
+      return this.buildAnalysis(issue, mapping, [...limitations, 'LLM analysis was unavailable; the displayed guidance is heuristic and must be verified against the repository.']);
+    }
+  }
+
+  private buildAnalysis(issue: ContributorIssue, mapping: IssueMapping, limitations: readonly string[] = []): IssueAnalysis {
     const labels = new Set(issue.labels.map((label) => normalize(label.name)));
     const rawText = issue.title + ' ' + (issue.body ?? '');
     const text = normalize(rawText);
@@ -85,7 +122,7 @@ export class ContributorIntelligenceService {
     const suggestedApproach = this.suggestedApproach(rawText, paths);
     const contributionSteps = this.contributionSteps(paths, mapping);
     const testingPlan = this.testingPlan(rawText, paths);
-    return { complexity, effort, requiredKnowledge, dependencies, beginnerSuitable, confidence: clamp(0.45 + (mapping.confidence * 0.35) + (issue.title.length > 10 ? 0.1 : 0)), reasons, evidence, explanation, rootCause, suggestedApproach, contributionSteps, testingPlan, method: 'deterministic-heuristic' };
+    return { complexity, effort, requiredKnowledge, dependencies, beginnerSuitable, confidence: clamp(0.45 + (mapping.confidence * 0.35) + (issue.title.length > 10 ? 0.1 : 0)), reasons: [...reasons, ...limitations], evidence, explanation, rootCause, suggestedApproach, contributionSteps, testingPlan, evidencePaths: paths, method: 'deterministic-heuristic' };
   }
 
   private evidenceExplanation(issue: ContributorIssue, chunk: RetrievedKnowledgeChunk): string {
@@ -107,26 +144,51 @@ export class ContributorIntelligenceService {
   }
 
   private suggestedApproach(text: string, paths: readonly string[]): string[] {
-    const steps = ['Reproduce the reported failure and capture the exact compiler or test diagnostic.', 'Inspect the retrieved paths and trace the input from the route boundary through validation to the response.', 'Make the smallest contract-preserving change; keep validation, inferred types, and error messages consistent.', 'Run focused tests first, then the repository checks required by its contribution documentation.'];
-    if (/zod|validation/.test(normalize(text))) steps.splice(2, 0, 'Use the existing validation context and schema inference pattern instead of introducing a second validation convention.');
-    if (paths.length === 0) steps.unshift('Search the repository for the issue terms and route name locally because the indexed corpus did not return source files.');
-    return steps;
+    const normalizedText = normalize(text);
+    const focus = this.issueFocus(text);
+    const target = paths.length > 0 ? paths.slice(0, 4).join(', ') : 'a local repository search for the issue terms';
+    const steps = [
+      `Reproduce “${focus}” locally and record the first failing test, compiler diagnostic, or runtime response.`,
+      `Trace the affected behavior through ${target}; treat these paths as retrieved leads and verify the actual call path before editing.`,
+      `Make the smallest change that satisfies the issue’s acceptance condition for ${focus}; do not broaden types or weaken validation to silence an error.`,
+      'Add a regression check for the observed failure and preserve the existing behavior for valid inputs.',
+    ];
+    if (/zod|validation|schema/.test(normalizedText)) steps.splice(2, 0, 'Keep the runtime schema and inferred TypeScript type derived from the same source, then verify both accepted and rejected input shapes.');
+    if (/type|typescript|mismatch|assign/.test(normalizedText)) steps.splice(2, 0, 'Compare the producer, validator, and consumer types at the failing boundary and correct the narrowest inconsistent contract.');
+    if (/docs?|readme|documentation/.test(normalizedText)) steps.splice(2, 0, 'Follow the repository’s documented contribution conventions and update only the documentation section described by the issue.');
+    return steps.slice(0, 8);
   }
 
   private contributionSteps(paths: readonly string[], mapping: IssueMapping): GuidanceStep[] {
+    const evidenceTarget = paths.length > 0 ? paths.slice(0, 4).join(', ') : 'the repository search results';
+    const confidenceNote = mapping.confidence < 0.7 ? ' Retrieval confidence is limited, so confirm the call path locally before committing.' : ' Retrieval confidence is sufficient to begin tracing, but still verify the code locally.';
     return [
-      { title: 'Before coding', actions: ['Read the repository contribution guidance.', `Review the issue and inspect ${paths.length > 0 ? paths.join(', ') : 'the repository search results'}.`], completionEvidence: 'You can explain the current behavior and the acceptance condition.' },
-      { title: 'While coding', actions: ['Create a focused branch.', 'Change only the affected contract, validation, and implementation paths.', 'Keep the retrieved evidence as a hypothesis and verify it against the local code.'], completionEvidence: 'The diff is narrow and the type/runtime contracts agree.' },
-      { title: 'Testing', actions: ['Run the focused route or validation tests.', 'Run TypeScript/build checks and relevant lint rules.', 'Check both valid and invalid input paths.'], completionEvidence: 'Tests and checks pass without weakening validation.' },
-      { title: 'Create the pull request', actions: ['Summarize the failure, root cause, and fix.', 'Link the issue and include test commands/results.', 'Ask for review if the inferred mapping confidence is below 0.7.'], completionEvidence: `Mapping confidence is ${mapping.confidence.toFixed(2)} and should be stated honestly in the PR.` },
+      { title: 'Understand the issue', actions: ['Read the full issue discussion and identify the expected outcome, constraints, and unanswered questions.', 'Write down a reproducible trigger and the observable acceptance condition.'], completionEvidence: 'You can state the current behavior, expected behavior, and a reproducible trigger.' },
+      { title: 'Trace before coding', actions: [`Inspect the retrieved evidence: ${evidenceTarget}.`, `Follow the data or request flow from its boundary to the failure and confirm whether the retrieved paths are actually involved.${confidenceNote}`], completionEvidence: 'You have identified the first failing boundary and can explain why the proposed files are involved.' },
+      { title: 'Implement narrowly', actions: ['Create a focused branch linked to the issue.', 'Change the smallest set of verified files, preserving existing public contracts unless the issue requires a contract change.', 'Add a regression test alongside the affected behavior.'], completionEvidence: 'The diff addresses the reported behavior without unrelated refactoring, and the regression test fails before the fix.' },
+      { title: 'Validate and submit', actions: ['Run focused tests, typecheck, lint, and the repository-required checks.', 'Review the final diff and confirm no secrets or generated artifacts are included.', 'Open a pull request that links the issue and reports the exact validation commands and results.'], completionEvidence: 'All required checks pass and the pull request explains the evidence, change, and test coverage.' },
     ];
   }
 
   private testingPlan(text: string, paths: readonly string[]): string[] {
-    const plan = ['Add or update a regression test that fails before the fix and passes after it.', 'Run the focused test suite for the affected route/module.', 'Run the project typecheck/build and lint commands.', 'Verify malformed input still returns the intended validation error and valid input still returns the expected response.'];
-    if (/api|route|endpoint/.test(normalize(text))) plan.push('Exercise the endpoint with representative valid, missing, and incorrectly typed parameters.');
-    if (paths.length > 0) plan.push(`Review test coverage for the affected path(s): ${paths.join(', ')}.`);
-    return plan;
+    const normalizedText = normalize(text);
+    const focus = this.issueFocus(text);
+    const plan = [
+      `Create a regression test that reproduces “${focus}” before the fix and passes after it.`,
+      'Run the narrowest affected test target first, then the repository’s full relevant test suite.',
+      'Run the repository typecheck/build and lint commands required by its contribution documentation.',
+    ];
+    if (/api|route|endpoint|request|response/.test(normalizedText)) plan.push('Exercise the affected boundary with valid input, missing input, and incorrectly typed input; verify status codes and response shape.');
+    if (/database|sql|schema|migration|prisma/.test(normalizedText)) plan.push('Run the affected database test or migration check against an isolated database and verify both existing and new records.');
+    if (/ui|component|render|page|frontend/.test(normalizedText)) plan.push('Verify the affected state in the UI and cover loading, success, empty, and error states where applicable.');
+    if (paths.length > 0) plan.push(`Review coverage and the final diff for the verified evidence paths: ${paths.slice(0, 6).join(', ')}.`);
+    else plan.push('Because no repository source path was retrieved, confirm the implementation location locally before claiming path-specific test coverage.');
+    return plan.slice(0, 10);
+  }
+
+  private issueFocus(text: string): string {
+    const cleaned = text.replace(/```[\s\S]*?```/g, ' ').replace(/https?:\/\/\S+/g, ' ').replace(/\s+/g, ' ').trim();
+    return (cleaned || 'the reported issue').slice(0, 220);
   }
 
   private knowledgeAreas(text: string, labels: ReadonlySet<string>, mapping: IssueMapping): string[] {
