@@ -48,8 +48,19 @@ export class KafkaProducerService implements OnModuleInit, OnModuleDestroy {
   }
 
   async onModuleInit(): Promise<void> {
-    await this.producer.connect();
-    this.logger.log('Kafka producer connected');
+    // Kafka is asynchronous and must not block the HTTP service during broker restarts.
+    void this.connectWithRetry();
+  }
+
+  private async connectWithRetry(): Promise<void> {
+    try {
+      await this.producer.connect();
+      this.logger.log('Kafka producer connected');
+    } catch (error) {
+      this.connected = false;
+      this.logger.warn(`Kafka producer unavailable; retrying in 5s: ${error instanceof Error ? error.message : String(error)}`);
+      setTimeout(() => void this.connectWithRetry(), 5_000).unref();
+    }
   }
 
   async onModuleDestroy(): Promise<void> {
