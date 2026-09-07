@@ -18,6 +18,6 @@ export class AskController {
   ask(@Param('repositoryId', new ParseUUIDPipe()) repositoryId: string, @Body() body: AskQuestionDto, @Req() request: Request) {
     const cookie = request.headers.cookie;
     if (!cookie) throw new UnauthorizedException('Authentication required');
-    return this.ai.ask(repositoryId, body.question, cookie);
+    return this.ai.ask(repositoryId, body.question, cookie, body.context, body.history);
   }
 }

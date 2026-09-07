@@ -120,7 +120,7 @@ export class ContributorIntelligenceService {
     const explanation = this.explanation(issue, paths);
     const rootCause = this.rootCause(rawText, mapping);
     const suggestedApproach = this.suggestedApproach(rawText, paths);
-    const contributionSteps = this.contributionSteps(paths, mapping);
+    const contributionSteps = this.contributionSteps(rawText, paths, mapping, rootCause);
     const testingPlan = this.testingPlan(rawText, paths);
     return { complexity, effort, requiredKnowledge, dependencies, beginnerSuitable, confidence: clamp(0.45 + (mapping.confidence * 0.35) + (issue.title.length > 10 ? 0.1 : 0)), reasons: [...reasons, ...limitations], evidence, explanation, rootCause, suggestedApproach, contributionSteps, testingPlan, evidencePaths: paths, method: 'deterministic-heuristic' };
   }
@@ -159,14 +159,58 @@ export class ContributorIntelligenceService {
     return steps.slice(0, 8);
   }
 
-  private contributionSteps(paths: readonly string[], mapping: IssueMapping): GuidanceStep[] {
-    const evidenceTarget = paths.length > 0 ? paths.slice(0, 4).join(', ') : 'the repository search results';
+  private contributionSteps(text: string, paths: readonly string[], mapping: IssueMapping, rootCause: string): GuidanceStep[] {
+    const normalizedText = normalize(text);
+    const focus = this.issueFocus(text);
+    const shortFocus = focus.length > 70 ? focus.slice(0, 67) + '…' : focus;
+    const evidenceTarget = paths.length > 0 ? paths.slice(0, 4).join(', ') : 'a targeted repository search for the issue terms (no path was retrieved yet)';
     const confidenceNote = mapping.confidence < 0.7 ? ' Retrieval confidence is limited, so confirm the call path locally before committing.' : ' Retrieval confidence is sufficient to begin tracing, but still verify the code locally.';
+    const implementationAction = /zod|validation|schema/.test(normalizedText)
+      ? 'Keep the runtime schema and inferred TypeScript type derived from the same source, then verify both accepted and rejected input shapes.'
+      : /type|typescript|mismatch|assign/.test(normalizedText)
+      ? 'Compare the producer, validator, and consumer types at the failing boundary and correct the narrowest inconsistent contract.'
+      : /docs?|readme|documentation/.test(normalizedText)
+      ? 'Update only the documentation section this issue describes, following the repository’s existing conventions.'
+      : /api|route|endpoint|request|response/.test(normalizedText)
+      ? 'Change the request/response handling at the affected endpoint without altering unrelated routes or contracts.'
+      : `Make the smallest change that satisfies the acceptance condition for “${shortFocus}”; do not broaden types or weaken validation to silence an error.`;
     return [
-      { title: 'Understand the issue', actions: ['Read the full issue discussion and identify the expected outcome, constraints, and unanswered questions.', 'Write down a reproducible trigger and the observable acceptance condition.'], completionEvidence: 'You can state the current behavior, expected behavior, and a reproducible trigger.' },
-      { title: 'Trace before coding', actions: [`Inspect the retrieved evidence: ${evidenceTarget}.`, `Follow the data or request flow from its boundary to the failure and confirm whether the retrieved paths are actually involved.${confidenceNote}`], completionEvidence: 'You have identified the first failing boundary and can explain why the proposed files are involved.' },
-      { title: 'Implement narrowly', actions: ['Create a focused branch linked to the issue.', 'Change the smallest set of verified files, preserving existing public contracts unless the issue requires a contract change.', 'Add a regression test alongside the affected behavior.'], completionEvidence: 'The diff addresses the reported behavior without unrelated refactoring, and the regression test fails before the fix.' },
-      { title: 'Validate and submit', actions: ['Run focused tests, typecheck, lint, and the repository-required checks.', 'Review the final diff and confirm no secrets or generated artifacts are included.', 'Open a pull request that links the issue and reports the exact validation commands and results.'], completionEvidence: 'All required checks pass and the pull request explains the evidence, change, and test coverage.' },
+      {
+        title: `Understand “${shortFocus}”`,
+        actions: [
+          'Read the full issue discussion and identify the expected outcome, constraints, and unanswered questions.',
+          `Write down a reproducible trigger for “${shortFocus}” and the observable acceptance condition described in the issue.`,
+        ],
+        completionEvidence: `You can state the current behavior, the expected behavior for “${shortFocus}”, and a reproducible trigger.`,
+      },
+      {
+        title: 'Trace the affected path before coding',
+        actions: [
+          `Inspect the retrieved evidence: ${evidenceTarget}.`,
+          `Follow the data or request flow from its boundary to the failure and confirm whether these specific paths are actually involved.${confidenceNote}`,
+        ],
+        completionEvidence: `You have identified the first failing boundary in ${evidenceTarget} and can explain why it is involved in “${shortFocus}”.`,
+      },
+      {
+        title: 'Implement the narrowest fix',
+        actions: [
+          'Create a focused branch linked to this issue.',
+          implementationAction,
+          'Add a regression test alongside the affected behavior.',
+        ],
+        completionEvidence: rootCause
+          ? `The diff addresses this issue's root cause (${rootCause.slice(0, 160)}) without unrelated refactoring, and the regression test fails before the fix.`
+          : 'The diff addresses the reported behavior without unrelated refactoring, and the regression test fails before the fix.',
+      },
+      {
+        title: 'Validate and open the pull request',
+        actions: [
+          'Run the narrowest focused test, then typecheck, lint, and the repository-required checks.',
+          'Review the final diff and confirm no secrets or generated artifacts are included.',
+          `Open a pull request that links this issue, explains how the change resolves “${shortFocus}”, and reports the exact validation commands and results.`,
+        ],
+        completionEvidence: 'All required checks pass and the pull request explains the evidence, change, and test coverage.',
+      },
     ];
   }
 

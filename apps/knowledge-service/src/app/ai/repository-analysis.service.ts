@@ -1,4 +1,4 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { HttpException, Inject, Injectable, Logger } from '@nestjs/common';
 import { z } from 'zod';
 import { KnowledgeIngestionService } from '../knowledge/knowledge-ingestion.service';
 import { RetrievedChunk } from '../knowledge/knowledge.types';
@@ -29,8 +29,18 @@ export class RepositoryAnalysisService {
 
   async analyze(repositoryId: string, cookieHeader: string): Promise<RepositoryAnalysis & { repositoryId: string; generatedAt: string; method: 'grounded-llm' | 'grounded-fallback' | 'insufficient-context' }> {
     const question = 'Explain this repository for a new contributor. Identify its architecture, entrypoints, services, libraries, data flow, technology stack, setup/testing workflow, and the safest path to a first pull request. Use README, contributing docs, manifests, CI, directory structure, and high-signal source files.';
-    const chunks = await this.knowledge.retrieve(repositoryId, question, 16, cookieHeader);
-    if (chunks.length === 0) return { repositoryId, generatedAt: new Date().toISOString(), method: 'insufficient-context', confidence: 'low', summary: 'Insufficient repository context was retrieved to create a reliable analysis.', audience: 'New contributors', techStack: [], architecture: { description: 'No architecture diagram was generated because repository context was unavailable.', nodes: [], edges: [] }, firstPrPath: [{ title: 'Collect repository context', actions: ['Retry analysis after repository indexing completes.'], outcome: 'A grounded repository overview can be generated.' }], questionsToExplore: [], evidence: [] };
+    let chunks: RetrievedChunk[];
+    try {
+      chunks = await this.knowledge.retrieveRepositoryOverview(repositoryId, cookieHeader, 64);
+    } catch (error) {
+      // Access errors are intentionally propagated so the client receives the
+      // correct 401/403 response. Unexpected retrieval failures, however, should
+      // produce a truthful low-confidence result rather than an opaque 500.
+      if (error instanceof HttpException) throw error;
+      this.logger.error(JSON.stringify({ event: 'repository-analysis-retrieval-failed', repositoryId, reason: error instanceof Error ? error.message : 'retrieval failed' }));
+      return this.insufficientContext(repositoryId);
+    }
+    if (chunks.length === 0) return this.insufficientContext(repositoryId);
     const allowedPaths = new Set(chunks.map((chunk) => chunk.path));
     const context = this.contextPrompt(chunks);
     const messages: ChatMessage[] = [
@@ -43,13 +53,22 @@ export class RepositoryAnalysisService {
       parsed = analysisSchema.parse(this.parseJsonResponse(raw));
     } catch (error) {
       this.logger.warn(JSON.stringify({ event: 'repository-analysis-llm-fallback', repositoryId, reason: error instanceof Error ? error.message : 'LLM analysis failed' }));
-      const fallbackChunks = await this.knowledge.retrieve(repositoryId, 'README overview project purpose features setup architecture technologies contribution testing', 64, cookieHeader);
+      let fallbackChunks = chunks;
+      try {
+        fallbackChunks = await this.knowledge.retrieveRepositoryOverview(repositoryId, cookieHeader, 64);
+      } catch (fallbackError) {
+        this.logger.warn(JSON.stringify({ event: 'repository-analysis-fallback-retrieval-failed', repositoryId, reason: fallbackError instanceof Error ? fallbackError.message : 'fallback retrieval failed' }));
+      }
       return this.buildEvidenceFallback(repositoryId, fallbackChunks.length > 0 ? fallbackChunks : chunks);
     }
     const evidence = parsed.evidence.filter((item) => allowedPaths.has(item.path));
     const nodeIds = new Set(parsed.architecture.nodes.map((node) => node.id));
     const edges = parsed.architecture.edges.filter((edge) => nodeIds.has(edge.from) && nodeIds.has(edge.to));
     return { ...parsed, architecture: { ...parsed.architecture, edges }, evidence, repositoryId, generatedAt: new Date().toISOString(), method: 'grounded-llm' };
+  }
+
+  private insufficientContext(repositoryId: string): RepositoryAnalysis & { repositoryId: string; generatedAt: string; method: 'insufficient-context' } {
+    return { repositoryId, generatedAt: new Date().toISOString(), method: 'insufficient-context', confidence: 'low', summary: 'Insufficient repository context was retrieved to create a reliable analysis.', audience: 'New contributors', techStack: [], architecture: { description: 'No architecture diagram was generated because repository context was unavailable.', nodes: [], edges: [] }, firstPrPath: [{ title: 'Collect repository context', actions: ['Retry analysis after repository indexing completes.'], outcome: 'A grounded repository overview can be generated.' }], questionsToExplore: [], evidence: [] };
   }
 
   private parseJsonResponse(raw: string): unknown {
@@ -65,7 +84,7 @@ export class RepositoryAnalysisService {
     const paths = [...new Set(uniqueChunks.map((chunk) => chunk.path))];
     const readme = uniqueChunks.filter((chunk) => chunk.documentType === 'readme').sort((left, right) => left.chunkIndex - right.chunkIndex);
     const prose = this.extractReadableReadmeProse(readme.map((chunk) => chunk.content).join('\n\n'));
-    const summary = (prose.slice(0, 6).join('\n\n') || `Repository context was retrieved from ${paths.slice(0, 5).join(', ')}. The language model was unavailable, so this evidence map avoids inventing a broader project description.`).slice(0, 5000);
+    const summary = this.buildReadableSummary(prose, paths);
     const techSignals: Array<[string, RegExp]> = [
       ['TypeScript', /\.tsx?\b|typescript/i], ['JavaScript', /\.jsx?\b|javascript|node\.js/i], ['Python', /\.py\b|python/i], ['React', /react/i], ['Next.js', /next(?:\.js)?/i], ['NestJS', /nestjs|nest\.js/i], ['Vue', /vue/i], ['Angular', /angular/i], ['Django', /django/i], ['FastAPI', /fastapi/i], ['PostgreSQL', /postgres(?:ql)?/i], ['MongoDB', /mongodb|mongo/i], ['Redis', /redis/i], ['Docker', /dockerfile|docker/i], ['GitHub Actions', /\.github\/workflows|github actions/i],
     ];
@@ -114,21 +133,35 @@ export class RepositoryAnalysisService {
       .replace(/^\s*#{1,6}\s*/gm, '')
       .replace(/[`*_>#]/g, ' ')
       .split(/\r?\n/)
+      .flatMap((line) => line.split(/(?<=[.!?])\s+(?=[A-Z0-9])/))
       .map((line) => line.replace(/^\s*[-*+]\s+/, '').replace(/\s+/g, ' ').trim())
       .map((line) => line.replace(/,\s*check out the (.+?),\s*check out the \1\s*\./i, '.'))
-      .filter((line) => line.length >= 35)
+      .filter((line) => line.length >= 35 && line.length <= 700)
       .filter((line) => /^[A-Z0-9"'“‘]/.test(line))
       .filter((line) => !/^table of contents$/i.test(line))
       .filter((line) => (line.match(/\|/g)?.length ?? 0) < 2)
       .filter((line) => !/(?:\[[^\]]+\]\([^)]*\).*){2,}/.test(line))
       .filter((line) => !/^(?:installation|setup|usage|contributing|license|contents?)\s*:?$/i.test(line))
       .filter((line) => !/^(?:[-=]\s*){3,}$/.test(line))
+      .filter((line) => !/(?:drop this into|stop being|for all url parameters|advanced usage|customization guide|see the .* section|cinematic .* monolith|configuration possibilities)/i.test(line))
       .filter((line) => {
-        const key = line.toLowerCase();
+        const key = line.toLowerCase().replace(/\W/g, '');
         if (seen.has(key)) return false;
         seen.add(key);
         return true;
       });
+  }
+
+  private buildReadableSummary(prose: readonly string[], paths: readonly string[]): string {
+    const selected = prose.map((text, index) => {
+      let score = 0;
+      if (/\b(?:is|lets|helps|provides|transforms|generates|creates|builds|visualizes)\b/i.test(text)) score += 3;
+      if (/\b(?:project|tool|library|platform|service|application|github|contribution|badge|visualization|api)\b/i.test(text)) score += 2;
+      if (/\b(?:url parameters|configuration|custom font|timezone|date range|organization dashboard|advanced usage|customization)\b/i.test(text)) score -= 8;
+      return { text, score: score - index * 0.01 };
+    }).filter((item) => item.score > 0).sort((left, right) => right.score - left.score).slice(0, 3).map((item) => item.text);
+    if (selected.length > 0) return selected.join(' ').slice(0, 900);
+    return `A verified overview could not be distilled from the repository README. Available repository evidence: ${paths.filter((path) => !/^issues\//i.test(path)).slice(0, 5).join(', ') || 'repository documents'}.`;
   }
 
   private contextPrompt(chunks: readonly RetrievedChunk[]): string {

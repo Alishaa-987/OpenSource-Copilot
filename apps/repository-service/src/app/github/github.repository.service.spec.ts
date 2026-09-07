@@ -30,14 +30,15 @@ function makeService() {
   };
   const session = { sessionId: 's', userId: 'u', token: 't', githubUserId: 7n, username: 'octocat', expiresAt: new Date().toISOString() };
   const sessions = { requireSession: jest.fn().mockResolvedValue(session), getSession: jest.fn().mockResolvedValue(null) };
+  const storedRepository = { id: '11111111-1111-4111-8111-111111111111', githubRepositoryId: 123n, owner: 'acme', name: 'copilot', fullName: 'acme/copilot', description: 'A repository', url: 'https://github.com/acme/copilot', stars: 12, forks: 2, language: 'TypeScript', topics: ['copilot'], license: 'MIT', defaultBranch: 'main', openIssuesCount: 3, lastSyncedAt: new Date('2026-01-01T00:00:00.000Z'), createdAt: new Date('2026-01-01T00:00:00.000Z'), updatedAt: new Date('2026-01-01T00:00:00.000Z') };
   const tx = {
-    repository: { upsert: jest.fn().mockResolvedValue({ id: '11111111-1111-4111-8111-111111111111', githubRepositoryId: 123n, owner: 'acme', name: 'copilot', fullName: 'acme/copilot', description: 'A repository', url: 'https://github.com/acme/copilot', stars: 12, forks: 2, language: 'TypeScript', topics: ['copilot'], license: 'MIT', defaultBranch: 'main', openIssuesCount: 3, lastSyncedAt: new Date('2026-01-01T00:00:00.000Z'), createdAt: new Date('2026-01-01T00:00:00.000Z'), updatedAt: new Date('2026-01-01T00:00:00.000Z') }) },
+    repository: { upsert: jest.fn().mockResolvedValue(storedRepository) },
     repositoryAccess: { upsert: jest.fn(), updateMany: jest.fn() },
     repositoryDocument: { upsert: jest.fn() },
     issue: { upsert: jest.fn() },
     issueLabel: { upsert: jest.fn() },
   };
-  const prisma = { $transaction: jest.fn(async (callback: (value: typeof tx) => Promise<unknown>) => callback(tx)) };
+  const prisma = { repository: { update: jest.fn().mockResolvedValue(storedRepository) }, $transaction: jest.fn(async (callback: (value: typeof tx) => Promise<unknown>) => callback(tx)) };
   const kafka = { publishRaw: jest.fn().mockResolvedValue(undefined) };
   const service = new GitHubRepositoryService(github as never, sessions as never, prisma as never, kafka as never);
   return { service, github, sessions, prisma, tx, kafka };
@@ -88,6 +89,22 @@ describe('GitHubRepositoryService', () => {
     await service.importRepository({} as never, { githubRepositoryId: '123' });
     expect(tx.repository.upsert).toHaveBeenCalledTimes(2);
     expect(kafka.publishRaw).toHaveBeenCalledTimes(2);
+  });
+
+  it('continues when optional repository documents fail after the repository is fetched', async () => {
+    const { service, github } = makeService();
+    github.getRepositoryById.mockResolvedValue(githubRepository);
+    github.getFile.mockRejectedValue(new GitHubApiError(503, 'GITHUB_HTTP_503'));
+    await expect(service.importRepository({} as never, { githubRepositoryId: '123' }))
+      .resolves.toMatchObject({ repository: { id: '123' }, imported: { documents: 0, issues: 0 } });
+  });
+
+  it('does not turn a committed import into 500 when Kafka is unavailable', async () => {
+    const { service, github, kafka } = makeService();
+    github.getRepositoryById.mockResolvedValue(githubRepository);
+    kafka.publishRaw.mockRejectedValue(new Error('broker unavailable'));
+    await expect(service.importRepository({} as never, { githubRepositoryId: '123' }))
+      .resolves.toMatchObject({ repository: { id: '123' }, imported: { documents: 0, issues: 0 } });
   });
 
   it('maps an inaccessible repository to a not-found response', async () => {

@@ -1,5 +1,5 @@
 ﻿export interface ChatMessage {
-  role: 'system' | 'user';
+  role: 'system' | 'user' | 'assistant';
   content: string;
 }
 export interface LlmProvider { complete(messages: readonly ChatMessage[]): Promise<string>; }

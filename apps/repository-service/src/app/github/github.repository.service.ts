@@ -1,7 +1,9 @@
 import {
   BadRequestException,
   ForbiddenException,
+  HttpException,
   Inject,
+  Logger,
   Injectable,
   NotFoundException,
   ServiceUnavailableException,
@@ -29,6 +31,8 @@ const DOCUMENT_PATHS = ['README.md', 'CONTRIBUTING.md', 'CODE_OF_CONDUCT.md', 'S
 
 @Injectable()
 export class GitHubRepositoryService {
+  private readonly logger = new Logger(GitHubRepositoryService.name);
+
   constructor(
     @Inject(GITHUB_CLIENT) private readonly github: GitHubClient,
     private readonly sessions: GitHubSessionService,
@@ -65,7 +69,11 @@ export class GitHubRepositoryService {
     } catch (error) {
       throw this.toHttpError(error);
     }
-    return this.importFromGitHub(session, repository);
+    try {
+      return await this.importFromGitHub(session, repository);
+    } catch (error) {
+      throw this.toHttpError(error);
+    }
   }
 
   async importPublicRepository(request: Request, input: PublicRepositoryImportDto): Promise<RepositoryImportResponse> {
@@ -104,7 +112,7 @@ export class GitHubRepositoryService {
 
     const refreshed = await this.prisma.repository.update({
       where: { id: repository.id },
-      data: this.repositoryUpdateData(live),
+      data: this.repositoryUpdateData(live, repository),
     });
 
     // Forks are analyzed against upstream issues, so their overview statistics
@@ -180,8 +188,14 @@ export class GitHubRepositoryService {
     const issuesPromise = (async () => {
       const allIssues = await this.fetchIssues(token, owner, name, false);
       if (githubRepository.fork && githubRepository.parent) {
-        const upstreamIssues = await this.fetchIssues(token, githubRepository.parent.owner.login, githubRepository.parent.name, true);
-        allIssues.push(...upstreamIssues);
+        try {
+          const upstreamIssues = await this.fetchIssues(token, githubRepository.parent.owner.login, githubRepository.parent.name, true);
+          allIssues.push(...upstreamIssues);
+        } catch (error) {
+          // A fork can be imported even when GitHub temporarily denies access to
+          // the upstream issue list. The fork's own issues remain valid data.
+          this.logger.warn(`Skipping upstream issue enrichment for ${githubRepository.full_name}: ${this.safeErrorMessage(error)}`);
+        }
       }
       return allIssues;
     })();
@@ -259,67 +273,83 @@ export class GitHubRepositoryService {
       githubRepositoryId: githubRepository.id.toString(),
       correlationId: getCorrelationId() ?? randomUUID(),
     });
-    await this.kafka.publishRaw({
-      topic: REPOSITORY_IMPORTED_TOPIC,
-      eventType: REPOSITORY_IMPORTED_EVENT_TYPE,
-      version: REPOSITORY_IMPORTED_EVENT_VERSION,
-      key: result.repository.id,
-      event,
-    });
-    // The import response is cached by the frontend immediately. For forks,
-    // return the upstream repository's live counters so the first render does
-    // not briefly (or permanently) show the fork's usual zero values.
-    let overviewSource = githubRepository;
-    if (githubRepository.fork && githubRepository.parent) {
-      try {
-        overviewSource = await this.github.getRepository(
-          token ?? '',
-          githubRepository.parent.owner.login,
-          githubRepository.parent.name,
-        );
-      } catch {
-        // Keep the imported fork response if upstream refresh is unavailable.
-      }
-    }
-    let importedLanguages: Record<string, number> = {};
     try {
-      importedLanguages = await this.github.getLanguages(token ?? '', overviewSource.owner.login, overviewSource.name);
-    } catch {
-      // Language statistics are optional enrichment.
+      await this.kafka.publishRaw({
+        topic: REPOSITORY_IMPORTED_TOPIC,
+        eventType: REPOSITORY_IMPORTED_EVENT_TYPE,
+        version: REPOSITORY_IMPORTED_EVENT_VERSION,
+        key: result.repository.id,
+        event,
+      });
+    } catch (error) {
+      // The database is the source of truth for imports. Kafka is an async
+      // enrichment trigger, so broker downtime must not turn a committed import
+      // into a misleading 500 response.
+      this.logger.warn(`Repository ${result.repository.id} imported but event publication failed: ${this.safeErrorMessage(error)}`);
     }
-    const overviewStars = overviewSource.stargazers_count ?? result.repository.stars;
-    const overviewOpenIssues = overviewSource.open_issues_count ?? result.repository.openIssuesCount;
-    await this.prisma.repository.update({
-      where: { id: result.repository.id },
-      data: { stars: overviewStars, openIssuesCount: overviewOpenIssues },
+    // Return immediately from the committed import. Fork counters, languages,
+    // and upstream enrichment are non-critical and previously made this request
+    // exceed the web proxy's approximately 30-second connection lifetime.
+    void this.refreshImportedOverview(result.repository.id, githubRepository, token).catch((error) => {
+      this.logger.warn(`Background overview refresh failed for ${result.repository.id}: ${this.safeErrorMessage(error)}`);
     });
-    const overviewRepository = {
-      ...result.repository,
-      stars: overviewStars,
-      openIssuesCount: overviewOpenIssues,
-      language: overviewSource.language ?? result.repository.language,
-    };
+    const overviewStars = githubRepository.stargazers_count ?? result.repository.stars;
+    const overviewOpenIssues = githubRepository.open_issues_count ?? result.repository.openIssuesCount;
     return {
-      repository: this.mapStoredRepository(overviewRepository, documents.find((document) => document.documentType === 'readme')?.content, importedLanguages),
+      repository: this.mapStoredRepository({
+        ...result.repository,
+        stars: overviewStars,
+        openIssuesCount: overviewOpenIssues,
+        language: githubRepository.language ?? result.repository.language,
+      }, documents.find((document) => document.documentType === 'readme')?.content),
       imported: { documents: documents.length, issues: issues.length, labels: result.labels },
     };
   }
 
-  private async fetchDocuments(token: string | undefined, owner: string, name: string): Promise<Array<{ documentType: string; path: string; content: string; sha: string }>> {
-    const documents: Array<{ documentType: string; path: string; content: string; sha: string }> = [];
-    for (const path of DOCUMENT_PATHS) {
-      const document = path === 'README.md'
-        ? await this.github.getReadme(token, owner, name)
-        : await this.github.getFile(token, owner, name, path);
-      if (!document || document.type !== 'file') continue;
-      documents.push({
-        documentType: path === 'README.md' ? 'readme' : 'repository-guide',
-        path: document.path,
-        content: this.decodeContent(document.content, document.encoding),
-        sha: document.sha,
-      });
+  private async refreshImportedOverview(repositoryId: string, imported: GitHubRepository, token: string | undefined): Promise<void> {
+    let overviewSource = imported;
+    if (imported.fork && imported.parent) {
+      try {
+        overviewSource = await this.github.getRepository(token ?? '', imported.parent.owner.login, imported.parent.name);
+      } catch {
+        // The imported repository remains usable when upstream metadata is unavailable.
+      }
     }
-    return documents;
+    let languages: Record<string, number> = {};
+    try {
+      languages = await this.github.getLanguages(token ?? '', overviewSource.owner.login, overviewSource.name);
+    } catch {
+      // Language statistics are optional enrichment.
+    }
+    await this.prisma.repository.update({
+      where: { id: repositoryId },
+      data: {
+        stars: overviewSource.stargazers_count,
+        openIssuesCount: overviewSource.open_issues_count,
+        language: overviewSource.language ?? undefined,
+      },
+    });
+  }
+
+  private async fetchDocuments(token: string | undefined, owner: string, name: string): Promise<Array<{ documentType: string; path: string; content: string; sha: string }>> {
+    const documents = await Promise.all(DOCUMENT_PATHS.map(async (path) => {
+      try {
+        const document = path === 'README.md'
+          ? await this.github.getReadme(token, owner, name)
+          : await this.github.getFile(token, owner, name, path);
+        if (!document || document.type !== 'file') return undefined;
+        return {
+          documentType: path === 'README.md' ? 'readme' : 'repository-guide',
+          path: document.path,
+          content: this.decodeContent(document.content, document.encoding),
+          sha: document.sha,
+        };
+      } catch (error) {
+        this.logger.warn(`Skipping optional document ${owner}/${name}/${path}: ${this.safeErrorMessage(error)}`);
+        return undefined;
+      }
+    }));
+    return documents.filter((document): document is { documentType: string; path: string; content: string; sha: string } => Boolean(document));
   }
 
   private async fetchIssues(token: string | undefined, owner: string, name: string, isUpstream: boolean): Promise<Array<{
@@ -409,7 +439,7 @@ export class GitHubRepositoryService {
     };
   }
 
-  private repositoryUpdateData(repository: GitHubRepository) {
+  private repositoryUpdateData(repository: GitHubRepository, existing?: { stars: number; openIssuesCount: number; forks: number; language: string | null }) {
     const data = this.repositoryCreateData(repository);
     return {
       owner: data.owner,
@@ -417,15 +447,15 @@ export class GitHubRepositoryService {
       fullName: data.fullName,
       description: data.description,
       url: data.url,
-      stars: data.stars,
-      forks: data.forks,
-      language: data.language,
+      stars: repository.stargazers_count ?? existing?.stars ?? data.stars,
+      forks: repository.forks_count ?? existing?.forks ?? data.forks,
+      language: repository.language ?? existing?.language ?? data.language,
       topics: data.topics,
       license: data.license,
       defaultBranch: data.defaultBranch,
       isFork: data.isFork,
       parentFullName: data.parentFullName,
-      openIssuesCount: data.openIssuesCount,
+      openIssuesCount: repository.open_issues_count ?? existing?.openIssuesCount ?? data.openIssuesCount,
       lastSyncedAt: data.lastSyncedAt,
     };
   }
@@ -537,8 +567,15 @@ export class GitHubRepositoryService {
     };
   }
 
+  private safeErrorMessage(error: unknown): string {
+    if (error instanceof GitHubApiError) return `${error.code} (${error.status})`;
+    if (error instanceof Error) return error.message;
+    return 'unknown error';
+  }
+
   private toHttpError(error: unknown): Error {
-    if (!(error instanceof GitHubApiError)) return new ServiceUnavailableException('GitHub API request failed');
+    if (error instanceof HttpException) return error;
+    if (!(error instanceof GitHubApiError)) return new ServiceUnavailableException('Repository import could not be completed');
     if (error instanceof GitHubRateLimitError) return new ServiceUnavailableException('GitHub API rate limit reached');
     if (error.status === 401) return new ForbiddenException('GitHub rejected the access token');
     if (error.status === 403) return new ForbiddenException('GitHub access was denied');

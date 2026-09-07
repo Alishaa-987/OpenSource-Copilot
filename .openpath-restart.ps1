@@ -14,7 +14,7 @@ $services = @(
   @{ Name = 'repository-service'; Port = 3001; Command = 'node dist\apps\repository-service\main.js' },
   @{ Name = 'guidance-service'; Port = 3002; Command = 'node dist\apps\guidance-service\main.js' },
   @{ Name = 'knowledge-service'; Port = 3003; Command = 'node dist\apps\knowledge-service\main.js' },
-  @{ Name = 'web'; Port = 3004; Command = 'pnpm --dir apps\web start -- -p 3004' }
+  @{ Name = 'web'; Port = 3004; Command = 'node apps\web\node_modules\next\dist\bin\next start apps\web -p 3004' }
 )
 foreach ($service in $services) {
   $out = Join-Path (Get-Location) ('.openpath-' + $service.Name + '-live.log')

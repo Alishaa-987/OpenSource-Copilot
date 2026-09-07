@@ -1,4 +1,4 @@
-﻿import { BadRequestException, Inject, Injectable, UnauthorizedException, ServiceUnavailableException } from '@nestjs/common';
+﻿import { BadRequestException, Inject, Injectable, Logger, UnauthorizedException, ServiceUnavailableException } from '@nestjs/common';
 import { TypedConfigService } from '@osc/config';
 import { PrismaService } from '@osc/database';
 import { REDIS_CLIENT } from '@osc/shared';
@@ -25,6 +25,8 @@ export interface GitHubSession {
 
 @Injectable()
 export class GitHubSessionService {
+  private readonly logger = new Logger(GitHubSessionService.name);
+
   constructor(
     @Inject(GITHUB_CLIENT) private readonly github: GitHubClient,
     @Inject(REDIS_CLIENT) private readonly redis: Redis,
@@ -40,7 +42,10 @@ export class GitHubSessionService {
     const state = randomUUID();
     const stateTtl = this.config.get('GITHUB_OAUTH_STATE_TTL_SECONDS');
     const validatedReturnTo = this.validateReturnTo(returnTo);
-    await this.redis.set(this.stateKey(state), JSON.stringify({ returnTo: validatedReturnTo } satisfies OAuthState), 'EX', stateTtl);
+    await this.withSessionStore(
+      () => this.redis.set(this.stateKey(state), JSON.stringify({ returnTo: validatedReturnTo } satisfies OAuthState), 'EX', stateTtl),
+      'store OAuth state',
+    );
     const authorizationUrl = new URL('https://github.com/login/oauth/authorize');
     authorizationUrl.searchParams.set('client_id', clientId);
     authorizationUrl.searchParams.set('redirect_uri', this.config.get('GITHUB_REDIRECT_URI'));
@@ -51,13 +56,13 @@ export class GitHubSessionService {
 
   async completeOAuth(code: string, state: string): Promise<GitHubAuthResponse & { session: GitHubSession }> {
     const stateKey = this.stateKey(state);
-    const stateRecord = await this.redis.get(stateKey);
+    const stateRecord = await this.withSessionStore(() => this.redis.get(stateKey), 'read OAuth state');
     if (!stateRecord) {
       throw new UnauthorizedException('Invalid or expired GitHub OAuth state');
     }
     const stateData = JSON.parse(stateRecord) as OAuthState;
     const returnTo = this.validateReturnTo(stateData.returnTo);
-    await this.redis.del(stateKey);
+    await this.withSessionStore(() => this.redis.del(stateKey), 'clear OAuth state');
     const clientId = this.config.get('GITHUB_CLIENT_ID');
     const clientSecret = this.config.get('GITHUB_CLIENT_SECRET');
     if (!clientId || !clientSecret) {
@@ -95,23 +100,30 @@ export class GitHubSessionService {
       token,
       expiresAt,
     };
-    await this.redis.set(this.sessionKey(sessionId), JSON.stringify({
-      ...session,
-      githubUserId: session.githubUserId.toString(),
-    }), 'EX', ttl);
+    await this.withSessionStore(
+      () => this.redis.set(this.sessionKey(sessionId), JSON.stringify({
+        ...session,
+        githubUserId: session.githubUserId.toString(),
+      }), 'EX', ttl),
+      'store session',
+    );
     return { user: this.mapUser(githubUser), expiresAt, session, returnTo };
   }
 
   async getSession(request: Request): Promise<GitHubSession | null> {
     const sessionId = this.readCookie(request.headers.cookie, this.config.get('GITHUB_SESSION_COOKIE_NAME'));
     if (!sessionId) return null;
-    const raw = await this.redis.get(this.sessionKey(sessionId));
+    const raw = await this.withSessionStore(() => this.redis.get(this.sessionKey(sessionId)), 'read session');
     if (!raw) return null;
     try {
       const parsed = JSON.parse(raw) as Omit<GitHubSession, 'githubUserId'> & { githubUserId: string };
       return { ...parsed, githubUserId: BigInt(parsed.githubUserId) };
     } catch {
-      await this.redis.del(this.sessionKey(sessionId));
+      // Corrupt session record: best-effort cleanup only. A store outage here
+      // must not turn "please log in again" into an opaque 500.
+      await this.redis.del(this.sessionKey(sessionId)).catch((error) => {
+        this.logger.warn(`Failed to clear a corrupt session record: ${this.safeErrorMessage(error)}`);
+      });
       return null;
     }
   }
@@ -136,7 +148,7 @@ export class GitHubSessionService {
 
   async destroySession(request: Request): Promise<void> {
     const sessionId = this.readCookie(request.headers.cookie, this.config.get('GITHUB_SESSION_COOKIE_NAME'));
-    if (sessionId) await this.redis.del(this.sessionKey(sessionId));
+    if (sessionId) await this.withSessionStore(() => this.redis.del(this.sessionKey(sessionId)), 'clear session');
   }
 
   cookieName(): string {
@@ -189,6 +201,28 @@ export class GitHubSessionService {
       if (key === name) return decodeURIComponent(value.join('='));
     }
     return null;
+  }
+
+  /**
+   * Every other failure path in this service (missing OAuth config, invalid
+   * state) already surfaces as a clean HTTP error. Direct Redis calls were the
+   * one gap: if the session store is down or drops mid-request, ioredis
+   * throws a raw connection error that NestJS's default handler turns into an
+   * opaque 500 on every authenticated endpoint (repository import included).
+   * Route every Redis call through here so that failure becomes a proper,
+   * descriptive 503 instead.
+   */
+  private async withSessionStore<T>(operation: () => Promise<T>, action: string): Promise<T> {
+    try {
+      return await operation();
+    } catch (error) {
+      this.logger.warn(`Session store operation failed (${action}): ${this.safeErrorMessage(error)}`);
+      throw new ServiceUnavailableException('Session store is unavailable');
+    }
+  }
+
+  private safeErrorMessage(error: unknown): string {
+    return error instanceof Error ? error.message : 'unknown error';
   }
 }
 

@@ -1,5 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, ServiceUnavailableException, UnauthorizedException } from '@nestjs/common';
 import { TypedConfigService } from '@osc/config';
 import { KnowledgeEnv } from '../env';
 import { RepositoryKnowledgeSource, SourceDocument } from './knowledge.types';
@@ -21,8 +21,19 @@ export class RepositorySourceClient {
     return headers;
   }
   async assertAccess(repositoryId: string, cookieHeader?: string): Promise<void> {
-    const response = await this.client.get<AccessResponse>('/v1/internal/repositories/' + encodeURIComponent(repositoryId) + '/access', { headers: this.headers(cookieHeader) });
-    if (response.data.repositoryId !== repositoryId || response.data.allowed !== true) throw new Error('Repository access was not granted');
+    try {
+      const response = await this.client.get<AccessResponse>('/v1/internal/repositories/' + encodeURIComponent(repositoryId) + '/access', { headers: this.headers(cookieHeader) });
+      if (response.data.repositoryId !== repositoryId || response.data.allowed !== true) throw new ForbiddenException('Repository access was not granted');
+    } catch (error) {
+      if (error instanceof UnauthorizedException || error instanceof ForbiddenException) throw error;
+      if (axios.isAxiosError(error)) {
+        const status = error.response?.status;
+        if (status === 401) throw new UnauthorizedException('GitHub session is missing or expired');
+        if (status === 403) throw new ForbiddenException('You do not have access to this repository');
+        throw new ServiceUnavailableException('Repository Service is unavailable while checking access');
+      }
+      throw error;
+    }
   }
   async getSource(repositoryId: string, cookieHeader?: string, question?: string): Promise<RepositoryKnowledgeSource> {
     const params = question ? { q: question.slice(0, 8_000) } : undefined;

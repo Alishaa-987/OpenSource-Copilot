@@ -26,6 +26,30 @@ export class KnowledgeIngestionService {
       return { repositoryId, chunks: 0 };
     }
   }
+  async retrieveRepositoryOverview(repositoryId: string, cookieHeader?: string, limit = 64): Promise<RetrievedChunk[]> {
+    await this.sourceClient.assertAccess(repositoryId, cookieHeader);
+    try {
+      const source = await this.sourceClient.getSource(repositoryId, cookieHeader);
+      const chunks = this.chunker.chunk(source.documents);
+      const priority: Record<RetrievedChunk['documentType'], number> = {
+        readme: 0,
+        contributing: 1,
+        documentation: 2,
+        'code-of-conduct': 3,
+        security: 4,
+        code: 5,
+        issue: 6,
+      };
+      return chunks
+        .sort((left, right) => priority[left.documentType] - priority[right.documentType] || left.path.localeCompare(right.path) || left.chunkIndex - right.chunkIndex)
+        .slice(0, limit)
+        .map((chunk, index) => ({ ...chunk, relevance: 0.9 - index / Math.max(limit, 1) * 0.2 }));
+    } catch (error) {
+      this.logger.warn(JSON.stringify({ event: 'repository-overview-retrieval-failed', repositoryId, reason: error instanceof Error ? error.message : 'overview retrieval failed' }));
+      throw error;
+    }
+  }
+
   async retrieve(repositoryId: string, question: string, limit?: number, cookieHeader?: string): Promise<RetrievedChunk[]> {
     await this.sourceClient.assertAccess(repositoryId, cookieHeader);
     const retrievalLimit = limit ?? this.config.get('KNOWLEDGE_RETRIEVAL_LIMIT');

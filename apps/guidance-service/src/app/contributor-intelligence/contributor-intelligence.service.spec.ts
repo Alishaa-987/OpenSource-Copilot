@@ -43,4 +43,24 @@ describe('ContributorIntelligenceService', () => {
     expect(result.mapping.confidence).toBe(0.15);
     expect(prisma.issueIntelligence.upsert).toHaveBeenCalledTimes(1);
   });
+
+  it('produces issue-specific contribution steps instead of a fixed generic template', async () => {
+    const apiIssue: ContributorIssue = { ...issue, title: 'Add pagination to the users API', body: 'The /users endpoint should support page and perPage query params' };
+    const docsIssue: ContributorIssue = { ...issue, id: '33333333-3333-4333-8333-333333333333', title: 'Fix typo in README installation section', body: 'The README documentation has an incorrect install command' };
+
+    const apiChunks = [{ path: 'src/users.controller.ts', documentType: 'code', url: 'https://github.com/example/repo/blob/main/src/users.controller.ts', content: 'endpoint code', relevance: 0.9 }];
+    const { service: apiService, issues: apiIssues } = makeService(jest.fn().mockResolvedValue(apiChunks));
+    apiIssues.getIssue.mockResolvedValue(apiIssue);
+    const apiResult = await apiService.getIntelligence(apiIssue.repositoryId, apiIssue.id, 'sid=session');
+
+    const docsChunks = [{ path: 'README.md', documentType: 'readme', url: 'https://github.com/example/repo/blob/main/README.md', content: 'install docs', relevance: 0.9 }];
+    const { service: docsService, issues: docsIssues } = makeService(jest.fn().mockResolvedValue(docsChunks));
+    docsIssues.getIssue.mockResolvedValue(docsIssue);
+    const docsResult = await docsService.getIntelligence(docsIssue.repositoryId, docsIssue.id, 'sid=session');
+
+    expect(apiResult.analysis.contributionSteps.map((step) => step.title)).not.toEqual(docsResult.analysis.contributionSteps.map((step) => step.title));
+    expect(apiResult.analysis.contributionSteps[2]?.actions.join(' ')).not.toEqual(docsResult.analysis.contributionSteps[2]?.actions.join(' '));
+    expect(apiResult.analysis.contributionSteps[1]?.actions.join(' ')).toContain('src/users.controller.ts');
+    expect(docsResult.analysis.contributionSteps[1]?.actions.join(' ')).toContain('README.md');
+  });
 });

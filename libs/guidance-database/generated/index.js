@@ -176,7 +176,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "e:\\mc_project\\libs\\guidance-database\\generated",
+      "value": "E:\\mc_project\\libs\\guidance-database\\generated",
       "fromEnvVar": null
     },
     "config": {
@@ -190,7 +190,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "e:\\mc_project\\apps\\guidance-service\\prisma\\schema.prisma",
+    "sourceFilePath": "E:\\mc_project\\apps\\guidance-service\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
