@@ -33,6 +33,16 @@ export type ImportedRepositoryProjection = $Result.DefaultSelection<Prisma.$Impo
  * 
  */
 export type IssueIntelligence = $Result.DefaultSelection<Prisma.$IssueIntelligencePayload>
+/**
+ * Model ResumeProfile
+ * 
+ */
+export type ResumeProfile = $Result.DefaultSelection<Prisma.$ResumeProfilePayload>
+/**
+ * Model SkillGapAssessment
+ * 
+ */
+export type SkillGapAssessment = $Result.DefaultSelection<Prisma.$SkillGapAssessmentPayload>
 
 /**
  * ##  Prisma Client ʲˢ
@@ -191,6 +201,26 @@ export class PrismaClient<
     * ```
     */
   get issueIntelligence(): Prisma.IssueIntelligenceDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.resumeProfile`: Exposes CRUD operations for the **ResumeProfile** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ResumeProfiles
+    * const resumeProfiles = await prisma.resumeProfile.findMany()
+    * ```
+    */
+  get resumeProfile(): Prisma.ResumeProfileDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.skillGapAssessment`: Exposes CRUD operations for the **SkillGapAssessment** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more SkillGapAssessments
+    * const skillGapAssessments = await prisma.skillGapAssessment.findMany()
+    * ```
+    */
+  get skillGapAssessment(): Prisma.SkillGapAssessmentDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -635,7 +665,9 @@ export namespace Prisma {
     Recommendation: 'Recommendation',
     ProcessedEvent: 'ProcessedEvent',
     ImportedRepositoryProjection: 'ImportedRepositoryProjection',
-    IssueIntelligence: 'IssueIntelligence'
+    IssueIntelligence: 'IssueIntelligence',
+    ResumeProfile: 'ResumeProfile',
+    SkillGapAssessment: 'SkillGapAssessment'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -654,7 +686,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "recommendation" | "processedEvent" | "importedRepositoryProjection" | "issueIntelligence"
+      modelProps: "recommendation" | "processedEvent" | "importedRepositoryProjection" | "issueIntelligence" | "resumeProfile" | "skillGapAssessment"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -954,6 +986,154 @@ export namespace Prisma {
           }
         }
       }
+      ResumeProfile: {
+        payload: Prisma.$ResumeProfilePayload<ExtArgs>
+        fields: Prisma.ResumeProfileFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ResumeProfileFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ResumeProfilePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ResumeProfileFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ResumeProfilePayload>
+          }
+          findFirst: {
+            args: Prisma.ResumeProfileFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ResumeProfilePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ResumeProfileFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ResumeProfilePayload>
+          }
+          findMany: {
+            args: Prisma.ResumeProfileFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ResumeProfilePayload>[]
+          }
+          create: {
+            args: Prisma.ResumeProfileCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ResumeProfilePayload>
+          }
+          createMany: {
+            args: Prisma.ResumeProfileCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.ResumeProfileCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ResumeProfilePayload>[]
+          }
+          delete: {
+            args: Prisma.ResumeProfileDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ResumeProfilePayload>
+          }
+          update: {
+            args: Prisma.ResumeProfileUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ResumeProfilePayload>
+          }
+          deleteMany: {
+            args: Prisma.ResumeProfileDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ResumeProfileUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.ResumeProfileUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ResumeProfilePayload>[]
+          }
+          upsert: {
+            args: Prisma.ResumeProfileUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ResumeProfilePayload>
+          }
+          aggregate: {
+            args: Prisma.ResumeProfileAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateResumeProfile>
+          }
+          groupBy: {
+            args: Prisma.ResumeProfileGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ResumeProfileGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ResumeProfileCountArgs<ExtArgs>
+            result: $Utils.Optional<ResumeProfileCountAggregateOutputType> | number
+          }
+        }
+      }
+      SkillGapAssessment: {
+        payload: Prisma.$SkillGapAssessmentPayload<ExtArgs>
+        fields: Prisma.SkillGapAssessmentFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.SkillGapAssessmentFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SkillGapAssessmentPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.SkillGapAssessmentFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SkillGapAssessmentPayload>
+          }
+          findFirst: {
+            args: Prisma.SkillGapAssessmentFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SkillGapAssessmentPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.SkillGapAssessmentFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SkillGapAssessmentPayload>
+          }
+          findMany: {
+            args: Prisma.SkillGapAssessmentFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SkillGapAssessmentPayload>[]
+          }
+          create: {
+            args: Prisma.SkillGapAssessmentCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SkillGapAssessmentPayload>
+          }
+          createMany: {
+            args: Prisma.SkillGapAssessmentCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.SkillGapAssessmentCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SkillGapAssessmentPayload>[]
+          }
+          delete: {
+            args: Prisma.SkillGapAssessmentDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SkillGapAssessmentPayload>
+          }
+          update: {
+            args: Prisma.SkillGapAssessmentUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SkillGapAssessmentPayload>
+          }
+          deleteMany: {
+            args: Prisma.SkillGapAssessmentDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.SkillGapAssessmentUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.SkillGapAssessmentUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SkillGapAssessmentPayload>[]
+          }
+          upsert: {
+            args: Prisma.SkillGapAssessmentUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SkillGapAssessmentPayload>
+          }
+          aggregate: {
+            args: Prisma.SkillGapAssessmentAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSkillGapAssessment>
+          }
+          groupBy: {
+            args: Prisma.SkillGapAssessmentGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SkillGapAssessmentGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.SkillGapAssessmentCountArgs<ExtArgs>
+            result: $Utils.Optional<SkillGapAssessmentCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1054,6 +1234,8 @@ export namespace Prisma {
     processedEvent?: ProcessedEventOmit
     importedRepositoryProjection?: ImportedRepositoryProjectionOmit
     issueIntelligence?: IssueIntelligenceOmit
+    resumeProfile?: ResumeProfileOmit
+    skillGapAssessment?: SkillGapAssessmentOmit
   }
 
   /* Types for Logging */
@@ -5270,6 +5452,2085 @@ export namespace Prisma {
 
 
   /**
+   * Model ResumeProfile
+   */
+
+  export type AggregateResumeProfile = {
+    _count: ResumeProfileCountAggregateOutputType | null
+    _min: ResumeProfileMinAggregateOutputType | null
+    _max: ResumeProfileMaxAggregateOutputType | null
+  }
+
+  export type ResumeProfileMinAggregateOutputType = {
+    githubUserId: string | null
+    fileName: string | null
+    fileType: string | null
+    summary: string | null
+    parsedAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ResumeProfileMaxAggregateOutputType = {
+    githubUserId: string | null
+    fileName: string | null
+    fileType: string | null
+    summary: string | null
+    parsedAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ResumeProfileCountAggregateOutputType = {
+    githubUserId: number
+    fileName: number
+    fileType: number
+    summary: number
+    skills: number
+    programmingLanguages: number
+    frameworksTools: number
+    projects: number
+    experience: number
+    education: number
+    parsedAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type ResumeProfileMinAggregateInputType = {
+    githubUserId?: true
+    fileName?: true
+    fileType?: true
+    summary?: true
+    parsedAt?: true
+    updatedAt?: true
+  }
+
+  export type ResumeProfileMaxAggregateInputType = {
+    githubUserId?: true
+    fileName?: true
+    fileType?: true
+    summary?: true
+    parsedAt?: true
+    updatedAt?: true
+  }
+
+  export type ResumeProfileCountAggregateInputType = {
+    githubUserId?: true
+    fileName?: true
+    fileType?: true
+    summary?: true
+    skills?: true
+    programmingLanguages?: true
+    frameworksTools?: true
+    projects?: true
+    experience?: true
+    education?: true
+    parsedAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type ResumeProfileAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ResumeProfile to aggregate.
+     */
+    where?: ResumeProfileWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ResumeProfiles to fetch.
+     */
+    orderBy?: ResumeProfileOrderByWithRelationInput | ResumeProfileOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ResumeProfileWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ResumeProfiles from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ResumeProfiles.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ResumeProfiles
+    **/
+    _count?: true | ResumeProfileCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ResumeProfileMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ResumeProfileMaxAggregateInputType
+  }
+
+  export type GetResumeProfileAggregateType<T extends ResumeProfileAggregateArgs> = {
+        [P in keyof T & keyof AggregateResumeProfile]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateResumeProfile[P]>
+      : GetScalarType<T[P], AggregateResumeProfile[P]>
+  }
+
+
+
+
+  export type ResumeProfileGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ResumeProfileWhereInput
+    orderBy?: ResumeProfileOrderByWithAggregationInput | ResumeProfileOrderByWithAggregationInput[]
+    by: ResumeProfileScalarFieldEnum[] | ResumeProfileScalarFieldEnum
+    having?: ResumeProfileScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ResumeProfileCountAggregateInputType | true
+    _min?: ResumeProfileMinAggregateInputType
+    _max?: ResumeProfileMaxAggregateInputType
+  }
+
+  export type ResumeProfileGroupByOutputType = {
+    githubUserId: string
+    fileName: string
+    fileType: string
+    summary: string
+    skills: JsonValue
+    programmingLanguages: JsonValue
+    frameworksTools: JsonValue
+    projects: JsonValue
+    experience: JsonValue
+    education: JsonValue
+    parsedAt: Date
+    updatedAt: Date
+    _count: ResumeProfileCountAggregateOutputType | null
+    _min: ResumeProfileMinAggregateOutputType | null
+    _max: ResumeProfileMaxAggregateOutputType | null
+  }
+
+  type GetResumeProfileGroupByPayload<T extends ResumeProfileGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ResumeProfileGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ResumeProfileGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ResumeProfileGroupByOutputType[P]>
+            : GetScalarType<T[P], ResumeProfileGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ResumeProfileSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    githubUserId?: boolean
+    fileName?: boolean
+    fileType?: boolean
+    summary?: boolean
+    skills?: boolean
+    programmingLanguages?: boolean
+    frameworksTools?: boolean
+    projects?: boolean
+    experience?: boolean
+    education?: boolean
+    parsedAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["resumeProfile"]>
+
+  export type ResumeProfileSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    githubUserId?: boolean
+    fileName?: boolean
+    fileType?: boolean
+    summary?: boolean
+    skills?: boolean
+    programmingLanguages?: boolean
+    frameworksTools?: boolean
+    projects?: boolean
+    experience?: boolean
+    education?: boolean
+    parsedAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["resumeProfile"]>
+
+  export type ResumeProfileSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    githubUserId?: boolean
+    fileName?: boolean
+    fileType?: boolean
+    summary?: boolean
+    skills?: boolean
+    programmingLanguages?: boolean
+    frameworksTools?: boolean
+    projects?: boolean
+    experience?: boolean
+    education?: boolean
+    parsedAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["resumeProfile"]>
+
+  export type ResumeProfileSelectScalar = {
+    githubUserId?: boolean
+    fileName?: boolean
+    fileType?: boolean
+    summary?: boolean
+    skills?: boolean
+    programmingLanguages?: boolean
+    frameworksTools?: boolean
+    projects?: boolean
+    experience?: boolean
+    education?: boolean
+    parsedAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type ResumeProfileOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"githubUserId" | "fileName" | "fileType" | "summary" | "skills" | "programmingLanguages" | "frameworksTools" | "projects" | "experience" | "education" | "parsedAt" | "updatedAt", ExtArgs["result"]["resumeProfile"]>
+
+  export type $ResumeProfilePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ResumeProfile"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      githubUserId: string
+      fileName: string
+      fileType: string
+      summary: string
+      skills: Prisma.JsonValue
+      programmingLanguages: Prisma.JsonValue
+      frameworksTools: Prisma.JsonValue
+      projects: Prisma.JsonValue
+      experience: Prisma.JsonValue
+      education: Prisma.JsonValue
+      parsedAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["resumeProfile"]>
+    composites: {}
+  }
+
+  type ResumeProfileGetPayload<S extends boolean | null | undefined | ResumeProfileDefaultArgs> = $Result.GetResult<Prisma.$ResumeProfilePayload, S>
+
+  type ResumeProfileCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ResumeProfileFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ResumeProfileCountAggregateInputType | true
+    }
+
+  export interface ResumeProfileDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ResumeProfile'], meta: { name: 'ResumeProfile' } }
+    /**
+     * Find zero or one ResumeProfile that matches the filter.
+     * @param {ResumeProfileFindUniqueArgs} args - Arguments to find a ResumeProfile
+     * @example
+     * // Get one ResumeProfile
+     * const resumeProfile = await prisma.resumeProfile.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ResumeProfileFindUniqueArgs>(args: SelectSubset<T, ResumeProfileFindUniqueArgs<ExtArgs>>): Prisma__ResumeProfileClient<$Result.GetResult<Prisma.$ResumeProfilePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one ResumeProfile that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ResumeProfileFindUniqueOrThrowArgs} args - Arguments to find a ResumeProfile
+     * @example
+     * // Get one ResumeProfile
+     * const resumeProfile = await prisma.resumeProfile.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ResumeProfileFindUniqueOrThrowArgs>(args: SelectSubset<T, ResumeProfileFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ResumeProfileClient<$Result.GetResult<Prisma.$ResumeProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ResumeProfile that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ResumeProfileFindFirstArgs} args - Arguments to find a ResumeProfile
+     * @example
+     * // Get one ResumeProfile
+     * const resumeProfile = await prisma.resumeProfile.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ResumeProfileFindFirstArgs>(args?: SelectSubset<T, ResumeProfileFindFirstArgs<ExtArgs>>): Prisma__ResumeProfileClient<$Result.GetResult<Prisma.$ResumeProfilePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ResumeProfile that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ResumeProfileFindFirstOrThrowArgs} args - Arguments to find a ResumeProfile
+     * @example
+     * // Get one ResumeProfile
+     * const resumeProfile = await prisma.resumeProfile.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ResumeProfileFindFirstOrThrowArgs>(args?: SelectSubset<T, ResumeProfileFindFirstOrThrowArgs<ExtArgs>>): Prisma__ResumeProfileClient<$Result.GetResult<Prisma.$ResumeProfilePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more ResumeProfiles that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ResumeProfileFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ResumeProfiles
+     * const resumeProfiles = await prisma.resumeProfile.findMany()
+     * 
+     * // Get first 10 ResumeProfiles
+     * const resumeProfiles = await prisma.resumeProfile.findMany({ take: 10 })
+     * 
+     * // Only select the `githubUserId`
+     * const resumeProfileWithGithubUserIdOnly = await prisma.resumeProfile.findMany({ select: { githubUserId: true } })
+     * 
+     */
+    findMany<T extends ResumeProfileFindManyArgs>(args?: SelectSubset<T, ResumeProfileFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ResumeProfilePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a ResumeProfile.
+     * @param {ResumeProfileCreateArgs} args - Arguments to create a ResumeProfile.
+     * @example
+     * // Create one ResumeProfile
+     * const ResumeProfile = await prisma.resumeProfile.create({
+     *   data: {
+     *     // ... data to create a ResumeProfile
+     *   }
+     * })
+     * 
+     */
+    create<T extends ResumeProfileCreateArgs>(args: SelectSubset<T, ResumeProfileCreateArgs<ExtArgs>>): Prisma__ResumeProfileClient<$Result.GetResult<Prisma.$ResumeProfilePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many ResumeProfiles.
+     * @param {ResumeProfileCreateManyArgs} args - Arguments to create many ResumeProfiles.
+     * @example
+     * // Create many ResumeProfiles
+     * const resumeProfile = await prisma.resumeProfile.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ResumeProfileCreateManyArgs>(args?: SelectSubset<T, ResumeProfileCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many ResumeProfiles and returns the data saved in the database.
+     * @param {ResumeProfileCreateManyAndReturnArgs} args - Arguments to create many ResumeProfiles.
+     * @example
+     * // Create many ResumeProfiles
+     * const resumeProfile = await prisma.resumeProfile.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many ResumeProfiles and only return the `githubUserId`
+     * const resumeProfileWithGithubUserIdOnly = await prisma.resumeProfile.createManyAndReturn({
+     *   select: { githubUserId: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends ResumeProfileCreateManyAndReturnArgs>(args?: SelectSubset<T, ResumeProfileCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ResumeProfilePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a ResumeProfile.
+     * @param {ResumeProfileDeleteArgs} args - Arguments to delete one ResumeProfile.
+     * @example
+     * // Delete one ResumeProfile
+     * const ResumeProfile = await prisma.resumeProfile.delete({
+     *   where: {
+     *     // ... filter to delete one ResumeProfile
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ResumeProfileDeleteArgs>(args: SelectSubset<T, ResumeProfileDeleteArgs<ExtArgs>>): Prisma__ResumeProfileClient<$Result.GetResult<Prisma.$ResumeProfilePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one ResumeProfile.
+     * @param {ResumeProfileUpdateArgs} args - Arguments to update one ResumeProfile.
+     * @example
+     * // Update one ResumeProfile
+     * const resumeProfile = await prisma.resumeProfile.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ResumeProfileUpdateArgs>(args: SelectSubset<T, ResumeProfileUpdateArgs<ExtArgs>>): Prisma__ResumeProfileClient<$Result.GetResult<Prisma.$ResumeProfilePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more ResumeProfiles.
+     * @param {ResumeProfileDeleteManyArgs} args - Arguments to filter ResumeProfiles to delete.
+     * @example
+     * // Delete a few ResumeProfiles
+     * const { count } = await prisma.resumeProfile.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ResumeProfileDeleteManyArgs>(args?: SelectSubset<T, ResumeProfileDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ResumeProfiles.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ResumeProfileUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ResumeProfiles
+     * const resumeProfile = await prisma.resumeProfile.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ResumeProfileUpdateManyArgs>(args: SelectSubset<T, ResumeProfileUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ResumeProfiles and returns the data updated in the database.
+     * @param {ResumeProfileUpdateManyAndReturnArgs} args - Arguments to update many ResumeProfiles.
+     * @example
+     * // Update many ResumeProfiles
+     * const resumeProfile = await prisma.resumeProfile.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more ResumeProfiles and only return the `githubUserId`
+     * const resumeProfileWithGithubUserIdOnly = await prisma.resumeProfile.updateManyAndReturn({
+     *   select: { githubUserId: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends ResumeProfileUpdateManyAndReturnArgs>(args: SelectSubset<T, ResumeProfileUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ResumeProfilePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one ResumeProfile.
+     * @param {ResumeProfileUpsertArgs} args - Arguments to update or create a ResumeProfile.
+     * @example
+     * // Update or create a ResumeProfile
+     * const resumeProfile = await prisma.resumeProfile.upsert({
+     *   create: {
+     *     // ... data to create a ResumeProfile
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ResumeProfile we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ResumeProfileUpsertArgs>(args: SelectSubset<T, ResumeProfileUpsertArgs<ExtArgs>>): Prisma__ResumeProfileClient<$Result.GetResult<Prisma.$ResumeProfilePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of ResumeProfiles.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ResumeProfileCountArgs} args - Arguments to filter ResumeProfiles to count.
+     * @example
+     * // Count the number of ResumeProfiles
+     * const count = await prisma.resumeProfile.count({
+     *   where: {
+     *     // ... the filter for the ResumeProfiles we want to count
+     *   }
+     * })
+    **/
+    count<T extends ResumeProfileCountArgs>(
+      args?: Subset<T, ResumeProfileCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ResumeProfileCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ResumeProfile.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ResumeProfileAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ResumeProfileAggregateArgs>(args: Subset<T, ResumeProfileAggregateArgs>): Prisma.PrismaPromise<GetResumeProfileAggregateType<T>>
+
+    /**
+     * Group by ResumeProfile.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ResumeProfileGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ResumeProfileGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ResumeProfileGroupByArgs['orderBy'] }
+        : { orderBy?: ResumeProfileGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ResumeProfileGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetResumeProfileGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ResumeProfile model
+   */
+  readonly fields: ResumeProfileFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ResumeProfile.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ResumeProfileClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ResumeProfile model
+   */
+  interface ResumeProfileFieldRefs {
+    readonly githubUserId: FieldRef<"ResumeProfile", 'String'>
+    readonly fileName: FieldRef<"ResumeProfile", 'String'>
+    readonly fileType: FieldRef<"ResumeProfile", 'String'>
+    readonly summary: FieldRef<"ResumeProfile", 'String'>
+    readonly skills: FieldRef<"ResumeProfile", 'Json'>
+    readonly programmingLanguages: FieldRef<"ResumeProfile", 'Json'>
+    readonly frameworksTools: FieldRef<"ResumeProfile", 'Json'>
+    readonly projects: FieldRef<"ResumeProfile", 'Json'>
+    readonly experience: FieldRef<"ResumeProfile", 'Json'>
+    readonly education: FieldRef<"ResumeProfile", 'Json'>
+    readonly parsedAt: FieldRef<"ResumeProfile", 'DateTime'>
+    readonly updatedAt: FieldRef<"ResumeProfile", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ResumeProfile findUnique
+   */
+  export type ResumeProfileFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ResumeProfile
+     */
+    select?: ResumeProfileSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ResumeProfile
+     */
+    omit?: ResumeProfileOmit<ExtArgs> | null
+    /**
+     * Filter, which ResumeProfile to fetch.
+     */
+    where: ResumeProfileWhereUniqueInput
+  }
+
+  /**
+   * ResumeProfile findUniqueOrThrow
+   */
+  export type ResumeProfileFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ResumeProfile
+     */
+    select?: ResumeProfileSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ResumeProfile
+     */
+    omit?: ResumeProfileOmit<ExtArgs> | null
+    /**
+     * Filter, which ResumeProfile to fetch.
+     */
+    where: ResumeProfileWhereUniqueInput
+  }
+
+  /**
+   * ResumeProfile findFirst
+   */
+  export type ResumeProfileFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ResumeProfile
+     */
+    select?: ResumeProfileSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ResumeProfile
+     */
+    omit?: ResumeProfileOmit<ExtArgs> | null
+    /**
+     * Filter, which ResumeProfile to fetch.
+     */
+    where?: ResumeProfileWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ResumeProfiles to fetch.
+     */
+    orderBy?: ResumeProfileOrderByWithRelationInput | ResumeProfileOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ResumeProfiles.
+     */
+    cursor?: ResumeProfileWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ResumeProfiles from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ResumeProfiles.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ResumeProfiles.
+     */
+    distinct?: ResumeProfileScalarFieldEnum | ResumeProfileScalarFieldEnum[]
+  }
+
+  /**
+   * ResumeProfile findFirstOrThrow
+   */
+  export type ResumeProfileFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ResumeProfile
+     */
+    select?: ResumeProfileSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ResumeProfile
+     */
+    omit?: ResumeProfileOmit<ExtArgs> | null
+    /**
+     * Filter, which ResumeProfile to fetch.
+     */
+    where?: ResumeProfileWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ResumeProfiles to fetch.
+     */
+    orderBy?: ResumeProfileOrderByWithRelationInput | ResumeProfileOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ResumeProfiles.
+     */
+    cursor?: ResumeProfileWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ResumeProfiles from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ResumeProfiles.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ResumeProfiles.
+     */
+    distinct?: ResumeProfileScalarFieldEnum | ResumeProfileScalarFieldEnum[]
+  }
+
+  /**
+   * ResumeProfile findMany
+   */
+  export type ResumeProfileFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ResumeProfile
+     */
+    select?: ResumeProfileSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ResumeProfile
+     */
+    omit?: ResumeProfileOmit<ExtArgs> | null
+    /**
+     * Filter, which ResumeProfiles to fetch.
+     */
+    where?: ResumeProfileWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ResumeProfiles to fetch.
+     */
+    orderBy?: ResumeProfileOrderByWithRelationInput | ResumeProfileOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ResumeProfiles.
+     */
+    cursor?: ResumeProfileWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ResumeProfiles from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ResumeProfiles.
+     */
+    skip?: number
+    distinct?: ResumeProfileScalarFieldEnum | ResumeProfileScalarFieldEnum[]
+  }
+
+  /**
+   * ResumeProfile create
+   */
+  export type ResumeProfileCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ResumeProfile
+     */
+    select?: ResumeProfileSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ResumeProfile
+     */
+    omit?: ResumeProfileOmit<ExtArgs> | null
+    /**
+     * The data needed to create a ResumeProfile.
+     */
+    data: XOR<ResumeProfileCreateInput, ResumeProfileUncheckedCreateInput>
+  }
+
+  /**
+   * ResumeProfile createMany
+   */
+  export type ResumeProfileCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ResumeProfiles.
+     */
+    data: ResumeProfileCreateManyInput | ResumeProfileCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ResumeProfile createManyAndReturn
+   */
+  export type ResumeProfileCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ResumeProfile
+     */
+    select?: ResumeProfileSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ResumeProfile
+     */
+    omit?: ResumeProfileOmit<ExtArgs> | null
+    /**
+     * The data used to create many ResumeProfiles.
+     */
+    data: ResumeProfileCreateManyInput | ResumeProfileCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ResumeProfile update
+   */
+  export type ResumeProfileUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ResumeProfile
+     */
+    select?: ResumeProfileSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ResumeProfile
+     */
+    omit?: ResumeProfileOmit<ExtArgs> | null
+    /**
+     * The data needed to update a ResumeProfile.
+     */
+    data: XOR<ResumeProfileUpdateInput, ResumeProfileUncheckedUpdateInput>
+    /**
+     * Choose, which ResumeProfile to update.
+     */
+    where: ResumeProfileWhereUniqueInput
+  }
+
+  /**
+   * ResumeProfile updateMany
+   */
+  export type ResumeProfileUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ResumeProfiles.
+     */
+    data: XOR<ResumeProfileUpdateManyMutationInput, ResumeProfileUncheckedUpdateManyInput>
+    /**
+     * Filter which ResumeProfiles to update
+     */
+    where?: ResumeProfileWhereInput
+    /**
+     * Limit how many ResumeProfiles to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ResumeProfile updateManyAndReturn
+   */
+  export type ResumeProfileUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ResumeProfile
+     */
+    select?: ResumeProfileSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ResumeProfile
+     */
+    omit?: ResumeProfileOmit<ExtArgs> | null
+    /**
+     * The data used to update ResumeProfiles.
+     */
+    data: XOR<ResumeProfileUpdateManyMutationInput, ResumeProfileUncheckedUpdateManyInput>
+    /**
+     * Filter which ResumeProfiles to update
+     */
+    where?: ResumeProfileWhereInput
+    /**
+     * Limit how many ResumeProfiles to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ResumeProfile upsert
+   */
+  export type ResumeProfileUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ResumeProfile
+     */
+    select?: ResumeProfileSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ResumeProfile
+     */
+    omit?: ResumeProfileOmit<ExtArgs> | null
+    /**
+     * The filter to search for the ResumeProfile to update in case it exists.
+     */
+    where: ResumeProfileWhereUniqueInput
+    /**
+     * In case the ResumeProfile found by the `where` argument doesn't exist, create a new ResumeProfile with this data.
+     */
+    create: XOR<ResumeProfileCreateInput, ResumeProfileUncheckedCreateInput>
+    /**
+     * In case the ResumeProfile was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ResumeProfileUpdateInput, ResumeProfileUncheckedUpdateInput>
+  }
+
+  /**
+   * ResumeProfile delete
+   */
+  export type ResumeProfileDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ResumeProfile
+     */
+    select?: ResumeProfileSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ResumeProfile
+     */
+    omit?: ResumeProfileOmit<ExtArgs> | null
+    /**
+     * Filter which ResumeProfile to delete.
+     */
+    where: ResumeProfileWhereUniqueInput
+  }
+
+  /**
+   * ResumeProfile deleteMany
+   */
+  export type ResumeProfileDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ResumeProfiles to delete
+     */
+    where?: ResumeProfileWhereInput
+    /**
+     * Limit how many ResumeProfiles to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * ResumeProfile without action
+   */
+  export type ResumeProfileDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ResumeProfile
+     */
+    select?: ResumeProfileSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ResumeProfile
+     */
+    omit?: ResumeProfileOmit<ExtArgs> | null
+  }
+
+
+  /**
+   * Model SkillGapAssessment
+   */
+
+  export type AggregateSkillGapAssessment = {
+    _count: SkillGapAssessmentCountAggregateOutputType | null
+    _min: SkillGapAssessmentMinAggregateOutputType | null
+    _max: SkillGapAssessmentMaxAggregateOutputType | null
+  }
+
+  export type SkillGapAssessmentMinAggregateOutputType = {
+    id: string | null
+    githubUserId: string | null
+    repositoryId: string | null
+    issueId: string | null
+    contextHash: string | null
+    generatedAt: Date | null
+  }
+
+  export type SkillGapAssessmentMaxAggregateOutputType = {
+    id: string | null
+    githubUserId: string | null
+    repositoryId: string | null
+    issueId: string | null
+    contextHash: string | null
+    generatedAt: Date | null
+  }
+
+  export type SkillGapAssessmentCountAggregateOutputType = {
+    id: number
+    githubUserId: number
+    repositoryId: number
+    issueId: number
+    contextHash: number
+    resultJson: number
+    generatedAt: number
+    _all: number
+  }
+
+
+  export type SkillGapAssessmentMinAggregateInputType = {
+    id?: true
+    githubUserId?: true
+    repositoryId?: true
+    issueId?: true
+    contextHash?: true
+    generatedAt?: true
+  }
+
+  export type SkillGapAssessmentMaxAggregateInputType = {
+    id?: true
+    githubUserId?: true
+    repositoryId?: true
+    issueId?: true
+    contextHash?: true
+    generatedAt?: true
+  }
+
+  export type SkillGapAssessmentCountAggregateInputType = {
+    id?: true
+    githubUserId?: true
+    repositoryId?: true
+    issueId?: true
+    contextHash?: true
+    resultJson?: true
+    generatedAt?: true
+    _all?: true
+  }
+
+  export type SkillGapAssessmentAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SkillGapAssessment to aggregate.
+     */
+    where?: SkillGapAssessmentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SkillGapAssessments to fetch.
+     */
+    orderBy?: SkillGapAssessmentOrderByWithRelationInput | SkillGapAssessmentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: SkillGapAssessmentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SkillGapAssessments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SkillGapAssessments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned SkillGapAssessments
+    **/
+    _count?: true | SkillGapAssessmentCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SkillGapAssessmentMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SkillGapAssessmentMaxAggregateInputType
+  }
+
+  export type GetSkillGapAssessmentAggregateType<T extends SkillGapAssessmentAggregateArgs> = {
+        [P in keyof T & keyof AggregateSkillGapAssessment]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSkillGapAssessment[P]>
+      : GetScalarType<T[P], AggregateSkillGapAssessment[P]>
+  }
+
+
+
+
+  export type SkillGapAssessmentGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SkillGapAssessmentWhereInput
+    orderBy?: SkillGapAssessmentOrderByWithAggregationInput | SkillGapAssessmentOrderByWithAggregationInput[]
+    by: SkillGapAssessmentScalarFieldEnum[] | SkillGapAssessmentScalarFieldEnum
+    having?: SkillGapAssessmentScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SkillGapAssessmentCountAggregateInputType | true
+    _min?: SkillGapAssessmentMinAggregateInputType
+    _max?: SkillGapAssessmentMaxAggregateInputType
+  }
+
+  export type SkillGapAssessmentGroupByOutputType = {
+    id: string
+    githubUserId: string
+    repositoryId: string
+    issueId: string
+    contextHash: string
+    resultJson: JsonValue
+    generatedAt: Date
+    _count: SkillGapAssessmentCountAggregateOutputType | null
+    _min: SkillGapAssessmentMinAggregateOutputType | null
+    _max: SkillGapAssessmentMaxAggregateOutputType | null
+  }
+
+  type GetSkillGapAssessmentGroupByPayload<T extends SkillGapAssessmentGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SkillGapAssessmentGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SkillGapAssessmentGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SkillGapAssessmentGroupByOutputType[P]>
+            : GetScalarType<T[P], SkillGapAssessmentGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type SkillGapAssessmentSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    githubUserId?: boolean
+    repositoryId?: boolean
+    issueId?: boolean
+    contextHash?: boolean
+    resultJson?: boolean
+    generatedAt?: boolean
+  }, ExtArgs["result"]["skillGapAssessment"]>
+
+  export type SkillGapAssessmentSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    githubUserId?: boolean
+    repositoryId?: boolean
+    issueId?: boolean
+    contextHash?: boolean
+    resultJson?: boolean
+    generatedAt?: boolean
+  }, ExtArgs["result"]["skillGapAssessment"]>
+
+  export type SkillGapAssessmentSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    githubUserId?: boolean
+    repositoryId?: boolean
+    issueId?: boolean
+    contextHash?: boolean
+    resultJson?: boolean
+    generatedAt?: boolean
+  }, ExtArgs["result"]["skillGapAssessment"]>
+
+  export type SkillGapAssessmentSelectScalar = {
+    id?: boolean
+    githubUserId?: boolean
+    repositoryId?: boolean
+    issueId?: boolean
+    contextHash?: boolean
+    resultJson?: boolean
+    generatedAt?: boolean
+  }
+
+  export type SkillGapAssessmentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "githubUserId" | "repositoryId" | "issueId" | "contextHash" | "resultJson" | "generatedAt", ExtArgs["result"]["skillGapAssessment"]>
+
+  export type $SkillGapAssessmentPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "SkillGapAssessment"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      githubUserId: string
+      repositoryId: string
+      issueId: string
+      contextHash: string
+      resultJson: Prisma.JsonValue
+      generatedAt: Date
+    }, ExtArgs["result"]["skillGapAssessment"]>
+    composites: {}
+  }
+
+  type SkillGapAssessmentGetPayload<S extends boolean | null | undefined | SkillGapAssessmentDefaultArgs> = $Result.GetResult<Prisma.$SkillGapAssessmentPayload, S>
+
+  type SkillGapAssessmentCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<SkillGapAssessmentFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: SkillGapAssessmentCountAggregateInputType | true
+    }
+
+  export interface SkillGapAssessmentDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['SkillGapAssessment'], meta: { name: 'SkillGapAssessment' } }
+    /**
+     * Find zero or one SkillGapAssessment that matches the filter.
+     * @param {SkillGapAssessmentFindUniqueArgs} args - Arguments to find a SkillGapAssessment
+     * @example
+     * // Get one SkillGapAssessment
+     * const skillGapAssessment = await prisma.skillGapAssessment.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends SkillGapAssessmentFindUniqueArgs>(args: SelectSubset<T, SkillGapAssessmentFindUniqueArgs<ExtArgs>>): Prisma__SkillGapAssessmentClient<$Result.GetResult<Prisma.$SkillGapAssessmentPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one SkillGapAssessment that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {SkillGapAssessmentFindUniqueOrThrowArgs} args - Arguments to find a SkillGapAssessment
+     * @example
+     * // Get one SkillGapAssessment
+     * const skillGapAssessment = await prisma.skillGapAssessment.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends SkillGapAssessmentFindUniqueOrThrowArgs>(args: SelectSubset<T, SkillGapAssessmentFindUniqueOrThrowArgs<ExtArgs>>): Prisma__SkillGapAssessmentClient<$Result.GetResult<Prisma.$SkillGapAssessmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SkillGapAssessment that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SkillGapAssessmentFindFirstArgs} args - Arguments to find a SkillGapAssessment
+     * @example
+     * // Get one SkillGapAssessment
+     * const skillGapAssessment = await prisma.skillGapAssessment.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends SkillGapAssessmentFindFirstArgs>(args?: SelectSubset<T, SkillGapAssessmentFindFirstArgs<ExtArgs>>): Prisma__SkillGapAssessmentClient<$Result.GetResult<Prisma.$SkillGapAssessmentPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SkillGapAssessment that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SkillGapAssessmentFindFirstOrThrowArgs} args - Arguments to find a SkillGapAssessment
+     * @example
+     * // Get one SkillGapAssessment
+     * const skillGapAssessment = await prisma.skillGapAssessment.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends SkillGapAssessmentFindFirstOrThrowArgs>(args?: SelectSubset<T, SkillGapAssessmentFindFirstOrThrowArgs<ExtArgs>>): Prisma__SkillGapAssessmentClient<$Result.GetResult<Prisma.$SkillGapAssessmentPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more SkillGapAssessments that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SkillGapAssessmentFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all SkillGapAssessments
+     * const skillGapAssessments = await prisma.skillGapAssessment.findMany()
+     * 
+     * // Get first 10 SkillGapAssessments
+     * const skillGapAssessments = await prisma.skillGapAssessment.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const skillGapAssessmentWithIdOnly = await prisma.skillGapAssessment.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends SkillGapAssessmentFindManyArgs>(args?: SelectSubset<T, SkillGapAssessmentFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SkillGapAssessmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a SkillGapAssessment.
+     * @param {SkillGapAssessmentCreateArgs} args - Arguments to create a SkillGapAssessment.
+     * @example
+     * // Create one SkillGapAssessment
+     * const SkillGapAssessment = await prisma.skillGapAssessment.create({
+     *   data: {
+     *     // ... data to create a SkillGapAssessment
+     *   }
+     * })
+     * 
+     */
+    create<T extends SkillGapAssessmentCreateArgs>(args: SelectSubset<T, SkillGapAssessmentCreateArgs<ExtArgs>>): Prisma__SkillGapAssessmentClient<$Result.GetResult<Prisma.$SkillGapAssessmentPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many SkillGapAssessments.
+     * @param {SkillGapAssessmentCreateManyArgs} args - Arguments to create many SkillGapAssessments.
+     * @example
+     * // Create many SkillGapAssessments
+     * const skillGapAssessment = await prisma.skillGapAssessment.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends SkillGapAssessmentCreateManyArgs>(args?: SelectSubset<T, SkillGapAssessmentCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many SkillGapAssessments and returns the data saved in the database.
+     * @param {SkillGapAssessmentCreateManyAndReturnArgs} args - Arguments to create many SkillGapAssessments.
+     * @example
+     * // Create many SkillGapAssessments
+     * const skillGapAssessment = await prisma.skillGapAssessment.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many SkillGapAssessments and only return the `id`
+     * const skillGapAssessmentWithIdOnly = await prisma.skillGapAssessment.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends SkillGapAssessmentCreateManyAndReturnArgs>(args?: SelectSubset<T, SkillGapAssessmentCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SkillGapAssessmentPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a SkillGapAssessment.
+     * @param {SkillGapAssessmentDeleteArgs} args - Arguments to delete one SkillGapAssessment.
+     * @example
+     * // Delete one SkillGapAssessment
+     * const SkillGapAssessment = await prisma.skillGapAssessment.delete({
+     *   where: {
+     *     // ... filter to delete one SkillGapAssessment
+     *   }
+     * })
+     * 
+     */
+    delete<T extends SkillGapAssessmentDeleteArgs>(args: SelectSubset<T, SkillGapAssessmentDeleteArgs<ExtArgs>>): Prisma__SkillGapAssessmentClient<$Result.GetResult<Prisma.$SkillGapAssessmentPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one SkillGapAssessment.
+     * @param {SkillGapAssessmentUpdateArgs} args - Arguments to update one SkillGapAssessment.
+     * @example
+     * // Update one SkillGapAssessment
+     * const skillGapAssessment = await prisma.skillGapAssessment.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends SkillGapAssessmentUpdateArgs>(args: SelectSubset<T, SkillGapAssessmentUpdateArgs<ExtArgs>>): Prisma__SkillGapAssessmentClient<$Result.GetResult<Prisma.$SkillGapAssessmentPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more SkillGapAssessments.
+     * @param {SkillGapAssessmentDeleteManyArgs} args - Arguments to filter SkillGapAssessments to delete.
+     * @example
+     * // Delete a few SkillGapAssessments
+     * const { count } = await prisma.skillGapAssessment.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends SkillGapAssessmentDeleteManyArgs>(args?: SelectSubset<T, SkillGapAssessmentDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SkillGapAssessments.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SkillGapAssessmentUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many SkillGapAssessments
+     * const skillGapAssessment = await prisma.skillGapAssessment.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends SkillGapAssessmentUpdateManyArgs>(args: SelectSubset<T, SkillGapAssessmentUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SkillGapAssessments and returns the data updated in the database.
+     * @param {SkillGapAssessmentUpdateManyAndReturnArgs} args - Arguments to update many SkillGapAssessments.
+     * @example
+     * // Update many SkillGapAssessments
+     * const skillGapAssessment = await prisma.skillGapAssessment.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more SkillGapAssessments and only return the `id`
+     * const skillGapAssessmentWithIdOnly = await prisma.skillGapAssessment.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends SkillGapAssessmentUpdateManyAndReturnArgs>(args: SelectSubset<T, SkillGapAssessmentUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SkillGapAssessmentPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one SkillGapAssessment.
+     * @param {SkillGapAssessmentUpsertArgs} args - Arguments to update or create a SkillGapAssessment.
+     * @example
+     * // Update or create a SkillGapAssessment
+     * const skillGapAssessment = await prisma.skillGapAssessment.upsert({
+     *   create: {
+     *     // ... data to create a SkillGapAssessment
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the SkillGapAssessment we want to update
+     *   }
+     * })
+     */
+    upsert<T extends SkillGapAssessmentUpsertArgs>(args: SelectSubset<T, SkillGapAssessmentUpsertArgs<ExtArgs>>): Prisma__SkillGapAssessmentClient<$Result.GetResult<Prisma.$SkillGapAssessmentPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of SkillGapAssessments.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SkillGapAssessmentCountArgs} args - Arguments to filter SkillGapAssessments to count.
+     * @example
+     * // Count the number of SkillGapAssessments
+     * const count = await prisma.skillGapAssessment.count({
+     *   where: {
+     *     // ... the filter for the SkillGapAssessments we want to count
+     *   }
+     * })
+    **/
+    count<T extends SkillGapAssessmentCountArgs>(
+      args?: Subset<T, SkillGapAssessmentCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SkillGapAssessmentCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a SkillGapAssessment.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SkillGapAssessmentAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SkillGapAssessmentAggregateArgs>(args: Subset<T, SkillGapAssessmentAggregateArgs>): Prisma.PrismaPromise<GetSkillGapAssessmentAggregateType<T>>
+
+    /**
+     * Group by SkillGapAssessment.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SkillGapAssessmentGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends SkillGapAssessmentGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: SkillGapAssessmentGroupByArgs['orderBy'] }
+        : { orderBy?: SkillGapAssessmentGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, SkillGapAssessmentGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSkillGapAssessmentGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the SkillGapAssessment model
+   */
+  readonly fields: SkillGapAssessmentFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for SkillGapAssessment.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__SkillGapAssessmentClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the SkillGapAssessment model
+   */
+  interface SkillGapAssessmentFieldRefs {
+    readonly id: FieldRef<"SkillGapAssessment", 'String'>
+    readonly githubUserId: FieldRef<"SkillGapAssessment", 'String'>
+    readonly repositoryId: FieldRef<"SkillGapAssessment", 'String'>
+    readonly issueId: FieldRef<"SkillGapAssessment", 'String'>
+    readonly contextHash: FieldRef<"SkillGapAssessment", 'String'>
+    readonly resultJson: FieldRef<"SkillGapAssessment", 'Json'>
+    readonly generatedAt: FieldRef<"SkillGapAssessment", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * SkillGapAssessment findUnique
+   */
+  export type SkillGapAssessmentFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SkillGapAssessment
+     */
+    select?: SkillGapAssessmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SkillGapAssessment
+     */
+    omit?: SkillGapAssessmentOmit<ExtArgs> | null
+    /**
+     * Filter, which SkillGapAssessment to fetch.
+     */
+    where: SkillGapAssessmentWhereUniqueInput
+  }
+
+  /**
+   * SkillGapAssessment findUniqueOrThrow
+   */
+  export type SkillGapAssessmentFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SkillGapAssessment
+     */
+    select?: SkillGapAssessmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SkillGapAssessment
+     */
+    omit?: SkillGapAssessmentOmit<ExtArgs> | null
+    /**
+     * Filter, which SkillGapAssessment to fetch.
+     */
+    where: SkillGapAssessmentWhereUniqueInput
+  }
+
+  /**
+   * SkillGapAssessment findFirst
+   */
+  export type SkillGapAssessmentFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SkillGapAssessment
+     */
+    select?: SkillGapAssessmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SkillGapAssessment
+     */
+    omit?: SkillGapAssessmentOmit<ExtArgs> | null
+    /**
+     * Filter, which SkillGapAssessment to fetch.
+     */
+    where?: SkillGapAssessmentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SkillGapAssessments to fetch.
+     */
+    orderBy?: SkillGapAssessmentOrderByWithRelationInput | SkillGapAssessmentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SkillGapAssessments.
+     */
+    cursor?: SkillGapAssessmentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SkillGapAssessments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SkillGapAssessments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SkillGapAssessments.
+     */
+    distinct?: SkillGapAssessmentScalarFieldEnum | SkillGapAssessmentScalarFieldEnum[]
+  }
+
+  /**
+   * SkillGapAssessment findFirstOrThrow
+   */
+  export type SkillGapAssessmentFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SkillGapAssessment
+     */
+    select?: SkillGapAssessmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SkillGapAssessment
+     */
+    omit?: SkillGapAssessmentOmit<ExtArgs> | null
+    /**
+     * Filter, which SkillGapAssessment to fetch.
+     */
+    where?: SkillGapAssessmentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SkillGapAssessments to fetch.
+     */
+    orderBy?: SkillGapAssessmentOrderByWithRelationInput | SkillGapAssessmentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SkillGapAssessments.
+     */
+    cursor?: SkillGapAssessmentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SkillGapAssessments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SkillGapAssessments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SkillGapAssessments.
+     */
+    distinct?: SkillGapAssessmentScalarFieldEnum | SkillGapAssessmentScalarFieldEnum[]
+  }
+
+  /**
+   * SkillGapAssessment findMany
+   */
+  export type SkillGapAssessmentFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SkillGapAssessment
+     */
+    select?: SkillGapAssessmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SkillGapAssessment
+     */
+    omit?: SkillGapAssessmentOmit<ExtArgs> | null
+    /**
+     * Filter, which SkillGapAssessments to fetch.
+     */
+    where?: SkillGapAssessmentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SkillGapAssessments to fetch.
+     */
+    orderBy?: SkillGapAssessmentOrderByWithRelationInput | SkillGapAssessmentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing SkillGapAssessments.
+     */
+    cursor?: SkillGapAssessmentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SkillGapAssessments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SkillGapAssessments.
+     */
+    skip?: number
+    distinct?: SkillGapAssessmentScalarFieldEnum | SkillGapAssessmentScalarFieldEnum[]
+  }
+
+  /**
+   * SkillGapAssessment create
+   */
+  export type SkillGapAssessmentCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SkillGapAssessment
+     */
+    select?: SkillGapAssessmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SkillGapAssessment
+     */
+    omit?: SkillGapAssessmentOmit<ExtArgs> | null
+    /**
+     * The data needed to create a SkillGapAssessment.
+     */
+    data: XOR<SkillGapAssessmentCreateInput, SkillGapAssessmentUncheckedCreateInput>
+  }
+
+  /**
+   * SkillGapAssessment createMany
+   */
+  export type SkillGapAssessmentCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many SkillGapAssessments.
+     */
+    data: SkillGapAssessmentCreateManyInput | SkillGapAssessmentCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * SkillGapAssessment createManyAndReturn
+   */
+  export type SkillGapAssessmentCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SkillGapAssessment
+     */
+    select?: SkillGapAssessmentSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SkillGapAssessment
+     */
+    omit?: SkillGapAssessmentOmit<ExtArgs> | null
+    /**
+     * The data used to create many SkillGapAssessments.
+     */
+    data: SkillGapAssessmentCreateManyInput | SkillGapAssessmentCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * SkillGapAssessment update
+   */
+  export type SkillGapAssessmentUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SkillGapAssessment
+     */
+    select?: SkillGapAssessmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SkillGapAssessment
+     */
+    omit?: SkillGapAssessmentOmit<ExtArgs> | null
+    /**
+     * The data needed to update a SkillGapAssessment.
+     */
+    data: XOR<SkillGapAssessmentUpdateInput, SkillGapAssessmentUncheckedUpdateInput>
+    /**
+     * Choose, which SkillGapAssessment to update.
+     */
+    where: SkillGapAssessmentWhereUniqueInput
+  }
+
+  /**
+   * SkillGapAssessment updateMany
+   */
+  export type SkillGapAssessmentUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update SkillGapAssessments.
+     */
+    data: XOR<SkillGapAssessmentUpdateManyMutationInput, SkillGapAssessmentUncheckedUpdateManyInput>
+    /**
+     * Filter which SkillGapAssessments to update
+     */
+    where?: SkillGapAssessmentWhereInput
+    /**
+     * Limit how many SkillGapAssessments to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * SkillGapAssessment updateManyAndReturn
+   */
+  export type SkillGapAssessmentUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SkillGapAssessment
+     */
+    select?: SkillGapAssessmentSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SkillGapAssessment
+     */
+    omit?: SkillGapAssessmentOmit<ExtArgs> | null
+    /**
+     * The data used to update SkillGapAssessments.
+     */
+    data: XOR<SkillGapAssessmentUpdateManyMutationInput, SkillGapAssessmentUncheckedUpdateManyInput>
+    /**
+     * Filter which SkillGapAssessments to update
+     */
+    where?: SkillGapAssessmentWhereInput
+    /**
+     * Limit how many SkillGapAssessments to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * SkillGapAssessment upsert
+   */
+  export type SkillGapAssessmentUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SkillGapAssessment
+     */
+    select?: SkillGapAssessmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SkillGapAssessment
+     */
+    omit?: SkillGapAssessmentOmit<ExtArgs> | null
+    /**
+     * The filter to search for the SkillGapAssessment to update in case it exists.
+     */
+    where: SkillGapAssessmentWhereUniqueInput
+    /**
+     * In case the SkillGapAssessment found by the `where` argument doesn't exist, create a new SkillGapAssessment with this data.
+     */
+    create: XOR<SkillGapAssessmentCreateInput, SkillGapAssessmentUncheckedCreateInput>
+    /**
+     * In case the SkillGapAssessment was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<SkillGapAssessmentUpdateInput, SkillGapAssessmentUncheckedUpdateInput>
+  }
+
+  /**
+   * SkillGapAssessment delete
+   */
+  export type SkillGapAssessmentDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SkillGapAssessment
+     */
+    select?: SkillGapAssessmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SkillGapAssessment
+     */
+    omit?: SkillGapAssessmentOmit<ExtArgs> | null
+    /**
+     * Filter which SkillGapAssessment to delete.
+     */
+    where: SkillGapAssessmentWhereUniqueInput
+  }
+
+  /**
+   * SkillGapAssessment deleteMany
+   */
+  export type SkillGapAssessmentDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SkillGapAssessments to delete
+     */
+    where?: SkillGapAssessmentWhereInput
+    /**
+     * Limit how many SkillGapAssessments to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * SkillGapAssessment without action
+   */
+  export type SkillGapAssessmentDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SkillGapAssessment
+     */
+    select?: SkillGapAssessmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SkillGapAssessment
+     */
+    omit?: SkillGapAssessmentOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -5332,6 +7593,37 @@ export namespace Prisma {
   };
 
   export type IssueIntelligenceScalarFieldEnum = (typeof IssueIntelligenceScalarFieldEnum)[keyof typeof IssueIntelligenceScalarFieldEnum]
+
+
+  export const ResumeProfileScalarFieldEnum: {
+    githubUserId: 'githubUserId',
+    fileName: 'fileName',
+    fileType: 'fileType',
+    summary: 'summary',
+    skills: 'skills',
+    programmingLanguages: 'programmingLanguages',
+    frameworksTools: 'frameworksTools',
+    projects: 'projects',
+    experience: 'experience',
+    education: 'education',
+    parsedAt: 'parsedAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type ResumeProfileScalarFieldEnum = (typeof ResumeProfileScalarFieldEnum)[keyof typeof ResumeProfileScalarFieldEnum]
+
+
+  export const SkillGapAssessmentScalarFieldEnum: {
+    id: 'id',
+    githubUserId: 'githubUserId',
+    repositoryId: 'repositoryId',
+    issueId: 'issueId',
+    contextHash: 'contextHash',
+    resultJson: 'resultJson',
+    generatedAt: 'generatedAt'
+  };
+
+  export type SkillGapAssessmentScalarFieldEnum = (typeof SkillGapAssessmentScalarFieldEnum)[keyof typeof SkillGapAssessmentScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -5716,6 +8008,156 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"IssueIntelligence"> | Date | string
   }
 
+  export type ResumeProfileWhereInput = {
+    AND?: ResumeProfileWhereInput | ResumeProfileWhereInput[]
+    OR?: ResumeProfileWhereInput[]
+    NOT?: ResumeProfileWhereInput | ResumeProfileWhereInput[]
+    githubUserId?: StringFilter<"ResumeProfile"> | string
+    fileName?: StringFilter<"ResumeProfile"> | string
+    fileType?: StringFilter<"ResumeProfile"> | string
+    summary?: StringFilter<"ResumeProfile"> | string
+    skills?: JsonFilter<"ResumeProfile">
+    programmingLanguages?: JsonFilter<"ResumeProfile">
+    frameworksTools?: JsonFilter<"ResumeProfile">
+    projects?: JsonFilter<"ResumeProfile">
+    experience?: JsonFilter<"ResumeProfile">
+    education?: JsonFilter<"ResumeProfile">
+    parsedAt?: DateTimeFilter<"ResumeProfile"> | Date | string
+    updatedAt?: DateTimeFilter<"ResumeProfile"> | Date | string
+  }
+
+  export type ResumeProfileOrderByWithRelationInput = {
+    githubUserId?: SortOrder
+    fileName?: SortOrder
+    fileType?: SortOrder
+    summary?: SortOrder
+    skills?: SortOrder
+    programmingLanguages?: SortOrder
+    frameworksTools?: SortOrder
+    projects?: SortOrder
+    experience?: SortOrder
+    education?: SortOrder
+    parsedAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ResumeProfileWhereUniqueInput = Prisma.AtLeast<{
+    githubUserId?: string
+    AND?: ResumeProfileWhereInput | ResumeProfileWhereInput[]
+    OR?: ResumeProfileWhereInput[]
+    NOT?: ResumeProfileWhereInput | ResumeProfileWhereInput[]
+    fileName?: StringFilter<"ResumeProfile"> | string
+    fileType?: StringFilter<"ResumeProfile"> | string
+    summary?: StringFilter<"ResumeProfile"> | string
+    skills?: JsonFilter<"ResumeProfile">
+    programmingLanguages?: JsonFilter<"ResumeProfile">
+    frameworksTools?: JsonFilter<"ResumeProfile">
+    projects?: JsonFilter<"ResumeProfile">
+    experience?: JsonFilter<"ResumeProfile">
+    education?: JsonFilter<"ResumeProfile">
+    parsedAt?: DateTimeFilter<"ResumeProfile"> | Date | string
+    updatedAt?: DateTimeFilter<"ResumeProfile"> | Date | string
+  }, "githubUserId">
+
+  export type ResumeProfileOrderByWithAggregationInput = {
+    githubUserId?: SortOrder
+    fileName?: SortOrder
+    fileType?: SortOrder
+    summary?: SortOrder
+    skills?: SortOrder
+    programmingLanguages?: SortOrder
+    frameworksTools?: SortOrder
+    projects?: SortOrder
+    experience?: SortOrder
+    education?: SortOrder
+    parsedAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: ResumeProfileCountOrderByAggregateInput
+    _max?: ResumeProfileMaxOrderByAggregateInput
+    _min?: ResumeProfileMinOrderByAggregateInput
+  }
+
+  export type ResumeProfileScalarWhereWithAggregatesInput = {
+    AND?: ResumeProfileScalarWhereWithAggregatesInput | ResumeProfileScalarWhereWithAggregatesInput[]
+    OR?: ResumeProfileScalarWhereWithAggregatesInput[]
+    NOT?: ResumeProfileScalarWhereWithAggregatesInput | ResumeProfileScalarWhereWithAggregatesInput[]
+    githubUserId?: StringWithAggregatesFilter<"ResumeProfile"> | string
+    fileName?: StringWithAggregatesFilter<"ResumeProfile"> | string
+    fileType?: StringWithAggregatesFilter<"ResumeProfile"> | string
+    summary?: StringWithAggregatesFilter<"ResumeProfile"> | string
+    skills?: JsonWithAggregatesFilter<"ResumeProfile">
+    programmingLanguages?: JsonWithAggregatesFilter<"ResumeProfile">
+    frameworksTools?: JsonWithAggregatesFilter<"ResumeProfile">
+    projects?: JsonWithAggregatesFilter<"ResumeProfile">
+    experience?: JsonWithAggregatesFilter<"ResumeProfile">
+    education?: JsonWithAggregatesFilter<"ResumeProfile">
+    parsedAt?: DateTimeWithAggregatesFilter<"ResumeProfile"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"ResumeProfile"> | Date | string
+  }
+
+  export type SkillGapAssessmentWhereInput = {
+    AND?: SkillGapAssessmentWhereInput | SkillGapAssessmentWhereInput[]
+    OR?: SkillGapAssessmentWhereInput[]
+    NOT?: SkillGapAssessmentWhereInput | SkillGapAssessmentWhereInput[]
+    id?: UuidFilter<"SkillGapAssessment"> | string
+    githubUserId?: StringFilter<"SkillGapAssessment"> | string
+    repositoryId?: UuidFilter<"SkillGapAssessment"> | string
+    issueId?: UuidFilter<"SkillGapAssessment"> | string
+    contextHash?: StringFilter<"SkillGapAssessment"> | string
+    resultJson?: JsonFilter<"SkillGapAssessment">
+    generatedAt?: DateTimeFilter<"SkillGapAssessment"> | Date | string
+  }
+
+  export type SkillGapAssessmentOrderByWithRelationInput = {
+    id?: SortOrder
+    githubUserId?: SortOrder
+    repositoryId?: SortOrder
+    issueId?: SortOrder
+    contextHash?: SortOrder
+    resultJson?: SortOrder
+    generatedAt?: SortOrder
+  }
+
+  export type SkillGapAssessmentWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    githubUserId_repositoryId_issueId?: SkillGapAssessmentGithubUserIdRepositoryIdIssueIdCompoundUniqueInput
+    AND?: SkillGapAssessmentWhereInput | SkillGapAssessmentWhereInput[]
+    OR?: SkillGapAssessmentWhereInput[]
+    NOT?: SkillGapAssessmentWhereInput | SkillGapAssessmentWhereInput[]
+    githubUserId?: StringFilter<"SkillGapAssessment"> | string
+    repositoryId?: UuidFilter<"SkillGapAssessment"> | string
+    issueId?: UuidFilter<"SkillGapAssessment"> | string
+    contextHash?: StringFilter<"SkillGapAssessment"> | string
+    resultJson?: JsonFilter<"SkillGapAssessment">
+    generatedAt?: DateTimeFilter<"SkillGapAssessment"> | Date | string
+  }, "id" | "githubUserId_repositoryId_issueId">
+
+  export type SkillGapAssessmentOrderByWithAggregationInput = {
+    id?: SortOrder
+    githubUserId?: SortOrder
+    repositoryId?: SortOrder
+    issueId?: SortOrder
+    contextHash?: SortOrder
+    resultJson?: SortOrder
+    generatedAt?: SortOrder
+    _count?: SkillGapAssessmentCountOrderByAggregateInput
+    _max?: SkillGapAssessmentMaxOrderByAggregateInput
+    _min?: SkillGapAssessmentMinOrderByAggregateInput
+  }
+
+  export type SkillGapAssessmentScalarWhereWithAggregatesInput = {
+    AND?: SkillGapAssessmentScalarWhereWithAggregatesInput | SkillGapAssessmentScalarWhereWithAggregatesInput[]
+    OR?: SkillGapAssessmentScalarWhereWithAggregatesInput[]
+    NOT?: SkillGapAssessmentScalarWhereWithAggregatesInput | SkillGapAssessmentScalarWhereWithAggregatesInput[]
+    id?: UuidWithAggregatesFilter<"SkillGapAssessment"> | string
+    githubUserId?: StringWithAggregatesFilter<"SkillGapAssessment"> | string
+    repositoryId?: UuidWithAggregatesFilter<"SkillGapAssessment"> | string
+    issueId?: UuidWithAggregatesFilter<"SkillGapAssessment"> | string
+    contextHash?: StringWithAggregatesFilter<"SkillGapAssessment"> | string
+    resultJson?: JsonWithAggregatesFilter<"SkillGapAssessment">
+    generatedAt?: DateTimeWithAggregatesFilter<"SkillGapAssessment"> | Date | string
+  }
+
   export type RecommendationCreateInput = {
     id?: string
     repositoryId: string
@@ -5987,6 +8429,181 @@ export namespace Prisma {
     generatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ResumeProfileCreateInput = {
+    githubUserId: string
+    fileName: string
+    fileType: string
+    summary: string
+    skills: JsonNullValueInput | InputJsonValue
+    programmingLanguages: JsonNullValueInput | InputJsonValue
+    frameworksTools: JsonNullValueInput | InputJsonValue
+    projects: JsonNullValueInput | InputJsonValue
+    experience: JsonNullValueInput | InputJsonValue
+    education: JsonNullValueInput | InputJsonValue
+    parsedAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ResumeProfileUncheckedCreateInput = {
+    githubUserId: string
+    fileName: string
+    fileType: string
+    summary: string
+    skills: JsonNullValueInput | InputJsonValue
+    programmingLanguages: JsonNullValueInput | InputJsonValue
+    frameworksTools: JsonNullValueInput | InputJsonValue
+    projects: JsonNullValueInput | InputJsonValue
+    experience: JsonNullValueInput | InputJsonValue
+    education: JsonNullValueInput | InputJsonValue
+    parsedAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ResumeProfileUpdateInput = {
+    githubUserId?: StringFieldUpdateOperationsInput | string
+    fileName?: StringFieldUpdateOperationsInput | string
+    fileType?: StringFieldUpdateOperationsInput | string
+    summary?: StringFieldUpdateOperationsInput | string
+    skills?: JsonNullValueInput | InputJsonValue
+    programmingLanguages?: JsonNullValueInput | InputJsonValue
+    frameworksTools?: JsonNullValueInput | InputJsonValue
+    projects?: JsonNullValueInput | InputJsonValue
+    experience?: JsonNullValueInput | InputJsonValue
+    education?: JsonNullValueInput | InputJsonValue
+    parsedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ResumeProfileUncheckedUpdateInput = {
+    githubUserId?: StringFieldUpdateOperationsInput | string
+    fileName?: StringFieldUpdateOperationsInput | string
+    fileType?: StringFieldUpdateOperationsInput | string
+    summary?: StringFieldUpdateOperationsInput | string
+    skills?: JsonNullValueInput | InputJsonValue
+    programmingLanguages?: JsonNullValueInput | InputJsonValue
+    frameworksTools?: JsonNullValueInput | InputJsonValue
+    projects?: JsonNullValueInput | InputJsonValue
+    experience?: JsonNullValueInput | InputJsonValue
+    education?: JsonNullValueInput | InputJsonValue
+    parsedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ResumeProfileCreateManyInput = {
+    githubUserId: string
+    fileName: string
+    fileType: string
+    summary: string
+    skills: JsonNullValueInput | InputJsonValue
+    programmingLanguages: JsonNullValueInput | InputJsonValue
+    frameworksTools: JsonNullValueInput | InputJsonValue
+    projects: JsonNullValueInput | InputJsonValue
+    experience: JsonNullValueInput | InputJsonValue
+    education: JsonNullValueInput | InputJsonValue
+    parsedAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ResumeProfileUpdateManyMutationInput = {
+    githubUserId?: StringFieldUpdateOperationsInput | string
+    fileName?: StringFieldUpdateOperationsInput | string
+    fileType?: StringFieldUpdateOperationsInput | string
+    summary?: StringFieldUpdateOperationsInput | string
+    skills?: JsonNullValueInput | InputJsonValue
+    programmingLanguages?: JsonNullValueInput | InputJsonValue
+    frameworksTools?: JsonNullValueInput | InputJsonValue
+    projects?: JsonNullValueInput | InputJsonValue
+    experience?: JsonNullValueInput | InputJsonValue
+    education?: JsonNullValueInput | InputJsonValue
+    parsedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ResumeProfileUncheckedUpdateManyInput = {
+    githubUserId?: StringFieldUpdateOperationsInput | string
+    fileName?: StringFieldUpdateOperationsInput | string
+    fileType?: StringFieldUpdateOperationsInput | string
+    summary?: StringFieldUpdateOperationsInput | string
+    skills?: JsonNullValueInput | InputJsonValue
+    programmingLanguages?: JsonNullValueInput | InputJsonValue
+    frameworksTools?: JsonNullValueInput | InputJsonValue
+    projects?: JsonNullValueInput | InputJsonValue
+    experience?: JsonNullValueInput | InputJsonValue
+    education?: JsonNullValueInput | InputJsonValue
+    parsedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SkillGapAssessmentCreateInput = {
+    id?: string
+    githubUserId: string
+    repositoryId: string
+    issueId: string
+    contextHash: string
+    resultJson: JsonNullValueInput | InputJsonValue
+    generatedAt?: Date | string
+  }
+
+  export type SkillGapAssessmentUncheckedCreateInput = {
+    id?: string
+    githubUserId: string
+    repositoryId: string
+    issueId: string
+    contextHash: string
+    resultJson: JsonNullValueInput | InputJsonValue
+    generatedAt?: Date | string
+  }
+
+  export type SkillGapAssessmentUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    githubUserId?: StringFieldUpdateOperationsInput | string
+    repositoryId?: StringFieldUpdateOperationsInput | string
+    issueId?: StringFieldUpdateOperationsInput | string
+    contextHash?: StringFieldUpdateOperationsInput | string
+    resultJson?: JsonNullValueInput | InputJsonValue
+    generatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SkillGapAssessmentUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    githubUserId?: StringFieldUpdateOperationsInput | string
+    repositoryId?: StringFieldUpdateOperationsInput | string
+    issueId?: StringFieldUpdateOperationsInput | string
+    contextHash?: StringFieldUpdateOperationsInput | string
+    resultJson?: JsonNullValueInput | InputJsonValue
+    generatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SkillGapAssessmentCreateManyInput = {
+    id?: string
+    githubUserId: string
+    repositoryId: string
+    issueId: string
+    contextHash: string
+    resultJson: JsonNullValueInput | InputJsonValue
+    generatedAt?: Date | string
+  }
+
+  export type SkillGapAssessmentUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    githubUserId?: StringFieldUpdateOperationsInput | string
+    repositoryId?: StringFieldUpdateOperationsInput | string
+    issueId?: StringFieldUpdateOperationsInput | string
+    contextHash?: StringFieldUpdateOperationsInput | string
+    resultJson?: JsonNullValueInput | InputJsonValue
+    generatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SkillGapAssessmentUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    githubUserId?: StringFieldUpdateOperationsInput | string
+    repositoryId?: StringFieldUpdateOperationsInput | string
+    issueId?: StringFieldUpdateOperationsInput | string
+    contextHash?: StringFieldUpdateOperationsInput | string
+    resultJson?: JsonNullValueInput | InputJsonValue
+    generatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type UuidFilter<$PrismaModel = never> = {
@@ -6353,6 +8970,73 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedJsonFilter<$PrismaModel>
     _max?: NestedJsonFilter<$PrismaModel>
+  }
+
+  export type ResumeProfileCountOrderByAggregateInput = {
+    githubUserId?: SortOrder
+    fileName?: SortOrder
+    fileType?: SortOrder
+    summary?: SortOrder
+    skills?: SortOrder
+    programmingLanguages?: SortOrder
+    frameworksTools?: SortOrder
+    projects?: SortOrder
+    experience?: SortOrder
+    education?: SortOrder
+    parsedAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ResumeProfileMaxOrderByAggregateInput = {
+    githubUserId?: SortOrder
+    fileName?: SortOrder
+    fileType?: SortOrder
+    summary?: SortOrder
+    parsedAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ResumeProfileMinOrderByAggregateInput = {
+    githubUserId?: SortOrder
+    fileName?: SortOrder
+    fileType?: SortOrder
+    summary?: SortOrder
+    parsedAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SkillGapAssessmentGithubUserIdRepositoryIdIssueIdCompoundUniqueInput = {
+    githubUserId: string
+    repositoryId: string
+    issueId: string
+  }
+
+  export type SkillGapAssessmentCountOrderByAggregateInput = {
+    id?: SortOrder
+    githubUserId?: SortOrder
+    repositoryId?: SortOrder
+    issueId?: SortOrder
+    contextHash?: SortOrder
+    resultJson?: SortOrder
+    generatedAt?: SortOrder
+  }
+
+  export type SkillGapAssessmentMaxOrderByAggregateInput = {
+    id?: SortOrder
+    githubUserId?: SortOrder
+    repositoryId?: SortOrder
+    issueId?: SortOrder
+    contextHash?: SortOrder
+    generatedAt?: SortOrder
+  }
+
+  export type SkillGapAssessmentMinOrderByAggregateInput = {
+    id?: SortOrder
+    githubUserId?: SortOrder
+    repositoryId?: SortOrder
+    issueId?: SortOrder
+    contextHash?: SortOrder
+    generatedAt?: SortOrder
   }
 
   export type StringFieldUpdateOperationsInput = {

@@ -66,6 +66,10 @@ model Repository {
   parentFullName     String?
   openIssuesCount    Int                  @default(0)
   lastSyncedAt       DateTime?            @db.Timestamptz(3)
+  // Repository monitoring state: when the background job last checked this
+  // repository's open issues on GitHub for ones we have not seen before.
+  // Null means it has never been checked yet (e.g. just imported).
+  lastIssueCheckAt   DateTime?            @db.Timestamptz(3)
   createdAt          DateTime             @default(now()) @db.Timestamptz(3)
   updatedAt          DateTime             @updatedAt @db.Timestamptz(3)
   accessEntries      RepositoryAccess[]
@@ -144,6 +148,28 @@ model IssueLabel {
   @@unique([issueId, name])
   @@index([issueId])
   @@map("issue_labels")
+}
+
+// In-app notifications for users about their monitored repositories (e.g. a
+// newly detected GitHub issue). Deliberately kept as plain scalar references
+// (no Prisma relations to User/Repository/Issue) so this feature does not
+// require touching those existing models - dedup and lookups only ever need
+// the ids below, not nested includes.
+model Notification {
+  id           String   @id @default(uuid()) @db.Uuid
+  userId       String   @db.Uuid
+  repositoryId String   @db.Uuid
+  issueId      String   @db.Uuid
+  type         String   @default("new_issue")
+  message      String
+  url          String
+  isRead       Boolean  @default(false)
+  createdAt    DateTime @default(now()) @db.Timestamptz(3)
+
+  // One notification per user per issue - the dedup guarantee.
+  @@unique([userId, issueId])
+  @@index([userId, isRead, createdAt])
+  @@map("notifications")
 }
 
 

@@ -12,8 +12,11 @@ import { HealthController } from './health.controller';
 import { GitHubController } from './github/github.controller';
 import { GitHubRepositoryService } from './github/github.repository.service';
 import { GitHubSessionService } from './github/github.session.service';
+import { NotificationsController } from './notifications.controller';
+import { NotificationsService } from './notifications.service';
 import { RepositoryIssuesController } from './repository-issues.controller';
 import { RepositoryKnowledgeController } from './repository-knowledge.controller';
+import { RepositoryMonitorService } from './repository-monitor.service';
 
 @Module({
   imports: [
@@ -29,8 +32,8 @@ import { RepositoryKnowledgeController } from './repository-knowledge.controller
     GitHubModule.forRoot(),
     HealthModule,
   ],
-  controllers: [AppController, HealthController, GitHubController, RepositoryIssuesController, RepositoryKnowledgeController],
-  providers: [AppService, GitHubSessionService, GitHubRepositoryService],
+  controllers: [AppController, HealthController, GitHubController, RepositoryIssuesController, RepositoryKnowledgeController, NotificationsController],
+  providers: [AppService, GitHubSessionService, GitHubRepositoryService, NotificationsService, RepositoryMonitorService],
 })
 export class AppModule {}
 

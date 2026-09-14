@@ -21,6 +21,12 @@ export const repositoryEnvSchema = baseEnvSchema
     GITHUB_SESSION_COOKIE_NAME: z.string().min(1).default('osc_github_session'),
     GITHUB_SESSION_TTL_SECONDS: z.coerce.number().int().min(300).max(2_592_000).default(604_800),
     GITHUB_OAUTH_STATE_TTL_SECONDS: z.coerce.number().int().min(60).max(600).default(600),
+    REPOSITORY_MONITOR_ENABLED: z.coerce.boolean().default(true),
+    // How often the background job re-checks monitored (imported) repositories
+    // for new GitHub issues. Kept well above GitHub's unauthenticated rate
+    // limit window (60 req/hour) since the monitor calls the GitHub API
+    // without a user token.
+    REPOSITORY_MONITOR_INTERVAL_MS: z.coerce.number().int().min(60_000).max(3_600_000).default(600_000),
   });
 
 export type RepositoryEnv = z.infer<typeof repositoryEnvSchema>;

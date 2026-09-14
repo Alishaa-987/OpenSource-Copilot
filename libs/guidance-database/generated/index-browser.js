@@ -160,6 +160,31 @@ exports.Prisma.IssueIntelligenceScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.ResumeProfileScalarFieldEnum = {
+  githubUserId: 'githubUserId',
+  fileName: 'fileName',
+  fileType: 'fileType',
+  summary: 'summary',
+  skills: 'skills',
+  programmingLanguages: 'programmingLanguages',
+  frameworksTools: 'frameworksTools',
+  projects: 'projects',
+  experience: 'experience',
+  education: 'education',
+  parsedAt: 'parsedAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.SkillGapAssessmentScalarFieldEnum = {
+  id: 'id',
+  githubUserId: 'githubUserId',
+  repositoryId: 'repositoryId',
+  issueId: 'issueId',
+  contextHash: 'contextHash',
+  resultJson: 'resultJson',
+  generatedAt: 'generatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -190,7 +215,9 @@ exports.Prisma.ModelName = {
   Recommendation: 'Recommendation',
   ProcessedEvent: 'ProcessedEvent',
   ImportedRepositoryProjection: 'ImportedRepositoryProjection',
-  IssueIntelligence: 'IssueIntelligence'
+  IssueIntelligence: 'IssueIntelligence',
+  ResumeProfile: 'ResumeProfile',
+  SkillGapAssessment: 'SkillGapAssessment'
 };
 
 /**

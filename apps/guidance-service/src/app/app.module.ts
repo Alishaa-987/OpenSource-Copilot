@@ -11,6 +11,7 @@ import { HealthController } from './health.controller';
 import { RepositoryImportedConsumer } from './events/repository-imported.consumer';
 import { ContributorIntelligenceModule } from './contributor-intelligence/contributor-intelligence.module';
 import { RecommendationsModule } from './recommendations/recommendations.module';
+import { ResumeIntelligenceModule } from './resume-intelligence/resume-intelligence.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { RecommendationsModule } from './recommendations/recommendations.module'
     GuidanceDatabaseModule,
     RecommendationsModule,
     ContributorIntelligenceModule,
+    ResumeIntelligenceModule,
   ],
   controllers: [AppController, HealthController],
   providers: [AppService, RepositoryImportedConsumer],

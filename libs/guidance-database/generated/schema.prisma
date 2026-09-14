@@ -68,3 +68,44 @@ model IssueIntelligence {
   @@index([issueId])
   @@map("issue_intelligence")
 }
+
+// One parsed, structured resume per GitHub user. Keyed by the stable GitHub
+// user id (same identity boundary as the rest of this service: no relation
+// to repository-service's internal tables, see the OWNERSHIP note above).
+// Only the LLM-extracted structured fields are stored - the raw uploaded
+// file/text is discarded once parsing succeeds, per "do not store
+// unnecessary raw data when structured data is sufficient".
+model ResumeProfile {
+  githubUserId         String   @id @map("github_user_id")
+  fileName             String   @map("file_name")
+  fileType             String   @map("file_type")
+  summary              String   @db.Text
+  skills               Json
+  programmingLanguages Json     @map("programming_languages")
+  frameworksTools      Json     @map("frameworks_tools")
+  projects             Json
+  experience           Json
+  education            Json
+  parsedAt             DateTime @default(now()) @map("parsed_at") @db.Timestamptz(3)
+  updatedAt            DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@map("resume_profiles")
+}
+
+// Cached resume-vs-issue comparison so repeat views of the same issue (with
+// an unchanged resume and unchanged issue analysis) don't re-spend an LLM
+// call. contextHash fingerprints (resume.updatedAt + the issue context sent
+// by the client); a mismatch means either changed and the cache misses.
+model SkillGapAssessment {
+  id           String   @id @default(uuid()) @db.Uuid
+  githubUserId String   @map("github_user_id")
+  repositoryId String   @db.Uuid
+  issueId      String   @db.Uuid
+  contextHash  String   @map("context_hash")
+  resultJson   Json     @map("result_json")
+  generatedAt  DateTime @default(now()) @db.Timestamptz(3)
+
+  @@unique([githubUserId, repositoryId, issueId])
+  @@index([repositoryId, issueId])
+  @@map("skill_gap_assessments")
+}

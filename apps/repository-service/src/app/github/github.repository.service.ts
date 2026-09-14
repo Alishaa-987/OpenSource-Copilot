@@ -49,7 +49,12 @@ export class GitHubRepositoryService {
         search: query.search,
       });
       return {
-        items: page.items.map((repository) => this.mapRepository(repository)),
+        // Dashboard cleanup: don't surface every repository GitHub returns -
+        // a 0-star repo is almost always a scratch/personal project, not
+        // something worth guiding a contributor toward. This only filters
+        // what this list response shows; nothing is touched on GitHub or in
+        // our own database.
+        items: page.items.filter((repository) => this.isDashboardQuality(repository)).map((repository) => this.mapRepository(repository)),
         page: page.pageInfo.page,
         perPage: page.pageInfo.perPage,
         hasNext: page.pageInfo.hasNext,
@@ -58,6 +63,26 @@ export class GitHubRepositoryService {
     } catch (error) {
       throw this.toHttpError(error);
     }
+  }
+
+  /**
+   * Quality filter for the dashboard list.
+   *
+   * IMPORTANT: this list is made of the user's FORKS (see
+   * GitHubClient.listAccessibleRepositories). A fork's stars live on its
+   * upstream repository, not on the copy, and GitHub's list endpoint does
+   * not return the parent - so a fork with 0 stars is completely normal and
+   * must never be hidden. Filtering purely on stars here emptied the whole
+   * dashboard.
+   *
+   * What is actually filtered: an original (non-fork) repository with no
+   * stars and no description, which is the shape of a scratch/placeholder
+   * repo rather than something worth contributing to.
+   */
+  private isDashboardQuality(repository: GitHubRepository): boolean {
+    if ((repository.stargazers_count ?? 0) > 0) return true;
+    if (repository.fork === true) return true;
+    return Boolean(repository.description?.trim());
   }
 
   async importRepository(request: Request, input: ImportRepositoryDto): Promise<RepositoryImportResponse> {
