@@ -27,6 +27,10 @@ export const repositoryEnvSchema = baseEnvSchema
     // limit window (60 req/hour) since the monitor calls the GitHub API
     // without a user token.
     REPOSITORY_MONITOR_INTERVAL_MS: z.coerce.number().int().min(60_000).max(3_600_000).default(600_000),
+    // Bounded work per cycle: the monitor calls GitHub unauthenticated (60
+    // requests/hour), so a cycle spends at most this many requests and the
+    // least-recently-checked repositories continue on the next one.
+    REPOSITORY_MONITOR_MAX_REQUESTS_PER_CYCLE: z.coerce.number().int().min(1).max(500).default(40),
   });
 
 export type RepositoryEnv = z.infer<typeof repositoryEnvSchema>;

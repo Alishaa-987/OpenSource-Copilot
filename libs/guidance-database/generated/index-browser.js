@@ -185,6 +185,15 @@ exports.Prisma.SkillGapAssessmentScalarFieldEnum = {
   generatedAt: 'generatedAt'
 };
 
+exports.Prisma.RepositoryAnalysisScalarFieldEnum = {
+  repositoryId: 'repositoryId',
+  analysisJson: 'analysisJson',
+  sourceVersion: 'sourceVersion',
+  generatedAt: 'generatedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -217,7 +226,8 @@ exports.Prisma.ModelName = {
   ImportedRepositoryProjection: 'ImportedRepositoryProjection',
   IssueIntelligence: 'IssueIntelligence',
   ResumeProfile: 'ResumeProfile',
-  SkillGapAssessment: 'SkillGapAssessment'
+  SkillGapAssessment: 'SkillGapAssessment',
+  RepositoryAnalysis: 'RepositoryAnalysis'
 };
 
 /**

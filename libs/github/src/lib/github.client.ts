@@ -182,12 +182,17 @@ export class GitHubClient {
     return this.parse(GitHubIssueSchema, response.data, `/repos/${owner}/${name}/issues/${issueNumber}`);
   }
 
-  async listIssueComments(token: string | undefined, owner: string, name: string, issueNumber: number): Promise<GitHubComment[]> {
+  /**
+   * Comments are returned oldest-first, so the newest ones live on the last
+   * page. `page` lets a caller that already knows the comment count jump
+   * straight there instead of walking every page.
+   */
+  async listIssueComments(token: string | undefined, owner: string, name: string, issueNumber: number, page = 1): Promise<GitHubComment[]> {
     const response = await this.request<unknown[]>({
       method: 'GET',
       url: `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(name)}/issues/${issueNumber}/comments`,
       token,
-      params: { page: 1, per_page: 100 },
+      params: { page, per_page: 100 },
     });
     return this.parseArray(GitHubCommentSchema, response.data, `/repos/${owner}/${name}/issues/${issueNumber}/comments`);
   }

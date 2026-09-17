@@ -83,6 +83,16 @@ export interface GitHubRepositoryResponse {
   defaultBranch: string;
   fork?: boolean;
   openIssuesCount: number;
+  /**
+   * Whether this repository has already been imported/analysed by the caller.
+   * Resolved from our own database, so the listing can show real state
+   * instead of assuming every row is new.
+   */
+  imported?: boolean;
+  /** Internal repository id, present only once imported. */
+  repositoryId?: string | null;
+  /** When the background monitor last checked it, present only once imported. */
+  lastIssueCheckAt?: string | null;
 }
 
 export interface RepositoryListResponse {
@@ -122,6 +132,8 @@ export interface ImportedRepositoryResponse extends GitHubRepositoryResponse {
   isFork: boolean;
   parentFullName: string | null;
   lastSyncedAt: string | null;
+  /** When the background monitor last checked this repository for new issue activity. */
+  lastIssueCheckAt: string | null;
   createdAt: string;
   updatedAt: string;
 }

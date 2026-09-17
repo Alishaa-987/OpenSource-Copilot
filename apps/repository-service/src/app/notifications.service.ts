@@ -1,13 +1,25 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@osc/database';
 
+/** Event kinds the repository monitor can raise. Deterministic, never AI-derived. */
+export type NotificationType =
+  | 'new_issue'
+  | 'new_comment'
+  | 'issue_closed'
+  | 'issue_reopened'
+  | 'issue_retitled';
+
 export interface NotificationResponse {
   id: string;
-  type: string;
+  type: NotificationType | string;
   message: string;
   url: string;
+  githubUrl: string;
   repositoryId: string;
+  repositoryFullName: string;
   issueId: string;
+  issueNumber: number;
+  issueTitle: string;
   isRead: boolean;
   createdAt: string;
 }
@@ -18,11 +30,28 @@ export interface NotificationListResponse {
 }
 
 /**
- * Owns the notifications table: reading a user's notifications and creating
- * one when the repository monitor finds a genuinely new GitHub issue. Kept
- * separate from RepositoryMonitorService so the "what is a notification"
- * concern (dedup, shape, read state) stays in one place regardless of what
- * triggers a notification in the future.
+ * One GitHub event, already resolved to our own ids. `dedupeKey` is the
+ * identity of the underlying event on GitHub (issue id, comment id, or a
+ * state transition), which is what makes re-polling safe.
+ */
+export interface MonitorEvent {
+  type: NotificationType;
+  repositoryId: string;
+  repositoryFullName: string;
+  issueId: string;
+  issueNumber: number;
+  issueTitle: string;
+  githubUrl: string;
+  message: string;
+  dedupeKey: string;
+}
+
+/**
+ * Owns the notifications table: reading a user's notifications, and recording
+ * the events the repository monitor detects.
+ *
+ * Nothing here calls an LLM - every message is composed from GitHub API and
+ * database state only.
  */
 @Injectable()
 export class NotificationsService {
@@ -49,45 +78,51 @@ export class NotificationsService {
   }
 
   /**
-   * Notifies every user who has access to the repository that a new issue
-   * appeared. `skipDuplicates` plus the (userId, issueId) unique constraint
-   * on the table is what makes this safe to call more than once for the
-   * same issue - a repeated call (e.g. an overlapping monitor cycle) never
-   * produces a second notification for the same user/issue pair.
+   * Fans one detected event out to every user who has access to the
+   * repository. `skipDuplicates` plus the (userId, dedupeKey) unique
+   * constraint is the dedup guarantee: replaying a poll, overlapping cycles,
+   * or two users importing the same repository can never produce a second
+   * copy of the same GitHub event for the same user.
+   *
+   * Returns how many notification rows were actually created.
    */
-  async notifyNewIssue(params: {
-    repositoryId: string;
-    repositoryFullName: string;
-    issueId: string;
-    issueTitle: string;
-    issueUrl: string;
-    userIds: string[];
-  }): Promise<void> {
-    if (params.userIds.length === 0) return;
-    const message = `New issue added in ${params.repositoryFullName}: ${params.issueTitle}`;
-    await this.prisma.notification.createMany({
-      data: params.userIds.map((userId) => ({
+  async recordEvents(events: readonly MonitorEvent[], userIds: readonly string[]): Promise<number> {
+    if (events.length === 0 || userIds.length === 0) return 0;
+    const rows = events.flatMap((event) =>
+      userIds.map((userId) => ({
         userId,
-        repositoryId: params.repositoryId,
-        issueId: params.issueId,
-        type: 'new_issue',
-        message,
-        url: params.issueUrl,
+        repositoryId: event.repositoryId,
+        repositoryFullName: event.repositoryFullName,
+        issueId: event.issueId,
+        issueNumber: event.issueNumber,
+        issueTitle: event.issueTitle,
+        type: event.type,
+        message: event.message,
+        url: `/issues/${event.issueId}`,
+        githubUrl: event.githubUrl,
+        dedupeKey: event.dedupeKey,
       })),
-      skipDuplicates: true,
-    });
+    );
+    const result = await this.prisma.notification.createMany({ data: rows, skipDuplicates: true });
+    return result.count;
   }
 
   private mapNotification(notification: {
-    id: string; type: string; message: string; url: string; repositoryId: string; issueId: string; isRead: boolean; createdAt: Date;
+    id: string; type: string; message: string; url: string; githubUrl: string;
+    repositoryId: string; repositoryFullName: string; issueId: string; issueNumber: number;
+    issueTitle: string; isRead: boolean; createdAt: Date;
   }): NotificationResponse {
     return {
       id: notification.id,
       type: notification.type,
       message: notification.message,
       url: notification.url,
+      githubUrl: notification.githubUrl,
       repositoryId: notification.repositoryId,
+      repositoryFullName: notification.repositoryFullName,
       issueId: notification.issueId,
+      issueNumber: notification.issueNumber,
+      issueTitle: notification.issueTitle,
       isRead: notification.isRead,
       createdAt: notification.createdAt.toISOString(),
     };

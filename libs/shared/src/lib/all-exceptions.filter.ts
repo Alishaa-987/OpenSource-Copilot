@@ -58,6 +58,28 @@ function sanitizeExceptionForLog(exception: unknown): string {
     .replace(/(authorization\s*[:=]\s*bearer\s+)[^\s,]+/gi, '$1[REDACTED]')
     .replace(/((?:cookie|password|secret|token|accessToken|refreshToken|api[_-]?key|client[_-]?secret)\s*[:=]\s*)[^\s,;)]*/gi, '$1[REDACTED]');
 }
+
+/**
+ * Development aid: mirror every 5xx (already sanitised above) into a single
+ * append-only file at the workspace root, `error-log.txt`.
+ *
+ * The response body deliberately never carries internal detail, and a
+ * scrolling dev-server terminal is easy to miss or lose - so without this the
+ * only copy of the real cause can scroll away before anyone reads it. One
+ * file makes a failure reproducible-then-readable after the fact. Disabled in
+ * production, and it can never affect the response.
+ */
+function recordToDevErrorLog(entry: string): void {
+  if (process.env['NODE_ENV'] === 'production') return;
+  try {
+    const fs = require('node:fs') as typeof import('node:fs');
+    const path = require('node:path') as typeof import('node:path');
+    fs.appendFileSync(path.join(process.cwd(), 'error-log.txt'), entry + '\n\n', 'utf8');
+  } catch {
+    // Diagnostics are best-effort only.
+  }
+}
+
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
   private readonly logger = new Logger(AllExceptionsFilter.name);
@@ -94,9 +116,13 @@ export class AllExceptionsFilter implements ExceptionFilter {
     // Log the full error server-side (with stack for 5xx). This is the ONLY
     // place internal detail is recorded â€” it never reaches the client.
     if (statusCode >= HttpStatus.INTERNAL_SERVER_ERROR) {
+      const detail = sanitizeExceptionForLog(exception);
       this.logger.error(
         `Unhandled exception [${correlationId}] ${request?.method ?? ''} ${path}`,
-        sanitizeExceptionForLog(exception),
+        detail,
+      );
+      recordToDevErrorLog(
+        `[${new Date().toISOString()}] ${statusCode} ${request?.method ?? ''} ${path} [${correlationId}]\n${detail}`,
       );
     } else {
       this.logger.warn(

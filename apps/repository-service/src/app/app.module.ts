@@ -14,6 +14,8 @@ import { GitHubRepositoryService } from './github/github.repository.service';
 import { GitHubSessionService } from './github/github.session.service';
 import { NotificationsController } from './notifications.controller';
 import { NotificationsService } from './notifications.service';
+import { ProfileController } from './profile.controller';
+import { ProfileService } from './profile.service';
 import { RepositoryIssuesController } from './repository-issues.controller';
 import { RepositoryKnowledgeController } from './repository-knowledge.controller';
 import { RepositoryMonitorService } from './repository-monitor.service';
@@ -32,8 +34,8 @@ import { RepositoryMonitorService } from './repository-monitor.service';
     GitHubModule.forRoot(),
     HealthModule,
   ],
-  controllers: [AppController, HealthController, GitHubController, RepositoryIssuesController, RepositoryKnowledgeController, NotificationsController],
-  providers: [AppService, GitHubSessionService, GitHubRepositoryService, NotificationsService, RepositoryMonitorService],
+  controllers: [AppController, HealthController, GitHubController, RepositoryIssuesController, RepositoryKnowledgeController, NotificationsController, ProfileController],
+  providers: [AppService, GitHubSessionService, GitHubRepositoryService, NotificationsService, RepositoryMonitorService, ProfileService],
 })
 export class AppModule {}
 

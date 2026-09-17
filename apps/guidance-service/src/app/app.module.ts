@@ -12,6 +12,7 @@ import { RepositoryImportedConsumer } from './events/repository-imported.consume
 import { ContributorIntelligenceModule } from './contributor-intelligence/contributor-intelligence.module';
 import { RecommendationsModule } from './recommendations/recommendations.module';
 import { ResumeIntelligenceModule } from './resume-intelligence/resume-intelligence.module';
+import { RepositoryAnalysisModule } from './repository-analysis/repository-analysis.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { ResumeIntelligenceModule } from './resume-intelligence/resume-intellige
     RecommendationsModule,
     ContributorIntelligenceModule,
     ResumeIntelligenceModule,
+    RepositoryAnalysisModule,
   ],
   controllers: [AppController, HealthController],
   providers: [AppService, RepositoryImportedConsumer],

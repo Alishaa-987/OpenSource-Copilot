@@ -160,16 +160,74 @@ model Notification {
   userId       String   @db.Uuid
   repositoryId String   @db.Uuid
   issueId      String   @db.Uuid
+  // Denormalised so a notification can be rendered without joining back to
+  // the repository/issue rows (and still reads correctly if either changes).
+  repositoryFullName String @default("")
+  issueNumber        Int    @default(0)
+  issueTitle         String @default("")
+  // new_issue | new_comment | issue_closed | issue_reopened | issue_retitled
   type         String   @default("new_issue")
   message      String
+  /// Internal link into the issue workspace.
   url          String
+  /// Canonical github.com link for the issue this event belongs to.
+  githubUrl    String   @default("")
+  /// Deterministic identity of the underlying GitHub event - for example
+  /// "issue:123456", "comment:987654", "state:123456:closed". Unique per
+  /// user, so re-polling can never produce a second copy of the same event.
+  /// Nullable only so rows written before this column existed stay valid;
+  /// Postgres treats NULLs as distinct, so they never collide.
+  dedupeKey    String?
   isRead       Boolean  @default(false)
   createdAt    DateTime @default(now()) @db.Timestamptz(3)
 
-  // One notification per user per issue - the dedup guarantee.
-  @@unique([userId, issueId])
+  @@unique([userId, dedupeKey])
   @@index([userId, isRead, createdAt])
+  @@index([repositoryId])
   @@map("notifications")
 }
 
+// Per-user progress on one issue. This is the only *new* source of truth the
+// contributor profile needs: "viewed" is recorded automatically when the
+// issue workspace is opened, and the user moves it to started/completed.
+// Every other profile statistic is derived from tables that already exist
+// (repository_access, repositories, issues), so nothing is duplicated here.
+model IssueProgress {
+  userId       String    @db.Uuid
+  issueId      String    @db.Uuid
+  repositoryId String    @db.Uuid
+  /// viewed | started | completed
+  status       String    @default("viewed")
+  startedAt    DateTime? @db.Timestamptz(3)
+  completedAt  DateTime? @db.Timestamptz(3)
+  createdAt    DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime  @updatedAt @db.Timestamptz(3)
 
+  @@id([userId, issueId])
+  @@index([userId, status])
+  @@index([userId, updatedAt])
+  @@map("issue_progress")
+}
+
+// Append-only activity timeline. Kept separate from IssueProgress because it
+// records *events* (what happened, when) rather than current state - that is
+// what the contribution timeline, streak and milestone sections read.
+// `dedupeKey` makes repeated signals for the same event idempotent, so an
+// automatic "viewed" ping on every page load cannot inflate the timeline.
+model ContributorActivity {
+  id           String   @id @default(uuid()) @db.Uuid
+  userId       String   @db.Uuid
+  /// repository_analyzed | issue_viewed | issue_started | issue_completed
+  type         String
+  repositoryId String?  @db.Uuid
+  issueId      String?  @db.Uuid
+  /// Small display payload (repository full name, issue number/title).
+  metadata     Json?
+  occurredAt   DateTime @default(now()) @db.Timestamptz(3)
+  dedupeKey    String?
+
+  @@unique([userId, dedupeKey])
+  @@index([userId, occurredAt])
+  @@index([userId, type])
+  @@map("contributor_activity")
+}

@@ -26,6 +26,7 @@ import {
   RepositoryListResponse,
 } from './github.dto';
 import { GitHubSession, GitHubSessionService } from './github.session.service';
+import { ProfileService } from '../profile.service';
 
 const DOCUMENT_PATHS = ['README.md', 'CONTRIBUTING.md', 'CODE_OF_CONDUCT.md', 'SECURITY.md'] as const;
 
@@ -38,6 +39,7 @@ export class GitHubRepositoryService {
     private readonly sessions: GitHubSessionService,
     private readonly prisma: PrismaService,
     private readonly kafka: KafkaProducerService,
+    private readonly profile: ProfileService,
   ) {}
 
   async listAccessibleRepositories(request: Request, query: ListRepositoriesQueryDto): Promise<RepositoryListResponse> {
@@ -48,13 +50,28 @@ export class GitHubRepositoryService {
         perPage: query.perPage,
         search: query.search,
       });
+      const visible = page.items.filter((repository) => this.isDashboardQuality(repository));
+      // Resolve which of these the caller has already imported, in one query,
+      // so each card can show its real state rather than always claiming the
+      // repository has never been analysed.
+      const importedRows = visible.length === 0 ? [] : await this.prisma.repository.findMany({
+        where: {
+          githubRepositoryId: { in: visible.map((repository) => BigInt(repository.id)) },
+          accessEntries: { some: { userId: session.userId } },
+        },
+        select: { id: true, githubRepositoryId: true, lastIssueCheckAt: true },
+      });
+      const importedByGithubId = new Map(importedRows.map((row) => [row.githubRepositoryId.toString(), row]));
       return {
-        // Dashboard cleanup: don't surface every repository GitHub returns -
-        // a 0-star repo is almost always a scratch/personal project, not
-        // something worth guiding a contributor toward. This only filters
-        // what this list response shows; nothing is touched on GitHub or in
-        // our own database.
-        items: page.items.filter((repository) => this.isDashboardQuality(repository)).map((repository) => this.mapRepository(repository)),
+        items: visible.map((repository) => {
+          const imported = importedByGithubId.get(String(repository.id));
+          return {
+            ...this.mapRepository(repository),
+            imported: Boolean(imported),
+            repositoryId: imported?.id ?? null,
+            lastIssueCheckAt: imported?.lastIssueCheckAt?.toISOString() ?? null,
+          };
+        }),
         page: page.pageInfo.page,
         perPage: page.pageInfo.perPage,
         hasNext: page.pageInfo.hasNext,
@@ -200,9 +217,17 @@ export class GitHubRepositoryService {
     const session = await this.sessions.requireSession(request);
     const issue = await this.prisma.issue.findFirst({
       where: { id: issueId, repository: { accessEntries: { some: { userId: session.userId } } } },
-      include: { labels: true },
+      include: { labels: true, repository: { select: { fullName: true } } },
     });
     if (!issue) throw new NotFoundException('Issue not found');
+    // Opening an issue is what "viewed" means - recorded here so the profile
+    // fills in by itself instead of asking the user to maintain it. Only the
+    // first view writes anything.
+    await this.profile.recordIssueViewed(session.userId, issue.id, issue.repositoryId, {
+      repositoryFullName: issue.repository.fullName,
+      issueNumber: issue.number,
+      issueTitle: issue.title,
+    });
     return this.mapIssue(issue);
   }
 
@@ -292,6 +317,16 @@ export class GitHubRepositoryService {
       }
       return { repository, labels };
     }, { timeout: 120_000 });
+
+    // Importing/analysing a repository is a profile milestone. Deduped on the
+    // repository id, so re-importing never duplicates the timeline entry.
+    if (session) {
+      await this.profile.recordActivity(session.userId, 'repository_analyzed', {
+        repositoryId: result.repository.id,
+        dedupeKey: `repository_analyzed:${result.repository.id}`,
+        metadata: { repositoryFullName: result.repository.fullName },
+      });
+    }
 
     const event = createRepositoryImportedEvent({
       repositoryId: result.repository.id,
@@ -498,7 +533,7 @@ export class GitHubRepositoryService {
     id: string; githubRepositoryId: bigint; owner: string; name: string; fullName: string;
     description: string | null; url: string; stars: number; forks: number; language: string | null;
     topics: string[]; license: string | null; defaultBranch: string; isFork: boolean; parentFullName: string | null; openIssuesCount: number;
-    lastSyncedAt: Date | null; createdAt: Date; updatedAt: Date;
+    lastSyncedAt: Date | null; lastIssueCheckAt?: Date | null; createdAt: Date; updatedAt: Date;
   }, readmeContent?: string, languages: Record<string, number> = {}): ImportedRepositoryResponse {
     return {
       id: repository.githubRepositoryId.toString(),
@@ -521,6 +556,7 @@ export class GitHubRepositoryService {
       parentFullName: repository.parentFullName,
       openIssuesCount: repository.openIssuesCount,
       lastSyncedAt: repository.lastSyncedAt?.toISOString() ?? null,
+      lastIssueCheckAt: repository.lastIssueCheckAt?.toISOString() ?? null,
       createdAt: repository.createdAt.toISOString(),
       updatedAt: repository.updatedAt.toISOString(),
     };

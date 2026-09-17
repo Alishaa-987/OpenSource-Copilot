@@ -43,6 +43,11 @@ export type ResumeProfile = $Result.DefaultSelection<Prisma.$ResumeProfilePayloa
  * 
  */
 export type SkillGapAssessment = $Result.DefaultSelection<Prisma.$SkillGapAssessmentPayload>
+/**
+ * Model RepositoryAnalysis
+ * 
+ */
+export type RepositoryAnalysis = $Result.DefaultSelection<Prisma.$RepositoryAnalysisPayload>
 
 /**
  * ##  Prisma Client ʲˢ
@@ -221,6 +226,16 @@ export class PrismaClient<
     * ```
     */
   get skillGapAssessment(): Prisma.SkillGapAssessmentDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.repositoryAnalysis`: Exposes CRUD operations for the **RepositoryAnalysis** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more RepositoryAnalyses
+    * const repositoryAnalyses = await prisma.repositoryAnalysis.findMany()
+    * ```
+    */
+  get repositoryAnalysis(): Prisma.RepositoryAnalysisDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -667,7 +682,8 @@ export namespace Prisma {
     ImportedRepositoryProjection: 'ImportedRepositoryProjection',
     IssueIntelligence: 'IssueIntelligence',
     ResumeProfile: 'ResumeProfile',
-    SkillGapAssessment: 'SkillGapAssessment'
+    SkillGapAssessment: 'SkillGapAssessment',
+    RepositoryAnalysis: 'RepositoryAnalysis'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -686,7 +702,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "recommendation" | "processedEvent" | "importedRepositoryProjection" | "issueIntelligence" | "resumeProfile" | "skillGapAssessment"
+      modelProps: "recommendation" | "processedEvent" | "importedRepositoryProjection" | "issueIntelligence" | "resumeProfile" | "skillGapAssessment" | "repositoryAnalysis"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1134,6 +1150,80 @@ export namespace Prisma {
           }
         }
       }
+      RepositoryAnalysis: {
+        payload: Prisma.$RepositoryAnalysisPayload<ExtArgs>
+        fields: Prisma.RepositoryAnalysisFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.RepositoryAnalysisFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RepositoryAnalysisPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.RepositoryAnalysisFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RepositoryAnalysisPayload>
+          }
+          findFirst: {
+            args: Prisma.RepositoryAnalysisFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RepositoryAnalysisPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.RepositoryAnalysisFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RepositoryAnalysisPayload>
+          }
+          findMany: {
+            args: Prisma.RepositoryAnalysisFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RepositoryAnalysisPayload>[]
+          }
+          create: {
+            args: Prisma.RepositoryAnalysisCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RepositoryAnalysisPayload>
+          }
+          createMany: {
+            args: Prisma.RepositoryAnalysisCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.RepositoryAnalysisCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RepositoryAnalysisPayload>[]
+          }
+          delete: {
+            args: Prisma.RepositoryAnalysisDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RepositoryAnalysisPayload>
+          }
+          update: {
+            args: Prisma.RepositoryAnalysisUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RepositoryAnalysisPayload>
+          }
+          deleteMany: {
+            args: Prisma.RepositoryAnalysisDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.RepositoryAnalysisUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.RepositoryAnalysisUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RepositoryAnalysisPayload>[]
+          }
+          upsert: {
+            args: Prisma.RepositoryAnalysisUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RepositoryAnalysisPayload>
+          }
+          aggregate: {
+            args: Prisma.RepositoryAnalysisAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateRepositoryAnalysis>
+          }
+          groupBy: {
+            args: Prisma.RepositoryAnalysisGroupByArgs<ExtArgs>
+            result: $Utils.Optional<RepositoryAnalysisGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.RepositoryAnalysisCountArgs<ExtArgs>
+            result: $Utils.Optional<RepositoryAnalysisCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1236,6 +1326,7 @@ export namespace Prisma {
     issueIntelligence?: IssueIntelligenceOmit
     resumeProfile?: ResumeProfileOmit
     skillGapAssessment?: SkillGapAssessmentOmit
+    repositoryAnalysis?: RepositoryAnalysisOmit
   }
 
   /* Types for Logging */
@@ -7531,6 +7622,1019 @@ export namespace Prisma {
 
 
   /**
+   * Model RepositoryAnalysis
+   */
+
+  export type AggregateRepositoryAnalysis = {
+    _count: RepositoryAnalysisCountAggregateOutputType | null
+    _min: RepositoryAnalysisMinAggregateOutputType | null
+    _max: RepositoryAnalysisMaxAggregateOutputType | null
+  }
+
+  export type RepositoryAnalysisMinAggregateOutputType = {
+    repositoryId: string | null
+    sourceVersion: string | null
+    generatedAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type RepositoryAnalysisMaxAggregateOutputType = {
+    repositoryId: string | null
+    sourceVersion: string | null
+    generatedAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type RepositoryAnalysisCountAggregateOutputType = {
+    repositoryId: number
+    analysisJson: number
+    sourceVersion: number
+    generatedAt: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type RepositoryAnalysisMinAggregateInputType = {
+    repositoryId?: true
+    sourceVersion?: true
+    generatedAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type RepositoryAnalysisMaxAggregateInputType = {
+    repositoryId?: true
+    sourceVersion?: true
+    generatedAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type RepositoryAnalysisCountAggregateInputType = {
+    repositoryId?: true
+    analysisJson?: true
+    sourceVersion?: true
+    generatedAt?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type RepositoryAnalysisAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which RepositoryAnalysis to aggregate.
+     */
+    where?: RepositoryAnalysisWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of RepositoryAnalyses to fetch.
+     */
+    orderBy?: RepositoryAnalysisOrderByWithRelationInput | RepositoryAnalysisOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: RepositoryAnalysisWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` RepositoryAnalyses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` RepositoryAnalyses.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned RepositoryAnalyses
+    **/
+    _count?: true | RepositoryAnalysisCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: RepositoryAnalysisMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: RepositoryAnalysisMaxAggregateInputType
+  }
+
+  export type GetRepositoryAnalysisAggregateType<T extends RepositoryAnalysisAggregateArgs> = {
+        [P in keyof T & keyof AggregateRepositoryAnalysis]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateRepositoryAnalysis[P]>
+      : GetScalarType<T[P], AggregateRepositoryAnalysis[P]>
+  }
+
+
+
+
+  export type RepositoryAnalysisGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: RepositoryAnalysisWhereInput
+    orderBy?: RepositoryAnalysisOrderByWithAggregationInput | RepositoryAnalysisOrderByWithAggregationInput[]
+    by: RepositoryAnalysisScalarFieldEnum[] | RepositoryAnalysisScalarFieldEnum
+    having?: RepositoryAnalysisScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: RepositoryAnalysisCountAggregateInputType | true
+    _min?: RepositoryAnalysisMinAggregateInputType
+    _max?: RepositoryAnalysisMaxAggregateInputType
+  }
+
+  export type RepositoryAnalysisGroupByOutputType = {
+    repositoryId: string
+    analysisJson: JsonValue
+    sourceVersion: string
+    generatedAt: Date
+    createdAt: Date
+    updatedAt: Date
+    _count: RepositoryAnalysisCountAggregateOutputType | null
+    _min: RepositoryAnalysisMinAggregateOutputType | null
+    _max: RepositoryAnalysisMaxAggregateOutputType | null
+  }
+
+  type GetRepositoryAnalysisGroupByPayload<T extends RepositoryAnalysisGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<RepositoryAnalysisGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof RepositoryAnalysisGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], RepositoryAnalysisGroupByOutputType[P]>
+            : GetScalarType<T[P], RepositoryAnalysisGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type RepositoryAnalysisSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    repositoryId?: boolean
+    analysisJson?: boolean
+    sourceVersion?: boolean
+    generatedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["repositoryAnalysis"]>
+
+  export type RepositoryAnalysisSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    repositoryId?: boolean
+    analysisJson?: boolean
+    sourceVersion?: boolean
+    generatedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["repositoryAnalysis"]>
+
+  export type RepositoryAnalysisSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    repositoryId?: boolean
+    analysisJson?: boolean
+    sourceVersion?: boolean
+    generatedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["repositoryAnalysis"]>
+
+  export type RepositoryAnalysisSelectScalar = {
+    repositoryId?: boolean
+    analysisJson?: boolean
+    sourceVersion?: boolean
+    generatedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type RepositoryAnalysisOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"repositoryId" | "analysisJson" | "sourceVersion" | "generatedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["repositoryAnalysis"]>
+
+  export type $RepositoryAnalysisPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "RepositoryAnalysis"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      repositoryId: string
+      /**
+       * The full analysis document as returned by knowledge-service.
+       */
+      analysisJson: Prisma.JsonValue
+      /**
+       * Lets a future analysis format invalidate rows written by an older one.
+       */
+      sourceVersion: string
+      /**
+       * When the underlying analysis was produced.
+       */
+      generatedAt: Date
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["repositoryAnalysis"]>
+    composites: {}
+  }
+
+  type RepositoryAnalysisGetPayload<S extends boolean | null | undefined | RepositoryAnalysisDefaultArgs> = $Result.GetResult<Prisma.$RepositoryAnalysisPayload, S>
+
+  type RepositoryAnalysisCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<RepositoryAnalysisFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: RepositoryAnalysisCountAggregateInputType | true
+    }
+
+  export interface RepositoryAnalysisDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['RepositoryAnalysis'], meta: { name: 'RepositoryAnalysis' } }
+    /**
+     * Find zero or one RepositoryAnalysis that matches the filter.
+     * @param {RepositoryAnalysisFindUniqueArgs} args - Arguments to find a RepositoryAnalysis
+     * @example
+     * // Get one RepositoryAnalysis
+     * const repositoryAnalysis = await prisma.repositoryAnalysis.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends RepositoryAnalysisFindUniqueArgs>(args: SelectSubset<T, RepositoryAnalysisFindUniqueArgs<ExtArgs>>): Prisma__RepositoryAnalysisClient<$Result.GetResult<Prisma.$RepositoryAnalysisPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one RepositoryAnalysis that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {RepositoryAnalysisFindUniqueOrThrowArgs} args - Arguments to find a RepositoryAnalysis
+     * @example
+     * // Get one RepositoryAnalysis
+     * const repositoryAnalysis = await prisma.repositoryAnalysis.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends RepositoryAnalysisFindUniqueOrThrowArgs>(args: SelectSubset<T, RepositoryAnalysisFindUniqueOrThrowArgs<ExtArgs>>): Prisma__RepositoryAnalysisClient<$Result.GetResult<Prisma.$RepositoryAnalysisPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first RepositoryAnalysis that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RepositoryAnalysisFindFirstArgs} args - Arguments to find a RepositoryAnalysis
+     * @example
+     * // Get one RepositoryAnalysis
+     * const repositoryAnalysis = await prisma.repositoryAnalysis.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends RepositoryAnalysisFindFirstArgs>(args?: SelectSubset<T, RepositoryAnalysisFindFirstArgs<ExtArgs>>): Prisma__RepositoryAnalysisClient<$Result.GetResult<Prisma.$RepositoryAnalysisPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first RepositoryAnalysis that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RepositoryAnalysisFindFirstOrThrowArgs} args - Arguments to find a RepositoryAnalysis
+     * @example
+     * // Get one RepositoryAnalysis
+     * const repositoryAnalysis = await prisma.repositoryAnalysis.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends RepositoryAnalysisFindFirstOrThrowArgs>(args?: SelectSubset<T, RepositoryAnalysisFindFirstOrThrowArgs<ExtArgs>>): Prisma__RepositoryAnalysisClient<$Result.GetResult<Prisma.$RepositoryAnalysisPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more RepositoryAnalyses that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RepositoryAnalysisFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all RepositoryAnalyses
+     * const repositoryAnalyses = await prisma.repositoryAnalysis.findMany()
+     * 
+     * // Get first 10 RepositoryAnalyses
+     * const repositoryAnalyses = await prisma.repositoryAnalysis.findMany({ take: 10 })
+     * 
+     * // Only select the `repositoryId`
+     * const repositoryAnalysisWithRepositoryIdOnly = await prisma.repositoryAnalysis.findMany({ select: { repositoryId: true } })
+     * 
+     */
+    findMany<T extends RepositoryAnalysisFindManyArgs>(args?: SelectSubset<T, RepositoryAnalysisFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RepositoryAnalysisPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a RepositoryAnalysis.
+     * @param {RepositoryAnalysisCreateArgs} args - Arguments to create a RepositoryAnalysis.
+     * @example
+     * // Create one RepositoryAnalysis
+     * const RepositoryAnalysis = await prisma.repositoryAnalysis.create({
+     *   data: {
+     *     // ... data to create a RepositoryAnalysis
+     *   }
+     * })
+     * 
+     */
+    create<T extends RepositoryAnalysisCreateArgs>(args: SelectSubset<T, RepositoryAnalysisCreateArgs<ExtArgs>>): Prisma__RepositoryAnalysisClient<$Result.GetResult<Prisma.$RepositoryAnalysisPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many RepositoryAnalyses.
+     * @param {RepositoryAnalysisCreateManyArgs} args - Arguments to create many RepositoryAnalyses.
+     * @example
+     * // Create many RepositoryAnalyses
+     * const repositoryAnalysis = await prisma.repositoryAnalysis.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends RepositoryAnalysisCreateManyArgs>(args?: SelectSubset<T, RepositoryAnalysisCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many RepositoryAnalyses and returns the data saved in the database.
+     * @param {RepositoryAnalysisCreateManyAndReturnArgs} args - Arguments to create many RepositoryAnalyses.
+     * @example
+     * // Create many RepositoryAnalyses
+     * const repositoryAnalysis = await prisma.repositoryAnalysis.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many RepositoryAnalyses and only return the `repositoryId`
+     * const repositoryAnalysisWithRepositoryIdOnly = await prisma.repositoryAnalysis.createManyAndReturn({
+     *   select: { repositoryId: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends RepositoryAnalysisCreateManyAndReturnArgs>(args?: SelectSubset<T, RepositoryAnalysisCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RepositoryAnalysisPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a RepositoryAnalysis.
+     * @param {RepositoryAnalysisDeleteArgs} args - Arguments to delete one RepositoryAnalysis.
+     * @example
+     * // Delete one RepositoryAnalysis
+     * const RepositoryAnalysis = await prisma.repositoryAnalysis.delete({
+     *   where: {
+     *     // ... filter to delete one RepositoryAnalysis
+     *   }
+     * })
+     * 
+     */
+    delete<T extends RepositoryAnalysisDeleteArgs>(args: SelectSubset<T, RepositoryAnalysisDeleteArgs<ExtArgs>>): Prisma__RepositoryAnalysisClient<$Result.GetResult<Prisma.$RepositoryAnalysisPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one RepositoryAnalysis.
+     * @param {RepositoryAnalysisUpdateArgs} args - Arguments to update one RepositoryAnalysis.
+     * @example
+     * // Update one RepositoryAnalysis
+     * const repositoryAnalysis = await prisma.repositoryAnalysis.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends RepositoryAnalysisUpdateArgs>(args: SelectSubset<T, RepositoryAnalysisUpdateArgs<ExtArgs>>): Prisma__RepositoryAnalysisClient<$Result.GetResult<Prisma.$RepositoryAnalysisPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more RepositoryAnalyses.
+     * @param {RepositoryAnalysisDeleteManyArgs} args - Arguments to filter RepositoryAnalyses to delete.
+     * @example
+     * // Delete a few RepositoryAnalyses
+     * const { count } = await prisma.repositoryAnalysis.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends RepositoryAnalysisDeleteManyArgs>(args?: SelectSubset<T, RepositoryAnalysisDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more RepositoryAnalyses.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RepositoryAnalysisUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many RepositoryAnalyses
+     * const repositoryAnalysis = await prisma.repositoryAnalysis.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends RepositoryAnalysisUpdateManyArgs>(args: SelectSubset<T, RepositoryAnalysisUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more RepositoryAnalyses and returns the data updated in the database.
+     * @param {RepositoryAnalysisUpdateManyAndReturnArgs} args - Arguments to update many RepositoryAnalyses.
+     * @example
+     * // Update many RepositoryAnalyses
+     * const repositoryAnalysis = await prisma.repositoryAnalysis.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more RepositoryAnalyses and only return the `repositoryId`
+     * const repositoryAnalysisWithRepositoryIdOnly = await prisma.repositoryAnalysis.updateManyAndReturn({
+     *   select: { repositoryId: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends RepositoryAnalysisUpdateManyAndReturnArgs>(args: SelectSubset<T, RepositoryAnalysisUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RepositoryAnalysisPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one RepositoryAnalysis.
+     * @param {RepositoryAnalysisUpsertArgs} args - Arguments to update or create a RepositoryAnalysis.
+     * @example
+     * // Update or create a RepositoryAnalysis
+     * const repositoryAnalysis = await prisma.repositoryAnalysis.upsert({
+     *   create: {
+     *     // ... data to create a RepositoryAnalysis
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the RepositoryAnalysis we want to update
+     *   }
+     * })
+     */
+    upsert<T extends RepositoryAnalysisUpsertArgs>(args: SelectSubset<T, RepositoryAnalysisUpsertArgs<ExtArgs>>): Prisma__RepositoryAnalysisClient<$Result.GetResult<Prisma.$RepositoryAnalysisPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of RepositoryAnalyses.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RepositoryAnalysisCountArgs} args - Arguments to filter RepositoryAnalyses to count.
+     * @example
+     * // Count the number of RepositoryAnalyses
+     * const count = await prisma.repositoryAnalysis.count({
+     *   where: {
+     *     // ... the filter for the RepositoryAnalyses we want to count
+     *   }
+     * })
+    **/
+    count<T extends RepositoryAnalysisCountArgs>(
+      args?: Subset<T, RepositoryAnalysisCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], RepositoryAnalysisCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a RepositoryAnalysis.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RepositoryAnalysisAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends RepositoryAnalysisAggregateArgs>(args: Subset<T, RepositoryAnalysisAggregateArgs>): Prisma.PrismaPromise<GetRepositoryAnalysisAggregateType<T>>
+
+    /**
+     * Group by RepositoryAnalysis.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RepositoryAnalysisGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends RepositoryAnalysisGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: RepositoryAnalysisGroupByArgs['orderBy'] }
+        : { orderBy?: RepositoryAnalysisGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, RepositoryAnalysisGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetRepositoryAnalysisGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the RepositoryAnalysis model
+   */
+  readonly fields: RepositoryAnalysisFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for RepositoryAnalysis.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__RepositoryAnalysisClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the RepositoryAnalysis model
+   */
+  interface RepositoryAnalysisFieldRefs {
+    readonly repositoryId: FieldRef<"RepositoryAnalysis", 'String'>
+    readonly analysisJson: FieldRef<"RepositoryAnalysis", 'Json'>
+    readonly sourceVersion: FieldRef<"RepositoryAnalysis", 'String'>
+    readonly generatedAt: FieldRef<"RepositoryAnalysis", 'DateTime'>
+    readonly createdAt: FieldRef<"RepositoryAnalysis", 'DateTime'>
+    readonly updatedAt: FieldRef<"RepositoryAnalysis", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * RepositoryAnalysis findUnique
+   */
+  export type RepositoryAnalysisFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RepositoryAnalysis
+     */
+    select?: RepositoryAnalysisSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RepositoryAnalysis
+     */
+    omit?: RepositoryAnalysisOmit<ExtArgs> | null
+    /**
+     * Filter, which RepositoryAnalysis to fetch.
+     */
+    where: RepositoryAnalysisWhereUniqueInput
+  }
+
+  /**
+   * RepositoryAnalysis findUniqueOrThrow
+   */
+  export type RepositoryAnalysisFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RepositoryAnalysis
+     */
+    select?: RepositoryAnalysisSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RepositoryAnalysis
+     */
+    omit?: RepositoryAnalysisOmit<ExtArgs> | null
+    /**
+     * Filter, which RepositoryAnalysis to fetch.
+     */
+    where: RepositoryAnalysisWhereUniqueInput
+  }
+
+  /**
+   * RepositoryAnalysis findFirst
+   */
+  export type RepositoryAnalysisFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RepositoryAnalysis
+     */
+    select?: RepositoryAnalysisSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RepositoryAnalysis
+     */
+    omit?: RepositoryAnalysisOmit<ExtArgs> | null
+    /**
+     * Filter, which RepositoryAnalysis to fetch.
+     */
+    where?: RepositoryAnalysisWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of RepositoryAnalyses to fetch.
+     */
+    orderBy?: RepositoryAnalysisOrderByWithRelationInput | RepositoryAnalysisOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for RepositoryAnalyses.
+     */
+    cursor?: RepositoryAnalysisWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` RepositoryAnalyses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` RepositoryAnalyses.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of RepositoryAnalyses.
+     */
+    distinct?: RepositoryAnalysisScalarFieldEnum | RepositoryAnalysisScalarFieldEnum[]
+  }
+
+  /**
+   * RepositoryAnalysis findFirstOrThrow
+   */
+  export type RepositoryAnalysisFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RepositoryAnalysis
+     */
+    select?: RepositoryAnalysisSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RepositoryAnalysis
+     */
+    omit?: RepositoryAnalysisOmit<ExtArgs> | null
+    /**
+     * Filter, which RepositoryAnalysis to fetch.
+     */
+    where?: RepositoryAnalysisWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of RepositoryAnalyses to fetch.
+     */
+    orderBy?: RepositoryAnalysisOrderByWithRelationInput | RepositoryAnalysisOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for RepositoryAnalyses.
+     */
+    cursor?: RepositoryAnalysisWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` RepositoryAnalyses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` RepositoryAnalyses.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of RepositoryAnalyses.
+     */
+    distinct?: RepositoryAnalysisScalarFieldEnum | RepositoryAnalysisScalarFieldEnum[]
+  }
+
+  /**
+   * RepositoryAnalysis findMany
+   */
+  export type RepositoryAnalysisFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RepositoryAnalysis
+     */
+    select?: RepositoryAnalysisSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RepositoryAnalysis
+     */
+    omit?: RepositoryAnalysisOmit<ExtArgs> | null
+    /**
+     * Filter, which RepositoryAnalyses to fetch.
+     */
+    where?: RepositoryAnalysisWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of RepositoryAnalyses to fetch.
+     */
+    orderBy?: RepositoryAnalysisOrderByWithRelationInput | RepositoryAnalysisOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing RepositoryAnalyses.
+     */
+    cursor?: RepositoryAnalysisWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` RepositoryAnalyses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` RepositoryAnalyses.
+     */
+    skip?: number
+    distinct?: RepositoryAnalysisScalarFieldEnum | RepositoryAnalysisScalarFieldEnum[]
+  }
+
+  /**
+   * RepositoryAnalysis create
+   */
+  export type RepositoryAnalysisCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RepositoryAnalysis
+     */
+    select?: RepositoryAnalysisSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RepositoryAnalysis
+     */
+    omit?: RepositoryAnalysisOmit<ExtArgs> | null
+    /**
+     * The data needed to create a RepositoryAnalysis.
+     */
+    data: XOR<RepositoryAnalysisCreateInput, RepositoryAnalysisUncheckedCreateInput>
+  }
+
+  /**
+   * RepositoryAnalysis createMany
+   */
+  export type RepositoryAnalysisCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many RepositoryAnalyses.
+     */
+    data: RepositoryAnalysisCreateManyInput | RepositoryAnalysisCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * RepositoryAnalysis createManyAndReturn
+   */
+  export type RepositoryAnalysisCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RepositoryAnalysis
+     */
+    select?: RepositoryAnalysisSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the RepositoryAnalysis
+     */
+    omit?: RepositoryAnalysisOmit<ExtArgs> | null
+    /**
+     * The data used to create many RepositoryAnalyses.
+     */
+    data: RepositoryAnalysisCreateManyInput | RepositoryAnalysisCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * RepositoryAnalysis update
+   */
+  export type RepositoryAnalysisUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RepositoryAnalysis
+     */
+    select?: RepositoryAnalysisSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RepositoryAnalysis
+     */
+    omit?: RepositoryAnalysisOmit<ExtArgs> | null
+    /**
+     * The data needed to update a RepositoryAnalysis.
+     */
+    data: XOR<RepositoryAnalysisUpdateInput, RepositoryAnalysisUncheckedUpdateInput>
+    /**
+     * Choose, which RepositoryAnalysis to update.
+     */
+    where: RepositoryAnalysisWhereUniqueInput
+  }
+
+  /**
+   * RepositoryAnalysis updateMany
+   */
+  export type RepositoryAnalysisUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update RepositoryAnalyses.
+     */
+    data: XOR<RepositoryAnalysisUpdateManyMutationInput, RepositoryAnalysisUncheckedUpdateManyInput>
+    /**
+     * Filter which RepositoryAnalyses to update
+     */
+    where?: RepositoryAnalysisWhereInput
+    /**
+     * Limit how many RepositoryAnalyses to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * RepositoryAnalysis updateManyAndReturn
+   */
+  export type RepositoryAnalysisUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RepositoryAnalysis
+     */
+    select?: RepositoryAnalysisSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the RepositoryAnalysis
+     */
+    omit?: RepositoryAnalysisOmit<ExtArgs> | null
+    /**
+     * The data used to update RepositoryAnalyses.
+     */
+    data: XOR<RepositoryAnalysisUpdateManyMutationInput, RepositoryAnalysisUncheckedUpdateManyInput>
+    /**
+     * Filter which RepositoryAnalyses to update
+     */
+    where?: RepositoryAnalysisWhereInput
+    /**
+     * Limit how many RepositoryAnalyses to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * RepositoryAnalysis upsert
+   */
+  export type RepositoryAnalysisUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RepositoryAnalysis
+     */
+    select?: RepositoryAnalysisSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RepositoryAnalysis
+     */
+    omit?: RepositoryAnalysisOmit<ExtArgs> | null
+    /**
+     * The filter to search for the RepositoryAnalysis to update in case it exists.
+     */
+    where: RepositoryAnalysisWhereUniqueInput
+    /**
+     * In case the RepositoryAnalysis found by the `where` argument doesn't exist, create a new RepositoryAnalysis with this data.
+     */
+    create: XOR<RepositoryAnalysisCreateInput, RepositoryAnalysisUncheckedCreateInput>
+    /**
+     * In case the RepositoryAnalysis was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<RepositoryAnalysisUpdateInput, RepositoryAnalysisUncheckedUpdateInput>
+  }
+
+  /**
+   * RepositoryAnalysis delete
+   */
+  export type RepositoryAnalysisDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RepositoryAnalysis
+     */
+    select?: RepositoryAnalysisSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RepositoryAnalysis
+     */
+    omit?: RepositoryAnalysisOmit<ExtArgs> | null
+    /**
+     * Filter which RepositoryAnalysis to delete.
+     */
+    where: RepositoryAnalysisWhereUniqueInput
+  }
+
+  /**
+   * RepositoryAnalysis deleteMany
+   */
+  export type RepositoryAnalysisDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which RepositoryAnalyses to delete
+     */
+    where?: RepositoryAnalysisWhereInput
+    /**
+     * Limit how many RepositoryAnalyses to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * RepositoryAnalysis without action
+   */
+  export type RepositoryAnalysisDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RepositoryAnalysis
+     */
+    select?: RepositoryAnalysisSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RepositoryAnalysis
+     */
+    omit?: RepositoryAnalysisOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -7624,6 +8728,18 @@ export namespace Prisma {
   };
 
   export type SkillGapAssessmentScalarFieldEnum = (typeof SkillGapAssessmentScalarFieldEnum)[keyof typeof SkillGapAssessmentScalarFieldEnum]
+
+
+  export const RepositoryAnalysisScalarFieldEnum: {
+    repositoryId: 'repositoryId',
+    analysisJson: 'analysisJson',
+    sourceVersion: 'sourceVersion',
+    generatedAt: 'generatedAt',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type RepositoryAnalysisScalarFieldEnum = (typeof RepositoryAnalysisScalarFieldEnum)[keyof typeof RepositoryAnalysisScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -8158,6 +9274,63 @@ export namespace Prisma {
     generatedAt?: DateTimeWithAggregatesFilter<"SkillGapAssessment"> | Date | string
   }
 
+  export type RepositoryAnalysisWhereInput = {
+    AND?: RepositoryAnalysisWhereInput | RepositoryAnalysisWhereInput[]
+    OR?: RepositoryAnalysisWhereInput[]
+    NOT?: RepositoryAnalysisWhereInput | RepositoryAnalysisWhereInput[]
+    repositoryId?: UuidFilter<"RepositoryAnalysis"> | string
+    analysisJson?: JsonFilter<"RepositoryAnalysis">
+    sourceVersion?: StringFilter<"RepositoryAnalysis"> | string
+    generatedAt?: DateTimeFilter<"RepositoryAnalysis"> | Date | string
+    createdAt?: DateTimeFilter<"RepositoryAnalysis"> | Date | string
+    updatedAt?: DateTimeFilter<"RepositoryAnalysis"> | Date | string
+  }
+
+  export type RepositoryAnalysisOrderByWithRelationInput = {
+    repositoryId?: SortOrder
+    analysisJson?: SortOrder
+    sourceVersion?: SortOrder
+    generatedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type RepositoryAnalysisWhereUniqueInput = Prisma.AtLeast<{
+    repositoryId?: string
+    AND?: RepositoryAnalysisWhereInput | RepositoryAnalysisWhereInput[]
+    OR?: RepositoryAnalysisWhereInput[]
+    NOT?: RepositoryAnalysisWhereInput | RepositoryAnalysisWhereInput[]
+    analysisJson?: JsonFilter<"RepositoryAnalysis">
+    sourceVersion?: StringFilter<"RepositoryAnalysis"> | string
+    generatedAt?: DateTimeFilter<"RepositoryAnalysis"> | Date | string
+    createdAt?: DateTimeFilter<"RepositoryAnalysis"> | Date | string
+    updatedAt?: DateTimeFilter<"RepositoryAnalysis"> | Date | string
+  }, "repositoryId">
+
+  export type RepositoryAnalysisOrderByWithAggregationInput = {
+    repositoryId?: SortOrder
+    analysisJson?: SortOrder
+    sourceVersion?: SortOrder
+    generatedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: RepositoryAnalysisCountOrderByAggregateInput
+    _max?: RepositoryAnalysisMaxOrderByAggregateInput
+    _min?: RepositoryAnalysisMinOrderByAggregateInput
+  }
+
+  export type RepositoryAnalysisScalarWhereWithAggregatesInput = {
+    AND?: RepositoryAnalysisScalarWhereWithAggregatesInput | RepositoryAnalysisScalarWhereWithAggregatesInput[]
+    OR?: RepositoryAnalysisScalarWhereWithAggregatesInput[]
+    NOT?: RepositoryAnalysisScalarWhereWithAggregatesInput | RepositoryAnalysisScalarWhereWithAggregatesInput[]
+    repositoryId?: UuidWithAggregatesFilter<"RepositoryAnalysis"> | string
+    analysisJson?: JsonWithAggregatesFilter<"RepositoryAnalysis">
+    sourceVersion?: StringWithAggregatesFilter<"RepositoryAnalysis"> | string
+    generatedAt?: DateTimeWithAggregatesFilter<"RepositoryAnalysis"> | Date | string
+    createdAt?: DateTimeWithAggregatesFilter<"RepositoryAnalysis"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"RepositoryAnalysis"> | Date | string
+  }
+
   export type RecommendationCreateInput = {
     id?: string
     repositoryId: string
@@ -8606,6 +9779,69 @@ export namespace Prisma {
     generatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type RepositoryAnalysisCreateInput = {
+    repositoryId: string
+    analysisJson: JsonNullValueInput | InputJsonValue
+    sourceVersion?: string
+    generatedAt?: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type RepositoryAnalysisUncheckedCreateInput = {
+    repositoryId: string
+    analysisJson: JsonNullValueInput | InputJsonValue
+    sourceVersion?: string
+    generatedAt?: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type RepositoryAnalysisUpdateInput = {
+    repositoryId?: StringFieldUpdateOperationsInput | string
+    analysisJson?: JsonNullValueInput | InputJsonValue
+    sourceVersion?: StringFieldUpdateOperationsInput | string
+    generatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type RepositoryAnalysisUncheckedUpdateInput = {
+    repositoryId?: StringFieldUpdateOperationsInput | string
+    analysisJson?: JsonNullValueInput | InputJsonValue
+    sourceVersion?: StringFieldUpdateOperationsInput | string
+    generatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type RepositoryAnalysisCreateManyInput = {
+    repositoryId: string
+    analysisJson: JsonNullValueInput | InputJsonValue
+    sourceVersion?: string
+    generatedAt?: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type RepositoryAnalysisUpdateManyMutationInput = {
+    repositoryId?: StringFieldUpdateOperationsInput | string
+    analysisJson?: JsonNullValueInput | InputJsonValue
+    sourceVersion?: StringFieldUpdateOperationsInput | string
+    generatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type RepositoryAnalysisUncheckedUpdateManyInput = {
+    repositoryId?: StringFieldUpdateOperationsInput | string
+    analysisJson?: JsonNullValueInput | InputJsonValue
+    sourceVersion?: StringFieldUpdateOperationsInput | string
+    generatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type UuidFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -9037,6 +10273,31 @@ export namespace Prisma {
     issueId?: SortOrder
     contextHash?: SortOrder
     generatedAt?: SortOrder
+  }
+
+  export type RepositoryAnalysisCountOrderByAggregateInput = {
+    repositoryId?: SortOrder
+    analysisJson?: SortOrder
+    sourceVersion?: SortOrder
+    generatedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type RepositoryAnalysisMaxOrderByAggregateInput = {
+    repositoryId?: SortOrder
+    sourceVersion?: SortOrder
+    generatedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type RepositoryAnalysisMinOrderByAggregateInput = {
+    repositoryId?: SortOrder
+    sourceVersion?: SortOrder
+    generatedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type StringFieldUpdateOperationsInput = {

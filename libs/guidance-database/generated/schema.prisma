@@ -109,3 +109,27 @@ model SkillGapAssessment {
   @@index([repositoryId, issueId])
   @@map("skill_gap_assessments")
 }
+
+// Repository-level AI analysis (summary, tech stack, architecture map,
+// first-PR path), persisted here for the same reason IssueIntelligence is:
+// guidance-service is this system's owner of durable, AI-derived analysis.
+// knowledge-service computes it from RAG + LLM and deliberately stays
+// stateless, so the result would otherwise be lost on every page load.
+//
+// This is product data, not a cache: monitoring, notifications, contribution
+// history and progress tracking all read from it later. Redis stays for
+// genuinely temporary state (sessions, OAuth state).
+model RepositoryAnalysis {
+  repositoryId  String   @id @map("repository_id") @db.Uuid
+  /// The full analysis document as returned by knowledge-service.
+  analysisJson  Json     @map("analysis_json")
+  /// Lets a future analysis format invalidate rows written by an older one.
+  sourceVersion String   @default("repo-analysis-v1") @map("source_version")
+  /// When the underlying analysis was produced.
+  generatedAt   DateTime @default(now()) @map("generated_at") @db.Timestamptz(3)
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt     DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@index([generatedAt])
+  @@map("repository_analyses")
+}

@@ -121,6 +121,9 @@ export const GitHubIssueSchema = z
     comments: z.number().int().nonnegative().optional(),
     html_url: z.string().url(),
     closed_at: z.string().datetime({ offset: true }).nullable().optional(),
+    // Read by the repository monitor so an unchanged issue can be skipped
+    // without spending an extra request on it.
+    updated_at: z.string().datetime({ offset: true }).optional(),
     labels: z.array(GitHubIssueLabelSchema).optional(),
     pull_request: z.unknown().optional(),
   })
