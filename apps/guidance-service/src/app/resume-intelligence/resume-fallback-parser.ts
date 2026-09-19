@@ -77,12 +77,31 @@ export class ResumeFallbackParser {
     return new RegExp(`(^|[^A-Za-z0-9+#.])${escaped}([^A-Za-z0-9+#]|$)`, 'i').test(text);
   }
 
+  /**
+   * Picks a line that actually reads like a sentence about the person.
+   *
+   * The previous rule ("first line of 40+ characters") almost always matched
+   * the contact header of a CV - email, LinkedIn URL, phone, city - which then
+   * showed up as the contributor's summary on their profile. Contact lines are
+   * skipped here so the summary is either a real sentence or nothing at all;
+   * an empty summary is better than an email address.
+   */
   private buildSummary(resumeText: string): string {
-    const line = resumeText
+    const candidate = resumeText
       .split(/\n+/)
       .map((entry) => entry.trim())
-      .find((entry) => entry.length >= 40 && /[a-z]/.test(entry));
-    const summary = line ?? resumeText.trim().slice(0, 300);
-    return summary.slice(0, 600);
+      .find((entry) => this.readsLikeProse(entry));
+    return (candidate ?? '').slice(0, 600);
+  }
+
+  private readsLikeProse(line: string): boolean {
+    if (line.length < 60 || line.length > 600) return false;
+    if (/@|https?:\/\/|www\.|linkedin|github\.com|\+\d[\d\s()-]{6,}/i.test(line)) return false;
+    // Contact headers and section rules are mostly separators, not words.
+    if ((line.match(/[|\u2022\u00b7]/g) ?? []).length >= 2) return false;
+    if (!/[a-z]/.test(line)) return false;
+    // A sentence has verbs and spaces; a keyword row does not.
+    if (line.split(/\s+/).length < 10) return false;
+    return true;
   }
 }

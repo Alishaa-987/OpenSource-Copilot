@@ -31,6 +31,10 @@ export const repositoryEnvSchema = baseEnvSchema
     // requests/hour), so a cycle spends at most this many requests and the
     // least-recently-checked repositories continue on the next one.
     REPOSITORY_MONITOR_MAX_REQUESTS_PER_CYCLE: z.coerce.number().int().min(1).max(500).default(40),
+    // Off by default: marking an issue closed because it is absent from an
+    // unauthenticated listing is unreliable and can wipe a whole repository.
+    // Enable only once the monitor reads GitHub with a real token.
+    REPOSITORY_MONITOR_CLOSE_DETECTION: z.coerce.boolean().default(false),
   });
 
 export type RepositoryEnv = z.infer<typeof repositoryEnvSchema>;

@@ -1,9 +1,0 @@
-[2026-09-14T21:47:45.475Z] 503 POST /api/v1/repositories/8199e681-89c1-43d0-a0a7-ac25ea6152a6/issues/da7a9cb4-29a6-44f2-839f-ac390afbc035/skill-gap [89bdcd69-2326-432b-a20a-fa53c3b083d6]
-ServiceUnavailableException: The AI returned a readiness analysis in an unexpected shape. Please try again.
-    at GuidanceLlmService.assessSkillGap (E:\mc_project\apps\guidance-service\src\app\contributor-intelligence\guidance-llm.service.ts:154:13)
-    at processTicksAndRejections (node:internal/process/task_queues:105:5)
-    at SkillGapService.assess (E:\mc_project\apps\guidance-service\src\app\resume-intelligence\skill-gap.service.ts:40:20)
-    at SkillGapController.assess (E:\mc_project\apps\guidance-service\src\app\resume-intelligence\resume-intelligence.controller.ts:73:20)
-    at E:\mc_project\node_modules\@nestjs\core\router\router-execution-context.js:47:62
-    at E:\mc_project\node_modules\@nestjs\core\router\router-proxy.js:9:17
-

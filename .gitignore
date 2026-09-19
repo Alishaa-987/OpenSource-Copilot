@@ -49,3 +49,20 @@ Thumbs.db
 !.vscode/extensions.json
 *.swp
 .claude/
+
+# diagnostics and scratch output
+*.out.log
+*.err.log
+runtime-logs/
+.openpath-logs/
+.openpath-*
+_diag_*
+diag*.txt
+issues-diag.txt
+error-log.txt
+build-log.txt
+db-push.txt
+repair.txt
+page-eslint.json
+Claude outputs/
+.kombai/
