@@ -350,6 +350,78 @@ The system also includes:
 - Provider failure handling
 - Contributor Intelligence
 
+## Resume Intelligence and Readiness
+
+Understanding an issue is only half the question. The other half is whether
+*you* are ready to work on it.
+
+A contributor uploads a resume once (PDF, DOCX or plain text). It is parsed
+into skills, languages, frameworks, projects and experience, and stored against
+their account.
+
+Parsing degrades rather than fails: if the AI provider is unavailable, rejects
+the key, rate-limits, or returns an unusable response, a deterministic
+keyword parser runs instead and the profile is still saved. Uploading a resume
+never depends on an external service being healthy.
+
+The readiness view then answers the question in three steps:
+
+1. **What this issue actually requires** — derived from the files and labels
+   the analysis was grounded in, not from the issue title. Documentation, CSS,
+   markup, frontend, backend, tests, CI, configuration, data and build tooling
+   are each identified only when a real path or label matched, and the matched
+   evidence is shown alongside the claim.
+2. **What you need to understand** — each area expressed in engineering terms,
+   as a concrete list of things to read before starting.
+3. **How you compare** — the stored resume against that requirement: skills
+   already held, skills missing, skills partly covered, relevant experience,
+   and an action checklist.
+
+Steps 1 and 2 are fully deterministic and render even with no resume on file.
+
+## Repository Monitoring and Notifications
+
+Imported repositories are polled in the background for new issues.
+
+Detection is deterministic — no model is involved in deciding whether
+something happened. Every event carries the repository name, issue number,
+issue title, event type, a short message and a direct link to the issue on
+GitHub.
+
+Three properties matter here:
+
+- **Deduplication is enforced by the database.** A unique constraint on
+  `(userId, dedupeKey)` makes a duplicate notification impossible rather than
+  merely unlikely.
+- **The request budget is bounded.** Each cycle spends at most a configured
+  number of GitHub requests, so monitoring cannot exhaust the rate limit.
+- **Absence is not treated as evidence.** An issue missing from a listing does
+  not mean it was closed; an unauthenticated listing is capped at 60 requests
+  per hour and routinely returns nothing. Closure detection is therefore off by
+  default and gated behind `REPOSITORY_MONITOR_CLOSE_DETECTION`, to be enabled
+  only once the monitor calls GitHub with a token.
+
+## Contributor Profile and Progress
+
+Progress is recorded as the contributor works: opening an issue records that it
+was studied, and two explicit actions — *Start working* and *Mark complete* —
+record the rest.
+
+From that record the profile derives:
+
+- Totals for repositories analysed and issues studied, started and completed
+- A rank (Newcomer through Maintainer) with points and progress to the next one
+- Badges in bronze, silver and gold tiers, with the next step shown for each
+  one still locked
+- Per-project progress bars
+- A 90-day activity heatmap with current streak, longest streak and active days
+- Skill levels, grouped as Strong, Practising, Familiar or Exploring
+
+Skill levels are derived from two sources only: what the resume states, and
+what the contributor has actually completed in the product. Each level is shown
+with the rule that produced it and the evidence behind it. No level is
+estimated and no model is called to produce one.
+
 ## Contributor Intelligence
 
 OpenSource Copilot is designed around the contributor journey.
@@ -402,7 +474,15 @@ A typical OpenSource Copilot workflow looks like:
         ↓
 10. Explore similar context
         ↓
-11. Start contributing
+11. Check personal readiness
+        ↓
+12. Start working (progress recorded)
+        ↓
+13. Mark complete
+        ↓
+14. Profile, skills and badges update
+        ↓
+15. Get notified when new issues appear
 ```
 The experience is designed to reduce the amount of manual repository exploration required before a developer can begin meaningful work.
 
@@ -454,7 +534,7 @@ OpenSource Copilot uses a modular, service-oriented backend architecture.
 
 The central backend entry point responsible for routing, shared infrastructure, health checks, and backend application coordination.
 
-Repository Service
+## Repository Service
 
 Responsible for:
 
@@ -465,7 +545,12 @@ Responsible for:
 - Issues
 - Repository documents
 - Repository access
-##  Guidance Service
+- Background repository monitoring
+- Notifications
+- Contributor profile statistics
+- Issue progress tracking
+
+## Guidance Service
 
 Responsible for:
 
@@ -476,6 +561,10 @@ Responsible for:
 - Contributor recommendations
 - Similar issue context
 - Similar PR context
+- Persisted repository analysis
+- Resume parsing
+- Skill-gap and readiness assessment
+
 ## Knowledge Service
 
 Responsible for:
@@ -527,12 +616,24 @@ Owns repository-related data such as:
 - Repository documents
 - Issues
 - Issue labels
+- Notifications
+- Issue progress
+- Contributor activity
+
 ## Guidance Service
 
 Owns contributor intelligence data such as:
 
 - Recommendations
 - Issue intelligence
+- Repository analysis
+- Resume profiles
+- Skill-gap assessments
+
+Repository analysis is stored in PostgreSQL rather than Redis. It is product
+data that later features depend on — monitoring, contribution history and the
+contributor profile — not a cache that may be discarded.
+
 ## Knowledge Service
 
 Uses Qdrant for vector-based repository knowledge and semantic retrieval.
@@ -543,7 +644,9 @@ Services communicate through APIs and events rather than directly accessing anot
 
 | Category         | Technologies                     |
 | ---------------- | -------------------------------- |
-| Frontend         | Next.js, React, TypeScript       |
+| Frontend         | Next.js (App Router), React, TypeScript |
+| Styling          | Tailwind CSS                     |
+| Client data      | TanStack Query                   |
 | Backend          | NestJS, TypeScript               |
 | Monorepo         | Nx                               |
 | Database         | PostgreSQL                       |
@@ -640,9 +743,23 @@ git clone https://github.com/Alishaa-987/OpenSource-Copilot.git
 cd OpenSource-Copilot
 ```
 ## Install Dependencies
+
+Install the workspace dependencies from the repository root:
+
 ```
 npm install
 ```
+
+The frontend is a standalone Next.js project and is **not** part of the root
+npm workspace, so its dependencies are installed separately:
+
+```
+cd apps/web
+npm install
+cd ../..
+```
+
+Skipping this step is the usual cause of `Cannot find module next/dist/bin/next`.
 ## Configure Environment Variables
 
 Create your local environment file:
@@ -691,9 +808,34 @@ npx nx serve guidance-service
 ```
 npx nx serve knowledge-service
 ```
-Start the frontend:
+Start the frontend from its own folder:
+
 ```
-npx nx serve web
+cd apps/web
+npm run dev
+```
+
+Each service binds a fixed port:
+
+| Service            | Port |
+| ------------------ | ---- |
+| gateway            | 3000 |
+| repository-service | 3001 |
+| guidance-service   | 3002 |
+| knowledge-service  | 3003 |
+| web                | 3004 |
+
+The frontend proxies `/api/repository/*`, `/api/guidance/*` and
+`/api/knowledge/*` to the services above, so only port 3004 is opened in the
+browser.
+
+### Database schemas
+
+Each service owns its own schema and generates its own Prisma client:
+
+```
+npm run prisma:generate
+npm run prisma:guidance:generate
 ```
 ## Development
 
@@ -719,24 +861,31 @@ with PostgreSQL, Redis, and Kafka running locally.
 
 OpenSource Copilot is actively evolving.
 
+Already shipped:
+
+- Background repository synchronization
+- Contribution difficulty estimation
+- Persisted repository analysis
+- Resume parsing and skill-gap assessment
+- Contributor profile, progress tracking and badges
+- In-app notifications with database-enforced deduplication
+
 Planned improvements include:
 
+- Authenticated GitHub access for the monitor, to lift the 60 requests/hour
+  limit and make closure detection safe to enable
+- GitHub webhook integration, replacing polling
 - Repository architecture visualization
-- GitHub webhook integration
-- Background repository synchronization
-- Deeper code understanding
 - Branch-aware repository indexing
-- Advanced code-aware retrieval
-- Retrieval reranking
+- Advanced code-aware retrieval and retrieval reranking
 - Improved issue-to-code reasoning
 - Pull request intelligence
 - Personalized contributor recommendations
-- Contribution difficulty estimation
 - Interactive contributor onboarding
-- Advanced AI orchestration
 - Additional AI and embedding providers
 - Production observability and distributed tracing
-- Vision
+
+## Vision
 
 Open-source projects contain an enormous amount of knowledge, but that knowledge is often difficult for new contributors to discover.
 ```
