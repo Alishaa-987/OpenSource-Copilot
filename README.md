@@ -560,40 +560,67 @@ Services communicate through APIs and events rather than directly accessing anot
 
 
 ## Project Structure
+
 ```
 OpenSource-Copilot/
 │
 ├── apps/
-│   ├── web/
-│   │   └── Next.js frontend
-│   │
-│   ├── gateway/
-│   │   └── API gateway
-│   │
-│   ├── repository-service/
-│   │   └── GitHub & repository intelligence
-│   │
-│   ├── guidance-service/
-│   │   └── Contributor intelligence
-│   │
-│   └── knowledge-service/
-│       └── AI & RAG
+│   ├── web/                     Next.js 16 frontend (port 3004)
+│   ├── gateway/                 API gateway (port 3000)
+│   ├── gateway-e2e/             Gateway end-to-end tests
+│   ├── repository-service/      GitHub integration, repositories,
+│   │                            issues, notifications, profile
+│   ├── guidance-service/        Contributor intelligence, resume
+│   │                            parsing, recommendations
+│   └── knowledge-service/       RAG indexing, retrieval, LLM access
 │
 ├── libs/
-│   ├── contracts/
-│   ├── config/
-│   ├── observability/
-│   ├── shared/
-│   ├── database/
-│   ├── kafka/
-│   └── github/
+│   ├── contracts/               Shared DTOs and API contracts
+│   ├── config/                  Configuration loading and validation
+│   ├── database/                Prisma client for repository-service
+│   ├── guidance-database/       Prisma client for guidance-service
+│   ├── github/                  GitHub API client
+│   ├── kafka/                   Kafka producer/consumer helpers
+│   ├── observability/           Logging and tracing
+│   └── shared/                  Cross-cutting utilities and filters
 │
-├── docker-compose.yml
+├── docs/
+│   ├── ARCHITECTURE.md          Service boundaries and data flow
+│   ├── API.md                   Endpoint reference
+│   ├── DATABASE.md              Schemas and migrations
+│   ├── ENVIRONMENT.md           Environment variables
+│   ├── EVENTS.md                Kafka topics and payloads
+│   ├── BACKEND_PROGRESS.md      Implementation status
+│   ├── ENGINEERING_QUALITY_REVIEW.md
+│   └── FRONTEND_BACKEND_CONTRACT.md
+│
+├── tools/                       Maintenance scripts (see tools/README.md)
+│   ├── diagnose-issues.js
+│   ├── repair-issues.js
+│   └── restart-services.ps1
+│
+├── .gitattributes               Line-ending normalisation
+├── .gitignore
+├── .env.example
+├── docker-compose.yml           Postgres, Redis, Qdrant, Kafka
 ├── nx.json
 ├── package.json
-├── tsconfig.json
+├── tsconfig.base.json
 └── README.md
 ```
+
+**Conventions**
+
+- Every service is an Nx application under `apps/`; anything shared between
+  two or more of them is a library under `libs/`.
+- `apps/web` is a standalone Next.js project and is **not** part of the root
+  npm workspace, so its dependencies are installed from inside that folder:
+  `cd apps/web && npm install`.
+- Documentation lives in `docs/`. The repository root holds only the README
+  and configuration.
+- `tools/` holds scripts run by hand. Their output is diagnostic and is
+  ignored by git — nothing generated there should be committed.
+
 ## Getting Started
 
 ## Prerequisites
